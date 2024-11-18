@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{d3aa0462-0b90-4413-ba16-d9c8774c8de1}</ProjectGuid>
+    <RootNamespace>MapleWinapi</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Client</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>-D_HAS_STD_BYTE=0 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>DirectXTex.lib;fmodL_vc.lib;fmodstudioL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;C:\Users\socls\Desktop\Maple_Winapi\External\Library\Fmod\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>-D_HAS_STD_BYTE=0 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>DirectXTex.lib;fmodL_vc.lib;fmodstudioL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;C:\Users\socls\Desktop\Maple_Winapi\External\Library\Fmod\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>-D_HAS_STD_BYTE=0 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>DirectXTex.lib;fmodL_vc.lib;fmodstudioL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;C:\Users\socls\Desktop\Maple_Winapi\External\Library\Fmod\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>-D_HAS_STD_BYTE=0 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>DirectXTex.lib;fmodL_vc.lib;fmodstudioL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;C:\Users\socls\Desktop\Maple_Winapi\External\Library\Fmod\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="CLoadScene.h" />
+    <ClInclude Include="CMath.h" />
+    <ClInclude Include="Component\CAnimation.h" />
+    <ClInclude Include="Component\CAnimator.h" />
+    <ClInclude Include="Component\CAudioListener.h" />
+    <ClInclude Include="Component\CAudioSource.h" />
+    <ClInclude Include="Component\CBoxCollider2D.h" />
+    <ClInclude Include="Component\CCamera.h" />
+    <ClInclude Include="Component\CCameraScript.h" />
+    <ClInclude Include="Component\CCircleCollider2D.h" />
+    <ClInclude Include="Component\CCollider.h" />
+    <ClInclude Include="Component\CComponent.h" />
+    <ClInclude Include="Component\CGravity.h" />
+    <ClInclude Include="Component\CPixelCollider.h" />
+    <ClInclude Include="Component\CRenderer.h" />
+    <ClInclude Include="Component\CRigidBody.h" />
+    <ClInclude Include="Component\CScript.h" />
+    <ClInclude Include="Component\CSpriteRenderer.h" />
+    <ClInclude Include="Component\CTransform.h" />
+    <ClInclude Include="Core\CCore.h" />
+    <ClInclude Include="Define.h" />
+    <ClInclude Include="Entity\CEntity.h" />
+    <ClInclude Include="Enum.h" />
+    <ClInclude Include="Fmod\CFmod.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="Graphics\CConstantBuffer.h" />
+    <ClInclude Include="Graphics\CGraphics.h" />
+    <ClInclude Include="Graphics\CGraphicsDevice_DX11.h" />
+    <ClInclude Include="Graphics\CIndexBuffer.h" />
+    <ClInclude Include="Graphics\CInputLayout.h" />
+    <ClInclude Include="Graphics\CVertexBuffer.h" />
+    <ClInclude Include="Layer\CLayer.h" />
+    <ClInclude Include="Manager\CCollisionManager.h" />
+    <ClInclude Include="Manager\CDamageManager.h" />
+    <ClInclude Include="Manager\CKeyManager.h" />
+    <ClInclude Include="Manager\CPathManager.h" />
+    <ClInclude Include="Manager\CResourceManager.h" />
+    <ClInclude Include="Manager\CSceneManager.h" />
+    <ClInclude Include="Manager\CTimeManager.h" />
+    <ClInclude Include="Manager\CUIManager.h" />
+    <ClInclude Include="Maple_Winapi.h" />
+    <ClInclude Include="Module\SelectGDI.h" />
+    <ClInclude Include="Object\CBtnUI.h" />
+    <ClInclude Include="Object\CDamage.h" />
+    <ClInclude Include="Object\CGameObject.h" />
+    <ClInclude Include="Object\CGround.h" />
+    <ClInclude Include="Object\CItem.h" />
+    <ClInclude Include="Object\CMeso.h" />
+    <ClInclude Include="Object\CMonster.h" />
+    <ClInclude Include="Object\CMonsterScript.h" />
+    <ClInclude Include="Object\CObject.h" />
+    <ClInclude Include="Object\CPlayer.h" />
+    <ClInclude Include="Object\CPlayerScript.h" />
+    <ClInclude Include="Object\CPortal.h" />
+    <ClInclude Include="Object\CUI.h" />
+    <ClInclude Include="Object\CUIHUD.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Resource\CAudioClip.h" />
+    <ClInclude Include="Resource\CMaterial.h" />
+    <ClInclude Include="Resource\CMesh.h" />
+    <ClInclude Include="Resource\CResource.h" />
+    <ClInclude Include="Resource\CShader.h" />
+    <ClInclude Include="Resource\CTexture.h" />
+    <ClInclude Include="Scene\CDontDestroyOnLoad.h" />
+    <ClInclude Include="Scene\CLoadingScene.h" />
+    <ClInclude Include="Scene\CScene.h" />
+    <ClInclude Include="Scene\CScene_Stage01.h" />
+    <ClInclude Include="Scene\CScene_Stage02.h" />
+    <ClInclude Include="Scene\CScene_Start.h" />
+    <ClInclude Include="Struct.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CMath.cpp" />
+    <ClCompile Include="Component\CAnimation.cpp" />
+    <ClCompile Include="Component\CAnimator.cpp" />
+    <ClCompile Include="Component\CAudioListener.cpp" />
+    <ClCompile Include="Component\CAudioSource.cpp" />
+    <ClCompile Include="Component\CBoxCollider2D.cpp" />
+    <ClCompile Include="Component\CCamera.cpp" />
+    <ClCompile Include="Component\CCameraScript.cpp" />
+    <ClCompile Include="Component\CCircleCollider2D.cpp" />
+    <ClCompile Include="Component\CCollider.cpp" />
+    <ClCompile Include="Component\CComponent.cpp" />
+    <ClCompile Include="Component\CGravity.cpp" />
+    <ClCompile Include="Component\CPixelCollider.cpp" />
+    <ClCompile Include="Component\CRenderer.cpp" />
+    <ClCompile Include="Component\CRigidBody.cpp" />
+    <ClCompile Include="Component\CScript.cpp" />
+    <ClCompile Include="Component\CSpriteRenderer.cpp" />
+    <ClCompile Include="Component\CTransform.cpp" />
+    <ClCompile Include="Core\CCore.cpp" />
+    <ClCompile Include="Entity\CEntity.cpp" />
+    <ClCompile Include="Fmod\CFmod.cpp" />
+    <ClCompile Include="Graphics\CConstantBuffer.cpp" />
+    <ClCompile Include="Graphics\CGraphics.cpp" />
+    <ClCompile Include="Graphics\CGraphicsDevice_DX11.cpp" />
+    <ClCompile Include="Graphics\CIndexBuffer.cpp" />
+    <ClCompile Include="Graphics\CInputLayout.cpp" />
+    <ClCompile Include="Graphics\CVertexBuffer.cpp" />
+    <ClCompile Include="Layer\CLayer.cpp" />
+    <ClCompile Include="Manager\CCollisionManager.cpp" />
+    <ClCompile Include="Manager\CDamageManager.cpp" />
+    <ClCompile Include="Manager\CKeyManager.cpp" />
+    <ClCompile Include="Manager\CPathManager.cpp" />
+    <ClCompile Include="Manager\CResourceManager.cpp" />
+    <ClCompile Include="Manager\CSceneManager.cpp" />
+    <ClCompile Include="Manager\CTimeManager.cpp" />
+    <ClCompile Include="Manager\CUIManager.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Module\SelectGDI.cpp" />
+    <ClCompile Include="Object\CBtnUI.cpp" />
+    <ClCompile Include="Object\CDamage.cpp" />
+    <ClCompile Include="Object\CGameObject.cpp" />
+    <ClCompile Include="Object\CGround.cpp" />
+    <ClCompile Include="Object\CItem.cpp" />
+    <ClCompile Include="Object\CMeso.cpp" />
+    <ClCompile Include="Object\CMonster.cpp" />
+    <ClCompile Include="Object\CMonsterScript.cpp" />
+    <ClCompile Include="Object\CObject.cpp" />
+    <ClCompile Include="Object\CPlayer.cpp" />
+    <ClCompile Include="Object\CPlayerScript.cpp" />
+    <ClCompile Include="Object\CPortal.cpp" />
+    <ClCompile Include="Object\CUI.cpp" />
+    <ClCompile Include="Object\CUIHUD.cpp" />
+    <ClCompile Include="Resource\CAudioClip.cpp" />
+    <ClCompile Include="Resource\CMaterial.cpp" />
+    <ClCompile Include="Resource\CMesh.cpp" />
+    <ClCompile Include="Resource\CResource.cpp" />
+    <ClCompile Include="Resource\CShader.cpp" />
+    <ClCompile Include="Resource\CTexture.cpp" />
+    <ClCompile Include="Scene\CDontDestroyOnLoad.cpp" />
+    <ClCompile Include="Scene\CLoadingScene.cpp" />
+    <ClCompile Include="Scene\CScene.cpp" />
+    <ClCompile Include="Scene\CScene_Stage01.cpp" />
+    <ClCompile Include="Scene\CScene_Stage02.cpp" />
+    <ClCompile Include="Scene\CScene_Start.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Maple_Winapi.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Maple_Winapi.ico" />
+    <Image Include="small.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

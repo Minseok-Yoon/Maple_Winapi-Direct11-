@@ -1,0 +1,113 @@
+#include "CSceneManager.h"
+#include "../Scene/CDontDestroyOnLoad.h"
+
+CScene* CSceneManager::m_pCurScene = nullptr;
+CScene* CSceneManager::m_pDontDestroyOnLoad = nullptr;
+map<wstring, CScene*> CSceneManager::m_mapScene = {};
+
+CSceneManager::CSceneManager()
+{
+}
+
+CSceneManager::~CSceneManager()
+{
+}
+
+void CSceneManager::Init()
+{
+	m_pDontDestroyOnLoad = CreateScene<CDontDestroyOnLoad>(L"DontDestroyOnLoad");
+}
+
+void CSceneManager::Update()
+{
+	m_pCurScene->Update();
+	m_pDontDestroyOnLoad->Update();
+}
+
+void CSceneManager::LateUpdate()
+{
+	m_pCurScene->LateUpdate();
+	m_pDontDestroyOnLoad->LateUpdate();
+}
+
+void CSceneManager::Render()
+{
+	m_pCurScene->Render();
+	m_pDontDestroyOnLoad->Render();
+}
+
+void CSceneManager::Destroy()
+{
+	m_pCurScene->Destroy();
+	m_pDontDestroyOnLoad->Destroy();
+}
+
+void CSceneManager::Release()
+{
+	for (auto& iter : m_mapScene)
+	{
+		delete iter.second;
+		iter.second = nullptr;
+	}
+}
+
+bool CSceneManager::SetCurScene(const wstring& _strName)
+{
+	map<wstring, CScene*>::iterator iter = m_mapScene.find(_strName);
+
+	if (iter == m_mapScene.end())
+		return false;
+
+	m_pCurScene = iter->second;
+	return true;
+}
+
+const wchar_t* CSceneManager::GetCurrentSceneName()
+{
+	return m_pCurScene ? m_pCurScene->GetName().c_str() : L"No Current Scene";
+}
+
+CScene* CSceneManager::LoadScene(const wstring& _strName)
+{
+	if (m_pCurScene)
+		m_pCurScene->Exit();
+
+	if (!SetCurScene(_strName))
+		return nullptr;
+
+	m_pCurScene->Enter();
+
+	return m_pCurScene;
+}
+
+CScene* CSceneManager::LoadScene(const wstring& _strName, const wstring& _strBackGroundName, const wstring& _strAudioName)
+{
+	if (!SetCurScene(_strName))
+		return nullptr;
+
+	m_pCurScene->Enter(_strBackGroundName, _strAudioName);
+
+	return m_pCurScene;
+}
+
+CScene* CSceneManager::ChangeScene(const wstring& _strName,
+	const wstring& _strBackGroundName, const wstring& _strAudioName)
+{
+	if (m_pCurScene)
+		m_pCurScene->Exit();
+
+	LoadScene(_strName, _strBackGroundName, _strAudioName);
+
+	return m_pCurScene;
+}
+
+vector<CGameObject*> CSceneManager::GetGameObjects(LAYER_TYPE _eLayerType)
+{
+	vector<CGameObject*> gameObjects = m_pCurScene->GetLayer(_eLayerType)->GetGameObjects();
+	vector<CGameObject*> dontDestroyOnLoad = m_pDontDestroyOnLoad->GetLayer(_eLayerType)->GetGameObjects();
+
+	gameObjects.insert(gameObjects.end(),
+		dontDestroyOnLoad.begin(), dontDestroyOnLoad.end());
+
+	return gameObjects;
+}
