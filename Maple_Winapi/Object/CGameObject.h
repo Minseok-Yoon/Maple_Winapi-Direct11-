@@ -11,7 +11,7 @@ public:
 	friend void Destroy(CGameObject* _pObj);
 
 	CGameObject();
-	~CGameObject();
+	virtual ~CGameObject();
 
 	virtual void Init();
 	virtual void Update();
@@ -24,7 +24,7 @@ public:
 		T* comp = new T();
 		comp->Init();
 		comp->SetOwner(this);
-		m_vecComponents[(UINT)comp->GetComponentType()] = comp;
+		m_vecComponents[static_cast<UINT>(comp->GetComponentType())] = comp;
 
 		return comp;
 	}

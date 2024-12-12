@@ -9,7 +9,7 @@ class CSpriteRenderer : public CComponent
 {
 public:
 	CSpriteRenderer();
-	~CSpriteRenderer();
+	virtual ~CSpriteRenderer();
 
 	void Init() override;
 	void Update() override;
@@ -17,6 +17,8 @@ public:
 	void Render() override;
 
 	void SetTexture(CTexture* _pTexture) { m_pTexture = _pTexture; }
+	CTexture* GetTexture() { return m_pTexture; }
+
 	void SetMaterial(CMaterial* _pMaterial) { m_pMaterial = _pMaterial; }
 	
 

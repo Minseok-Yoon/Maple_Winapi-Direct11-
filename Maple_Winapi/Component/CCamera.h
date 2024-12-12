@@ -18,17 +18,20 @@ public:
 		PT_Orthographic
 	};
 
-	static void SetGpuViewMatrix(math::Matrix matrix) { ViewMatrix = matrix; }
-	static math::Matrix GetGpuViewMatrix() { return ViewMatrix; }
+	static void SetGpuViewMatrix(const Matrix& matrix) { ViewMatrix = matrix; }
+	static Matrix GetGpuViewMatrix() { return ViewMatrix; }
 
-	static void SetGpuProjectionMatrix(math::Matrix matrix) { ProjectionMatrix = matrix; }
-	static math::Matrix GetGpuProjectionMatrix() { return ProjectionMatrix; }
+	static void SetGpuProjectionMatrix(const Matrix& matrix) { ProjectionMatrix = matrix; }
+	static Matrix GetGpuProjectionMatrix() { return ProjectionMatrix; }
 
-	void SetProjectionType(PROJECTION_TYPE _eProjectionType) { m_eProjectionType = _eProjectionType; }
-	void SetSize(float _fSize) { m_fSize = _fSize; }
+	Matrix GetViewMatrix() { return m_ViewMatrix; }
+	Matrix GetProjectionMatrix() { return m_ProjectionMatrix; }
+
+	void SetProjectionType(const PROJECTION_TYPE _eProjectionType) { m_eProjectionType = _eProjectionType; }
+	void SetSize(const float _fSize) { m_fSize = _fSize; }
 
 	CCamera();
-	~CCamera();
+	virtual ~CCamera();
 
 	void Init() override;
 	void Update() override;
@@ -42,12 +45,12 @@ public:
 	void CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType);
 
 private:
-	static math::Matrix ViewMatrix;
-	static math::Matrix	ProjectionMatrix;
+	static Matrix	ViewMatrix;
+	static Matrix	ProjectionMatrix;
 
 	PROJECTION_TYPE m_eProjectionType;
-	math::Matrix	m_ViewMatrix;
-	math::Matrix	m_ProjectionMatrix;
+	Matrix			m_ViewMatrix;
+	Matrix			m_ProjectionMatrix;
 	float			m_fAspectRatio;
 	float			m_fNear;
 	float			m_fFar;

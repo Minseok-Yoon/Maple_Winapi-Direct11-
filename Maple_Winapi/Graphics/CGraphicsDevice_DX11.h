@@ -18,6 +18,8 @@ public:
 
 	// swap chain
 	bool CreateSwapchain(DXGI_SWAP_CHAIN_DESC desc);	// 화면 교환 체인 생성(더블 버퍼링을 위한 스왑 체인)
+	void ReportLiveResources();
+	void ConfigureInfoQueue();
 	bool GetBuffer(UINT Buffer, REFIID riid, void** ppSurface);	// 스왑 체인의 백 버퍼 가져오기
 	bool CreateRenderTargetView(ID3D11Resource* pResource, const D3D11_RENDER_TARGET_VIEW_DESC* pDesc, ID3D11RenderTargetView** ppRTView);	// 렌더 타겟 뷰 생성
 	bool CreateDepthStencilView(ID3D11Resource* pResource, const D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc, ID3D11DepthStencilView** ppDepthStencilView);	// 깊이/스텐실 뷰 생성

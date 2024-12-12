@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Imgui">
+      <UniqueIdentifier>{7a224f39-c6a3-4916-a2b8-a017f18a356a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Imgui\impl">
+      <UniqueIdentifier>{951dd9b6-de64-4956-b51c-b8fbf5d1643d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGuizmo">
+      <UniqueIdentifier>{8a9923cd-7231-4c51-ba14-6efd87dbbf8e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)imgui_impl_dx11.cpp">
+      <Filter>Imgui\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)imgui_impl_win32.cpp">
+      <Filter>Imgui\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)imgui.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ImGuizmo-master\ImSequencer.cpp">
+      <Filter>ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ImGuizmo-master\ImGuizmo.cpp">
+      <Filter>ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ImGuizmo-master\GraphEditor.cpp">
+      <Filter>ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ImGuizmo-master\ImCurveEdit.cpp">
+      <Filter>ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\ImGuizmo-master\ImGradient.cpp">
+      <Filter>ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)imgui_draw.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)imgui_demo.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)imgui_tables.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)imgui_widgets.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)imgui_impl_dx11.h">
+      <Filter>Imgui\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)imgui_impl_win32.h">
+      <Filter>Imgui\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)imconfig.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)imgui.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\ImGuizmo-master\ImZoomSlider.h">
+      <Filter>ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\ImGuizmo-master\ImSequencer.h">
+      <Filter>ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\ImGuizmo-master\ImGuizmo.h">
+      <Filter>ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\ImGuizmo-master\GraphEditor.h">
+      <Filter>ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\ImGuizmo-master\ImCurveEdit.h">
+      <Filter>ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)imgui_internal.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)imstb_rectpack.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)imstb_textedit.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)imstb_truetype.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

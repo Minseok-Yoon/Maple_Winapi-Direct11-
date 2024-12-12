@@ -138,7 +138,7 @@ void CDamageManager::Update()
     }
 }
 
-void CDamageManager::Render(HDC _dc)
+void CDamageManager::Render()
 {
     for (auto pDamage : m_vDamageInit) {
         if (pDamage->bEnable) {
@@ -151,7 +151,7 @@ void CDamageManager::Render(HDC _dc)
             OutputDebugStringA(buffer);
 
             // ·»´õ¸µ È£Ãâ
-            pDamage->Render(_dc);
+            pDamage->Render();
         }
     }
 }

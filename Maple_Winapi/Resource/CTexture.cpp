@@ -79,6 +79,12 @@ HRESULT CTexture::Load(const wstring& _strPath)
 		OutputDebugStringW(ss.str().c_str());
 		return S_FALSE;
 	}
+	else
+	{
+		std::wstringstream ss;
+		ss << L"File exist: " << _strPath << "\n";
+		OutputDebugStringW(ss.str().c_str());
+	}
 
 	wstring ext
 		= _strPath.substr(_strPath.find_last_of(L".") + 1);
@@ -95,8 +101,17 @@ HRESULT CTexture::Load(const wstring& _strPath)
 	}
 	else // WIC (png, jpg, jpeg, bmp)
 	{
-		if (FAILED(LoadFromWICFile(_strPath.c_str(), WIC_FLAGS::WIC_FLAGS_NONE, nullptr, m_Image)))
-			return S_FALSE;
+		HRESULT hr = LoadFromWICFile(_strPath.c_str(), WIC_FLAGS::WIC_FLAGS_NONE, nullptr, m_Image);
+		if(FAILED(hr))
+		{
+			std::wstringstream ss;
+			ss << L"Failed to load WIC file: " << _strPath << L", HRESULT: " << std::hex << hr << L"\n";
+			OutputDebugStringW(ss.str().c_str());
+			return hr; // 실패 시 반환
+		}
+
+		/*if (FAILED(LoadFromWICFile(_strPath.c_str(), WIC_FLAGS::WIC_FLAGS_NONE, nullptr, m_Image)))
+			return S_FALSE;*/
 	}
 
 	HRESULT hr = CreateShaderResourceView
@@ -111,7 +126,12 @@ HRESULT CTexture::Load(const wstring& _strPath)
 	if (hr == S_FALSE)
 		assert(false/*"Texture load Failed!*/);
 
-	m_SRV->GetResource((ID3D11Resource**)m_Texture.GetAddressOf());
+	m_SRV->GetResource(reinterpret_cast<ID3D11Resource**>(m_Texture.GetAddressOf()));
+
+	// 메타데이터를 사용하여 텍스처 크기 저장
+	TexMetadata metadata = m_Image.GetMetadata();
+	m_tTextureSize.width = static_cast<UINT>(metadata.width);
+	m_tTextureSize.height = static_cast<UINT>(metadata.height);
 
 	// 클라이언트의 크기
 	return S_OK;

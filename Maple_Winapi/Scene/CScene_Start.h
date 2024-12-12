@@ -7,8 +7,9 @@ public:
     CScene_Start();
     virtual ~CScene_Start();
 
-    virtual void Enter(const wstring& _strBackGroundName, const wstring& _strAudioName);
-    virtual void Exit();
+    virtual void Enter(const wstring& _strBackGroundName, const wstring& _strAudioName) override;
+    virtual void Enter()override;
+    virtual void Exit() override;
 
     virtual void Init();
     virtual void Update();

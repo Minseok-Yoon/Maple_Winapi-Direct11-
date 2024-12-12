@@ -11,7 +11,7 @@ public:
 		Vector2		vSize;		// 프레임의 크기
 		Vector2		vOffSet;	// 프레임의 오프셋(프레임의 상대적인 위치를 조정)
 		float		fDuration;	// 프레임의 지속시간(해당 프레임이 얼마 동안 화면에 표시되는지 결정)
-		CTexture* pTexture;
+		CTexture*	pTexture;
 
 		tAnimFrm() :
 			vLeftTop(Vector2::Zero),

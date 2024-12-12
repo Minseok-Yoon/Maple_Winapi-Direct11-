@@ -37,7 +37,7 @@ void CGravity::Update()
     else
     {
         // 공증에 있을 때
-        m_vVelocity += m_vGravity * fDeltaTime;
+        m_vVelocity += m_vGravity * CTimeManager::GetfDeltaTime();
     }
 
     // 최대 속도 제한

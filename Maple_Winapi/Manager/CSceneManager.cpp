@@ -5,14 +5,6 @@ CScene* CSceneManager::m_pCurScene = nullptr;
 CScene* CSceneManager::m_pDontDestroyOnLoad = nullptr;
 map<wstring, CScene*> CSceneManager::m_mapScene = {};
 
-CSceneManager::CSceneManager()
-{
-}
-
-CSceneManager::~CSceneManager()
-{
-}
-
 void CSceneManager::Init()
 {
 	m_pDontDestroyOnLoad = CreateScene<CDontDestroyOnLoad>(L"DontDestroyOnLoad");
@@ -53,7 +45,7 @@ void CSceneManager::Release()
 
 bool CSceneManager::SetCurScene(const wstring& _strName)
 {
-	map<wstring, CScene*>::iterator iter = m_mapScene.find(_strName);
+	auto iter = m_mapScene.find(_strName);
 
 	if (iter == m_mapScene.end())
 		return false;
@@ -77,11 +69,20 @@ CScene* CSceneManager::LoadScene(const wstring& _strName)
 
 	m_pCurScene->Enter();
 
+	const wchar_t* currentSceneName = CSceneManager::GetCurrentSceneName();
+
+	std::wstringstream ss;
+	ss << L"CurScene: " << currentSceneName << "\n";
+	OutputDebugStringW(ss.str().c_str());
+
 	return m_pCurScene;
 }
 
 CScene* CSceneManager::LoadScene(const wstring& _strName, const wstring& _strBackGroundName, const wstring& _strAudioName)
 {
+	if (m_pCurScene)
+		m_pCurScene->Exit();
+
 	if (!SetCurScene(_strName))
 		return nullptr;
 

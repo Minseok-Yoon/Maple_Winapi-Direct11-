@@ -4,14 +4,14 @@
 #include "../Core/CCore.h"
 
 extern CCore core;
-math::Matrix CCamera::ViewMatrix = math::Matrix::Identity;
-math::Matrix CCamera::ProjectionMatrix = math::Matrix::Identity;
+Matrix CCamera::ViewMatrix = Matrix::Identity;
+Matrix CCamera::ProjectionMatrix =Matrix::Identity;
 
 CCamera::CCamera() :
 	CComponent(COMPONENT_TYPE::CT_Camera),
 	m_eProjectionType(PROJECTION_TYPE::PT_Perspective),
-	m_ViewMatrix(math::Matrix::Identity),
-	m_ProjectionMatrix(math::Matrix::Identity),
+	m_ViewMatrix(Matrix::Identity),
+	m_ProjectionMatrix(Matrix::Identity),
 	m_fAspectRatio(0.0f),
 	m_fNear(1.0f),
 	m_fFar(1000.0f),
@@ -34,6 +34,7 @@ void CCamera::Init()
 
 void CCamera::Update()
 {
+#pragma region
 	//CScene* pCurScene = CSceneManager::GetInst()->GetCurScene();
 	//Vector2 vMapSize = pCurScene->GetMapSize();
 
@@ -73,6 +74,7 @@ void CCamera::Update()
 	//	m_vLookPosition.y = 0;
 	//else if (m_vLookPosition.y > vMapSize.y - vResolution.y)
 	//	m_vLookPosition.y = (vMapSize.y - vResolution.y) - 10.f;
+#pragma endregion
 }
 
 void CCamera::LateUpdate()
@@ -86,6 +88,7 @@ void CCamera::LateUpdate()
 
 void CCamera::Render()
 {
+#pragma region 카메라 랜더
 	//if (m_listCamEffect.empty())
 	//	return;
 
@@ -134,6 +137,7 @@ void CCamera::Render()
 	//	// 효과 종료
 	//	m_listCamEffect.pop_front();
 	//}
+#pragma endregion
 }
 
 void CCamera::FadeIn(float _fDuration)
@@ -170,25 +174,25 @@ void CCamera::CreateViewMatrix()
 	const Vector3 up = tr->Up();
 	const Vector3 forward = tr->Forward();
 
-	m_ViewMatrix = math::Matrix::CreateLookToLH(pos, forward, up);
+	m_ViewMatrix = Matrix::CreateLookToLH(pos, forward, up);
 }
 
 void CCamera::CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType)
 {
-	RECT winRect;
+	RECT winRect = {};
 	GetClientRect(core.GetMainHWnd(), &winRect);
-	float width = (winRect.right - winRect.left);
-	float height = (winRect.bottom - winRect.top);
+	const float width = static_cast<float>(winRect.right - winRect.left);
+	const float height = static_cast<float>(winRect.bottom - winRect.top);
 	m_fAspectRatio = width / height;
 
 	switch (_eProjectionType)
 	{
 	case PROJECTION_TYPE::PT_Perspective:
-		m_ProjectionMatrix = math::Matrix::CreatePerspectiveFieldOfViewLH(XM_2PI / 6.0f, m_fAspectRatio, m_fNear, m_fFar);
+		m_ProjectionMatrix = Matrix::CreatePerspectiveFieldOfViewLH(XM_2PI / 6.0f, m_fAspectRatio, m_fNear, m_fFar);
 		break;
 
 	case PROJECTION_TYPE::PT_Orthographic:
-		m_ProjectionMatrix = math::Matrix::CreateOrthographicLH(width / m_fSize, height / m_fSize, m_fNear, m_fFar);
+		m_ProjectionMatrix = Matrix::CreateOrthographicLH(width / m_fSize, height / m_fSize, m_fNear, m_fFar);
 		break;
 	}
 }

@@ -57,7 +57,7 @@ void CBtnUI::OnLateUpdate()
 {
 }
 
-void CBtnUI::OnRender(HDC _Hdc)
+void CBtnUI::OnRender()
 {
 	/*if (m_pTexture == nullptr)
 		assert(false);

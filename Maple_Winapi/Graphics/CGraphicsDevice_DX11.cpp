@@ -7,10 +7,11 @@
 #include "../Resource/CMaterial.h"
 #include "../Manager/CResourceManager.h"
 
+extern CCore core;
+
 CGraphicDevice_DX11::CGraphicDevice_DX11()
 {
 	GetDevice() = this;
-	//GetDeviceContext() = this;
 
 	if (!(CreateDevice()))
 		assert(NULL && "Create Device Failed!");
@@ -28,6 +29,8 @@ bool CGraphicDevice_DX11::CreateDevice()
 	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
+	OutputDebugString(L"[INFO] Creating Direct3D Device...\n");
+
 	// D3D11CreateDevice 함수를 호출하여 Direct3D 장치를 생성
 	// 첫 번째 매개변수(0): 어댑터를 자동 선택(기본 그래픽 카드 사용)
 	// 두 번째 매개변수(D3D_DRIVER_TYPE_HARDWARE): 하드웨어 드라이버 타입을 지정하여 GPU를 사용
@@ -39,12 +42,19 @@ bool CGraphicDevice_DX11::CreateDevice()
 	// 여덟 번째 매개변수(mDevice.GetAddressOf()): 생성된 장치 포인터를 mDevice에 반환
 	// 아홉 번째 매개변수(0): 생성된 기능 수준을 받을 포인터 (NULL 처리)
 	// 열 번째 매개변수(mContext.GetAddressOf()): 장치 컨텍스트 포인터를 mContext에 반환
-	if (FAILED(D3D11CreateDevice(0, D3D_DRIVER_TYPE_HARDWARE,
-		0, creationFlags,
+	if (FAILED(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE,
+		nullptr, creationFlags,
 		featureLevels, ARRAYSIZE(featureLevels),
 		D3D11_SDK_VERSION, mDevice.GetAddressOf(),
-		0, mContext.GetAddressOf())))
+		nullptr, mContext.GetAddressOf())))
+	{
+		OutputDebugString(L"[ERROR] Failed to create Direct3D Device.\n");
 		return false;
+	}
+
+	OutputDebugString(L"[SUCCESS] Direct3D Device created successfully.\n");
+
+	ConfigureInfoQueue();
 
 	return true;
 }
@@ -54,6 +64,7 @@ bool CGraphicDevice_DX11::CreateSwapchain(DXGI_SWAP_CHAIN_DESC desc)
 	Microsoft::WRL::ComPtr<IDXGIDevice>     pDXGIDevice = nullptr;
 	Microsoft::WRL::ComPtr<IDXGIAdapter>    pAdapter = nullptr;
 	Microsoft::WRL::ComPtr<IDXGIFactory>    pFactory = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Debug>		debugDevice;
 
 	if (FAILED(mDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)pDXGIDevice.GetAddressOf())))
 		return false;
@@ -67,7 +78,57 @@ bool CGraphicDevice_DX11::CreateSwapchain(DXGI_SWAP_CHAIN_DESC desc)
 	if (FAILED(pFactory->CreateSwapChain(mDevice.Get(), &desc, mSwapChain.GetAddressOf())))
 		return false;
 
+	ReportLiveResources();
+
+	OutputDebugString(L"[SUCCESS] Swapchain created successfully.\n");
 	return true;
+}
+
+void CGraphicDevice_DX11::ReportLiveResources()
+{
+	// 사용 중인 객체 출력
+	Microsoft::WRL::ComPtr<ID3D11Debug> debugDevice;
+	if (SUCCEEDED(mDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(debugDevice.GetAddressOf()))))
+	{
+		// 모든 라이브 객체들에 대한 상세 리포트를 출력합니다.
+		debugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+	}
+}
+
+void CGraphicDevice_DX11::ConfigureInfoQueue()
+{
+	Microsoft::WRL::ComPtr<ID3D11InfoQueue> infoQueue;
+	if (SUCCEEDED(mDevice->QueryInterface(__uuidof(ID3D11InfoQueue), reinterpret_cast<void**>(infoQueue.GetAddressOf()))))
+	{
+		OutputDebugString(L"[INFO] Configuring Direct3D InfoQueue...\n");
+
+		// 심각한 오류와 경고 발생 시 중단
+		infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
+		infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
+
+		// WARNING 수준 메시지 필터링 (경고도 포함)
+		D3D11_MESSAGE_SEVERITY severities[] = {
+			D3D11_MESSAGE_SEVERITY_INFO,
+			D3D11_MESSAGE_SEVERITY_WARNING
+		};
+
+		D3D11_INFO_QUEUE_FILTER filter = {};
+		filter.DenyList.NumSeverities = _countof(severities);
+		filter.DenyList.pSeverityList = severities;
+
+		if (FAILED(infoQueue->AddStorageFilterEntries(&filter)))
+		{
+			OutputDebugString(L"[ERROR] Failed to add filter to InfoQueue.\n");
+		}
+		else
+		{
+			OutputDebugString(L"[SUCCESS] InfoQueue configured successfully.\n");
+		}
+	}
+	else
+	{
+		OutputDebugString(L"[WARNING] ID3D11InfoQueue not available. Debug filtering skipped.\n");
+	}
 }
 
 bool CGraphicDevice_DX11::GetBuffer(UINT Buffer, REFIID riid, void** ppSurface)
@@ -78,7 +139,8 @@ bool CGraphicDevice_DX11::GetBuffer(UINT Buffer, REFIID riid, void** ppSurface)
 	return true;
 }
 
-bool CGraphicDevice_DX11::CreateRenderTargetView(ID3D11Resource* pResource, const D3D11_RENDER_TARGET_VIEW_DESC* pDesc, ID3D11RenderTargetView** ppRTView)
+bool CGraphicDevice_DX11::CreateRenderTargetView(ID3D11Resource* pResource, 
+	const D3D11_RENDER_TARGET_VIEW_DESC* pDesc, ID3D11RenderTargetView** ppRTView)
 {
 	if (FAILED(mDevice->CreateRenderTargetView(pResource, pDesc, ppRTView)))
 		return false;
@@ -120,6 +182,12 @@ bool CGraphicDevice_DX11::CreateVertexShader(const std::wstring& fileName, ID3DB
 	// 컴파일 에러 메시지 출력을 위한 Blob 생성
 	ID3DBlob* errorBlob = nullptr;
 	const std::wstring shaderFilePath = L"..\\Shader\\";
+	const std::wstring fullPath = shaderFilePath + fileName + L"VS.hlsl";
+
+	// 경로 디버그 출력
+	OutputDebugStringW(L"Shader file path: ");
+	OutputDebugStringW(fullPath.c_str());
+	OutputDebugStringW(L"\n");
 	// 지정된 파일 이름과 기본 경로를 결합하여 HLSL 셰이더 파일을 컴파일
 	D3DCompileFromFile((shaderFilePath + fileName + L"VS.hlsl").c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE
 		, "main", "vs_5_0", shaderFlags, 0, ppCode, &errorBlob);
@@ -150,6 +218,13 @@ bool CGraphicDevice_DX11::CreatePixelShader(const std::wstring& fileName, ID3DBl
 	// 컴파일 에러 메시지 출력을 위한 Blob 생성.
 	ID3DBlob* errorBlob = nullptr;
 	const std::wstring shaderFilePath = L"..\\Shader\\";
+	const std::wstring fullPath = shaderFilePath + fileName + L"PS.hlsl";
+
+	// 경로 디버그 출력
+	OutputDebugStringW(L"Shader file path: ");
+	OutputDebugStringW(fullPath.c_str());
+	OutputDebugStringW(L"\n");
+
 	// 지정된 파일 이름과 기본 경로를 결합하여 HLSL 셰이더 파일을 컴파일.
 	D3DCompileFromFile((shaderFilePath + fileName + L"PS.hlsl").c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE
 		, "main", "ps_5_0", shaderFlags, 0, ppCode, &errorBlob);
@@ -259,12 +334,12 @@ void CGraphicDevice_DX11::BindPrimitiveTopology(const D3D11_PRIMITIVE_TOPOLOGY t
 
 void CGraphicDevice_DX11::BindVS(ID3D11VertexShader* pVertexShader)
 {
-	mContext->VSSetShader(pVertexShader, 0, 0);
+	mContext->VSSetShader(pVertexShader, nullptr, 0);
 }
 
 void CGraphicDevice_DX11::BindPS(ID3D11PixelShader* pPixelShader)
 {
-	mContext->PSSetShader(pPixelShader, 0, 0);
+	mContext->PSSetShader(pPixelShader, nullptr, 0);
 }
 
 void CGraphicDevice_DX11::BindVertexBuffer(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppVertexBuffers, const UINT* pStrides, const UINT* pOffsets)
@@ -355,12 +430,13 @@ void CGraphicDevice_DX11::BindDepthStencilState(ID3D11DepthStencilState* pDepthS
 
 void CGraphicDevice_DX11::BindViewPort()
 {
-	D3D11_VIEWPORT viewPort =
-	{
-		0, 0,
-		(float)CCore::GetInst()->GetResolution().x, (float)CCore::GetInst()->GetResolution().y,
-		0.0f, 1.0f
-	};
+	D3D11_VIEWPORT viewPort = {};
+	viewPort.Width = static_cast<float>(core.GetWidth());
+	viewPort.Height = static_cast<float>(core.GetHeight());
+	viewPort.TopLeftX = 0.0f;
+	viewPort.TopLeftY = 0.0f;
+	viewPort.MinDepth = 0.0f;
+	viewPort.MaxDepth = 1.0f;
 
 	mContext->RSSetViewports(1, &viewPort);
 }
@@ -379,7 +455,7 @@ void CGraphicDevice_DX11::BindDefaultRenderTarget()
 
 void CGraphicDevice_DX11::ClearRenderTargetView()
 {
-	FLOAT backgroundColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	FLOAT backgroundColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	mContext->ClearRenderTargetView(mRenderTargetView.Get(), backgroundColor);
 }
 
@@ -393,15 +469,16 @@ void CGraphicDevice_DX11::Initialize()
 #pragma region swapchain desc
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 
-	swapChainDesc.OutputWindow = CCore::GetInst()->GetMainHWnd();
+	swapChainDesc.OutputWindow = core.GetMainHWnd();
 	swapChainDesc.Windowed = true;
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.BufferDesc.Width = CCore::GetInst()->GetResolution().x;
-	swapChainDesc.BufferDesc.Height = CCore::GetInst()->GetResolution().y;
+	swapChainDesc.BufferDesc.Width = core.GetWidth();
+	swapChainDesc.BufferDesc.Height = core.GetHeight();
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.BufferDesc.RefreshRate.Numerator = 144;
 	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
@@ -425,7 +502,7 @@ void CGraphicDevice_DX11::Initialize()
 	if (!(CreateSwapchain(swapChainDesc)))
 		assert(NULL && "Create Swapchain Failed!");
 
-	if (!(GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)mRenderTarget.GetAddressOf())))
+	if (!(GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(mRenderTarget.GetAddressOf()))))
 		assert(NULL && "Couldn't bring rendertarget!");
 
 	if (!(CreateRenderTargetView(mRenderTarget.Get(), nullptr, mRenderTargetView.GetAddressOf())))
@@ -443,8 +520,8 @@ void CGraphicDevice_DX11::CreateDepthStencilView()
 	depthStencilDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_DEPTH_STENCIL;	// DepthStencil 뷰로 바인딩 설정
 	depthStencilDesc.Format = DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT;	// 24비트 깊이와 8비트 스텐실을 위한 포맷
 	depthStencilDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;				// 텍스처 사용 방식
-	depthStencilDesc.Width = CCore::GetInst()->GetResolution().x;			// 텍스처 너비 설정
-	depthStencilDesc.Height = CCore::GetInst()->GetResolution().y;			// 텍스처 높이 설정
+	depthStencilDesc.Width = core.GetWidth();			// 텍스처 너비 설정
+	depthStencilDesc.Height = core.GetHeight();			// 텍스처 높이 설정
 	depthStencilDesc.ArraySize = 1;											// 텍스처 배열의 크기(1로 단일 텍스처)
 	depthStencilDesc.SampleDesc.Count = 1;									// 멀티샘플링 설정(1로 단일 샘플)
 	depthStencilDesc.SampleDesc.Quality = 0;								// 샘플 퀄리티 설정

@@ -3,6 +3,7 @@
 #include "../Manager/CTimeManager.h"
 #include "../Component/CTransform.h"
 
+
 void Destroy(CGameObject* _pGameObject)
 {
 	if (_pGameObject != nullptr)
@@ -25,8 +26,7 @@ CGameObject::~CGameObject()
 		if (comp == nullptr)
 			continue;
 
-		delete comp;
-		comp = nullptr;
+		SAFE_DELETE(comp);
 	}
 }
 

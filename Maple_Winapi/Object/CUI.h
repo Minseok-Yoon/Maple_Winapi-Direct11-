@@ -26,7 +26,7 @@ public:
     void Init();
     void Update();
     void LateUpdate();
-    void Render(HDC _Hdc);
+    void Render();
     void Active();
     void InActive();
     void UIClear();
@@ -36,7 +36,7 @@ public:
     virtual void OnInActive();
     virtual void OnUpdate();
     virtual void OnLateUpdate();
-    virtual void OnRender(HDC _Hdc);
+    virtual void OnRender();
     virtual void OnClear();
 
     void SetUIType(UI_TYPE _eUIType) { m_eUIType = _eUIType; }

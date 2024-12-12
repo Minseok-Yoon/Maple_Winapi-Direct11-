@@ -6,14 +6,6 @@
 
 map<wstring, CResource*> CResourceManager::m_mapResources = {};
 
-CResourceManager::CResourceManager()
-{
-}
-
-CResourceManager::~CResourceManager()
-{
-}
-
 void CResourceManager::Insert(const wstring& _strKey, CResource* _pResource)
 {
     if (_strKey == L"")

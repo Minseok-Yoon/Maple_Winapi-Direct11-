@@ -27,7 +27,7 @@ void CAnimation::Update()
 	if (m_bFinish)
 		return;
 
-	m_fAccTime += fDeltaTime;
+	m_fAccTime += CTimeManager::GetfDeltaTime();
 
 	if (m_fAccTime >= m_vecAnimationFrm[m_iCurFrm].fDuration)
 	{

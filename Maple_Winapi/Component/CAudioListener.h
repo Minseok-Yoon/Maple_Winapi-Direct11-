@@ -5,7 +5,7 @@ class CAudioListener : public CComponent
 {
 public:
 	CAudioListener();
-	~CAudioListener();
+	virtual ~CAudioListener();
 
 	void Init() override;
 	void Update() override;

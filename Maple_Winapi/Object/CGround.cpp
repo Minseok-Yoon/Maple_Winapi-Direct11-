@@ -7,6 +7,7 @@
 #include "../Resource/CTexture.h"
 #include "../Core/CCore.h"
 #include "../Component/CPixelCollider.h"
+#include "../Component/CSpriteRenderer.h"
 
 CBackGround::CBackGround()
 {

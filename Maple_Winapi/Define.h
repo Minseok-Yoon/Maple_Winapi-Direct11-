@@ -11,10 +11,9 @@
 							type();\
 							~type();
 
-#define SAFE_RELEASE(p)		if(p) { p->Release(); p = NULL; }
-
-#define fDeltaTime CTimeManager::GetInst()->GetfDeltaTime()
-#define DeltaTime CTimeManager::GetInst()->GetDeltaTime()
+#define SAFE_DELETE(p) if (p) { delete p; p = nullptr; }
+#define SAFE_DELETE_ARRAY(p) if (p) { delete[] p; p = nullptr; }
+#define SAFE_RELEASE(p) if (p) { p->Release(); p = nullptr; }
 
 // 암시적 복사생성자 호출할 경우 부모 복사생성자 호출된다.
 #define CLONE(type) type* Clone() { return new type(*this); }

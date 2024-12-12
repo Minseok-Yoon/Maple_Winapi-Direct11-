@@ -56,7 +56,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="Shared" />
+  <ImportGroup Label="Shared">
+    <Import Project="..\Editor_Engine\Editor_Engine.vcxitems" Label="Shared" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -260,7 +262,6 @@
     <ClCompile Include="Entity\CEntity.cpp" />
     <ClCompile Include="Fmod\CFmod.cpp" />
     <ClCompile Include="Graphics\CConstantBuffer.cpp" />
-    <ClCompile Include="Graphics\CGraphics.cpp" />
     <ClCompile Include="Graphics\CGraphicsDevice_DX11.cpp" />
     <ClCompile Include="Graphics\CIndexBuffer.cpp" />
     <ClCompile Include="Graphics\CInputLayout.cpp" />
@@ -309,6 +310,9 @@
   <ItemGroup>
     <Image Include="Maple_Winapi.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\imgui-master\examples\example_win32_directx9\imgui.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,7 +9,6 @@ public:
 	CComponent(COMPONENT_TYPE _eComponentType);
 	virtual ~CComponent();
 
-public:
 	virtual void Init();
 	virtual void Update();
 	virtual void LateUpdate();

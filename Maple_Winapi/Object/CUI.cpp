@@ -33,10 +33,10 @@ void CUI::LateUpdate()
 		OnLateUpdate();
 }
 
-void CUI::Render(HDC _Hdc)
+void CUI::Render()
 {
 	if (m_bEnable)
-		OnRender(_Hdc);
+		OnRender();
 }
 
 void CUI::Active()
@@ -76,7 +76,7 @@ void CUI::OnLateUpdate()
 {
 }
 
-void CUI::OnRender(HDC _Hdc)
+void CUI::OnRender()
 {
 }
 

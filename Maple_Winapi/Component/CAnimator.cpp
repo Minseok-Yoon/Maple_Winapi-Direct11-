@@ -94,7 +94,7 @@ void CAnimator::CreateFrameAnimation(const wstring& _strName, const vector<wstri
 	for (const wstring& fileName : _vecFileNames)
 	{
 		// wstring 경로를 사용하여 텍스처를 로드
-		CTexture* texture = CResourceManager::GetInst()->Load<CTexture>(fileName, fileName);
+		CTexture* texture = CResourceManager::Load<CTexture>(fileName, fileName);
 		vecTextures.push_back(texture);
 	}
 

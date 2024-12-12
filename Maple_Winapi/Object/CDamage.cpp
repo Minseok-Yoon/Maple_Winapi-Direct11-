@@ -63,7 +63,7 @@ void CDamage::Update()
     }
 }
 
-void CDamage::Render(HDC _dc)
+void CDamage::Render()
 {
     //if (bEnable)
     //{

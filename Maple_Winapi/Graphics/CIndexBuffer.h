@@ -5,7 +5,7 @@ class CIndexBuffer : public GpuBuffer
 {
 public:
 	CIndexBuffer();
-	~CIndexBuffer();
+	virtual ~CIndexBuffer();
 
 	bool Create(const vector<UINT>& _vecIndices);
 	void Bind() const;

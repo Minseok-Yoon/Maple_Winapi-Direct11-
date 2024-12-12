@@ -7,7 +7,7 @@ class CLayer : public CEntity
 {
 public:
 	CLayer();
-	~CLayer();
+	virtual ~CLayer();
 
 	virtual void Init();
 	virtual void Update();
@@ -18,7 +18,7 @@ public:
 	void AddGameObject(CGameObject* _pAddGameObject);
 	void EraseGameObject(CGameObject* _pEraseGameObject);
 
-	const vector<CGameObject*> GetGameObjects() { return m_vecGameObjects; }
+	vector<CGameObject*> GetGameObjects() { return m_vecGameObjects; }
 
 private:
 	void findDeadGameObjects(OUT vector<CGameObject*>& _vecGameObjects);
@@ -29,4 +29,4 @@ private:
 	vector<CGameObject*> m_vecGameObjects;
 };
 
-typedef vector<CGameObject*>::iterator GameObjectIter;
+using CGameObjectIter = vector<CGameObject*>::iterator;

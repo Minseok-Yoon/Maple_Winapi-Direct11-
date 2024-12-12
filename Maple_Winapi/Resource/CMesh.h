@@ -19,7 +19,7 @@ public:
 	};
 
 	CMesh();
-	~CMesh();
+	virtual ~CMesh();
 
 	virtual HRESULT Load(const wstring& _strPath) override;
 

@@ -6,7 +6,7 @@ class CCameraScript : public CScript
 {
 public:
 	CCameraScript();
-	~CCameraScript();
+	virtual ~CCameraScript();
 
 	void Init() override;
 	void Update() override;

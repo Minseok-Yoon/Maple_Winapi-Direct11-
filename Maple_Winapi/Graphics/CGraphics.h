@@ -17,7 +17,7 @@ struct Vertex
 {
 	math::Vector3 pos;
 	math::Vector4 color;
-	math::Vector2  uv;	// texture coordinate
+	math::Vector2 uv;	// texture coordinate
 };
 
 struct GpuBuffer
@@ -31,10 +31,8 @@ struct GpuBuffer
 
 enum class SHADER_STAGE
 {
-	SS_NONE,
 	SS_VS,		// Vertex Shader
 	SS_HS,		// Hull Shader
-	SS_TS,		// Tessllator
 	SS_DS,		// Domain Shader
 	SS_GS,		// Gemetry Shader
 	SS_PS,		// Pixel Shader
@@ -44,8 +42,8 @@ enum class SHADER_STAGE
 
 enum class CB_TYPE
 {
-	CT_None,
 	CT_Transform,
+	CT_None,
 	CT_End,
 };
 

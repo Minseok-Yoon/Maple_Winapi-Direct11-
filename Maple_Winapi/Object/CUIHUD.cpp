@@ -31,7 +31,7 @@ void CUIHUD::OnLateUpdate()
 {
 }
 
-void CUIHUD::OnRender(HDC _Hdc)
+void CUIHUD::OnRender()
 {
 	/*TransparentBlt(_Hdc,
 		0, 0,

@@ -13,10 +13,10 @@ public:
     virtual void OnInActive() override;
     virtual void OnUpdate() override;
     virtual void OnLateUpdate() override;
-    virtual void OnRender(HDC _Hdc) override;
+    virtual void OnRender() override;
     virtual void OnClear() override;
 
-    void ButtonClick();
+    virtual void ButtonClick();
 
     void SetBtnTexture(CTexture* _pTexture) { m_pTexture = _pTexture; }
     void SetBtnPosition(Vector2 _vPos) { m_vPos = _vPos; }

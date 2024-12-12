@@ -5,7 +5,7 @@ class CDontDestroyOnLoad : public CScene
 {
 public:
 	CDontDestroyOnLoad();
-	~CDontDestroyOnLoad();
+	virtual ~CDontDestroyOnLoad();
 
 	void Init() override;
 	void Update() override;

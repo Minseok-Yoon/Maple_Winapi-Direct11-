@@ -9,7 +9,7 @@ class CScene : public CEntity
 {
 public:
 	CScene();
-	~CScene();
+	virtual ~CScene();
 
 	virtual void Init();
 	virtual void Update();
@@ -24,7 +24,7 @@ public:
 	void AddGameObject(CGameObject* _pGameObj, const LAYER_TYPE _eLayerType);
 	void EraseGameObject(CGameObject* _pGameObj);
 
-	CLayer* GetLayer(const LAYER_TYPE _eLayerType) { return m_vecLayers[(UINT)_eLayerType]; }
+	CLayer* GetLayer(const LAYER_TYPE _eLayerType) { return m_vecLayers[static_cast<UINT>(_eLayerType)]; }
 
 	//void SetMapSize(Vector2 _vMapSize) { m_vMapSize = _vMapSize; }
 	//Vector2 GetMapSize() { return m_vMapSize; }
@@ -33,7 +33,7 @@ private:
 	void createLayers();
 
 protected:
-	class CBackGround* m_pBackGround;
+	class CBackGround*	m_pBackGround;
 	class CAudioSource* m_pAudioSource;
 
 private:

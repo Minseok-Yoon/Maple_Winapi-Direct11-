@@ -150,7 +150,16 @@ void CKeyManager::getMousePositionByWindow()
 	// 윈도우 좌표->클라이언트 좌표(인자로 현재 윈도우 핸들값 넣는다.)
 	ScreenToClient(CCore::GetInst()->GetMainHWnd(), &mousePos);
 
-	m_vCurMousePos = Vector2((float)mousePos.x, (float)mousePos.y);
+	UINT width = CCore::GetInst()->GetWidth();
+	UINT height = CCore::GetInst()->GetHeight();
+
+	m_vCurMousePos.x = -1.0f;
+	m_vCurMousePos.y = -1.0f;
+
+	if (static_cast<UINT>(mousePos.x) > 0 && static_cast<UINT>(mousePos.x) < width)
+		m_vCurMousePos.x = static_cast<float>(mousePos.x);
+	if (static_cast<UINT>(mousePos.y) > 0 && static_cast<UINT>(mousePos.y) < height)
+		m_vCurMousePos.y = static_cast<float>(mousePos.y);
 }
 
 void CKeyManager::clearKeys()

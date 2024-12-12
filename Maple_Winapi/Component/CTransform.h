@@ -7,37 +7,40 @@ class CTransform : public CComponent
 {
 public:
 	CTransform();
-	~CTransform();
+	virtual ~CTransform();
 
 	void Init() override;
 	void Update() override;
 	void LateUpdate() override;
 	void Render() override;
 
-	void Bind();
+	void Bind() const;
 
+	void SetParent(CTransform* _pParent) { m_pParent = _pParent; }
 	CTransform* GetParent() { return m_pParent; }
-	const math::Matrix GetWorldMatrix() { return m_tWorldMatrix; }
 
-	void SetPosition(float _fX, float _fY, float _fZ) { m_vPosition = Vector3(_fX, _fY, _fZ); }
-	void SetPosition(Vector3 _vPosition) { m_vPosition = _vPosition; }
-	const Vector3 GetPosition() { return m_vPosition; }
+	void SetWorldMatrix(const Matrix& _tWorldMatrix) { m_tWorldMatrix = _tWorldMatrix; }
+	Matrix GetWorldMatrix() const { return m_tWorldMatrix; }
 
-	void SetScale(float _fX, float _fY, float _fZ) { m_vScale = Vector3(_fX, _fY, _fZ); }
-	void SetScale(Vector3 _vScale) { m_vScale = _vScale; }
-	const Vector3 GetScale() { return m_vScale; }
+	void SetPosition(const float _fX, const float _fY, const float _fZ) { m_vPosition = Vector3(_fX, _fY, _fZ); }
+	void SetPosition(const Vector3& _vPosition) { m_vPosition = _vPosition; }
+	Vector3 GetPosition() const { return m_vPosition; }
 
-	void SetRotation(float _fX, float _fY, float _fZ) { m_vRotation = Vector3(_fX, _fY, _fZ); }
-	void SetRotation(Vector3 _vRotation) { m_vRotation = _vRotation; }
-	const Vector3 GetRotation() { return m_vRotation; }
+	void SetScale(const float _fX, const float _fY, const float _fZ) { m_vScale = Vector3(_fX, _fY, _fZ); }
+	void SetScale(const Vector3& _vScale) { m_vScale = _vScale; }
+	Vector3 GetScale() const { return m_vScale; }
 
-	const Vector3 Forward() { return m_vForward; }
-	const Vector3 Right() { return m_vRight; }
-	const Vector3 Up() { return m_vUp; }
+	void SetRotation(const float _fX, const float _fY, const float _fZ) { m_vRotation = Vector3(_fX, _fY, _fZ); }
+	void SetRotation(const Vector3& _vRotation) { m_vRotation = _vRotation; }
+	Vector3 GetRotation() const { return m_vRotation; }
+
+	Vector3 Forward() const { return m_vForward; }
+	Vector3 Right() const { return m_vRight; }
+	Vector3 Up() const { return m_vUp; }
 
 private:
 	CTransform*		m_pParent;
-	math::Matrix	m_tWorldMatrix;
+	Matrix			m_tWorldMatrix;
 
 	// 위치, 크기, 회전
 	Vector3	m_vPosition;	// 오브젝트의 위치

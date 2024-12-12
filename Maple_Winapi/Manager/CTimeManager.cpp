@@ -2,11 +2,12 @@
 #include "CTimeManager.h"
 #include "../Core/CCore.h"
 
+LARGE_INTEGER CTimeManager::m_llFrequency = {};
+LARGE_INTEGER CTimeManager::m_llPrevCount = {};
+LARGE_INTEGER CTimeManager::m_llCurCount = {};
+float CTimeManager::m_fDeltaTime = 0.0f;
+
 CTimeManager::CTimeManager() :
-	m_llCurCount{},
-	m_llPrevCount{},
-	m_llFrequency{},
-	m_dDeltaTime(0.f),
 	m_dAcc(0.),
 	m_iCallCount(0)
 {
@@ -31,7 +32,7 @@ void CTimeManager::Update()
 
 	// 이전 프레임의 카운팅과, 현재 프레임 카운팅 값의 차이를 구한다.
 	// 즉 '한 프레임에 걸린 시간값'을 구하고 싶다.
-	m_dDeltaTime = (double)(m_llCurCount.QuadPart - m_llPrevCount.QuadPart) / (double)m_llFrequency.QuadPart;
+	m_fDeltaTime = (double)(m_llCurCount.QuadPart - m_llPrevCount.QuadPart) / (double)m_llFrequency.QuadPart;
 
 	// 이전카운트 값을 현재값으로 갱신(다음번에 계산을 위해서)
 	m_llPrevCount = m_llCurCount;
@@ -40,8 +41,8 @@ void CTimeManager::Update()
 
 	// 최소 프레임이 60미만으로 안떨어지게 설정
 #ifdef  _DEBUG
-	if (m_dDeltaTime > (1. / 60.))
-		m_dDeltaTime = (1. / 60.);
+	if (m_fDeltaTime > (1. / 60.))
+		m_fDeltaTime = (1. / 60.);
 #endif //  _DEBUGG
 }
 
@@ -49,7 +50,7 @@ void CTimeManager::Update()
 void CTimeManager::Render()
 {
 	++m_iCallCount;
-	m_dAcc += m_dDeltaTime;	// DT 누적
+	m_dAcc += m_fDeltaTime;	// DT 누적
 
 	if (m_dAcc >= 1.)
 	{
@@ -58,7 +59,7 @@ void CTimeManager::Render()
 		m_iCallCount = 0;
 
 		wchar_t szBuffer[255] = {};
-		swprintf_s(szBuffer, L"FPS : %d, DeltaTime : %f", m_iFPS, m_dDeltaTime);
+		swprintf_s(szBuffer, L"FPS : %d, DeltaTime : %f", m_iFPS, m_fDeltaTime);
 		SetWindowText(CCore::GetInst()->GetMainHWnd(), szBuffer);
 	}
 }

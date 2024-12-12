@@ -6,7 +6,7 @@
 
 CTransform::CTransform() :
 	CComponent(COMPONENT_TYPE::CT_Transform),
-	m_tWorldMatrix(math::Matrix::Identity),
+	m_tWorldMatrix(Matrix::Identity),
 	m_vScale(Vector3::One),
 	m_vRotation(Vector3::Zero),
 	m_vPosition(Vector3::Zero)
@@ -27,11 +27,11 @@ void CTransform::Update()
 
 void CTransform::LateUpdate()
 {
-	math::Matrix scale = math::Matrix::CreateScale(m_vScale.x, m_vScale.y, m_vScale.z);
-	math::Matrix rotation = math::Matrix::CreateRotationX(math::Radian(m_vRotation.x));
-	rotation = math::Matrix::CreateRotationY(math::Radian(m_vRotation.y));
-	rotation = math::Matrix::CreateRotationZ(math::Radian(m_vRotation.z));
-	math::Matrix translation = math::Matrix::CreateTranslation(m_vPosition);
+	Matrix scale = Matrix::CreateScale(m_vScale.x, m_vScale.y, m_vScale.z);
+	Matrix rotation = Matrix::CreateRotationX(math::Radian(m_vRotation.x));
+	rotation *= Matrix::CreateRotationY(math::Radian(m_vRotation.y));
+	rotation *= Matrix::CreateRotationZ(math::Radian(m_vRotation.z));
+	Matrix translation = Matrix::CreateTranslation(m_vPosition);
 
 	m_tWorldMatrix = scale * rotation * translation;
 
@@ -44,7 +44,7 @@ void CTransform::Render()
 {
 }
 
-void CTransform::Bind()
+void CTransform::Bind() const 
 {
 	TransformCB cbData = {};
 	cbData.world = GetWorldMatrix();

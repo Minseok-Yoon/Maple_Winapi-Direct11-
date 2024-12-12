@@ -1,6 +1,6 @@
 #include "CScene.h"
 
-//#include "../Object/CBackGround.h"
+#include "../Core/CCore.h"
 #include "../Object/CObject.h"
 
 #include "../Component/CSpriteRenderer.h"
@@ -11,6 +11,9 @@
 #include "../Manager/CSceneManager.h"
 #include "../Manager/CResourceManager.h"
 #include "../Resource/CAudioClip.h"
+#include "../Resource/CTexture.h"
+
+extern CCore core;
 
 CScene::CScene() :
 	m_vecLayers{}
@@ -84,22 +87,31 @@ void CScene::Enter()
 
 void CScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioName)
 {
-	//// 배경 객체 생성
+	UINT iWidth = core.GetWidth();
+	UINT iHeight = core.GetHeight();
+
+	// 배경 객체 생성
 	m_pBackGround = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
+	CTransform* backGroundTr = m_pBackGround->GetComponent<CTransform>();
+	backGroundTr->SetPosition(Vector3(0.0f, 0.0f, 0.0f));  // 배경 위치 설정
 
-	// 스프라이트 렌더러 설정
-	CSpriteRenderer* bgSR = m_pBackGround->AddComponent<CSpriteRenderer>();
-
+	// 배경 텍스처 로드
 	CTexture* bgTexture = CResourceManager::Find<CTexture>(_strBackGroundName);
-	if (bgTexture)
+
+	// 텍스처 크기 설정하기
+	CTexture::TextureSize textureSize = bgTexture->GetTextureSize();
+	if (textureSize.width <= iWidth || textureSize.height <= iHeight)
 	{
-		bgSR->SetTexture(bgTexture);
-		OutputDebugStringW(L"Texture loaded successly!\n");
+		backGroundTr->SetScale(Vector3(iWidth, iHeight, 0.0f));
 	}
 	else
 	{
-		OutputDebugStringA("Texture not found for Key!\n");
+		backGroundTr->SetScale(Vector3(textureSize.width, textureSize.height, 0.0f));
 	}
+
+	// 스프라이트 렌더러 설정
+	CSpriteRenderer* sr = m_pBackGround->AddComponent<CSpriteRenderer>();
+	sr->SetTexture(bgTexture);
 
 	// 오디오 리스너 및 소스 추가
 	m_pBackGround->AddComponent<CAudioListener>();
@@ -107,14 +119,6 @@ void CScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioNa
 
 	// 배경 음악 로드 및 재생
 	CAudioClip* ac = CResourceManager::Find<CAudioClip>(_strAudioName);
-	if (ac != nullptr)
-	{
-		OutputDebugStringW(L"Load Sound!\n");
-	}
-	else
-	{
-		OutputDebugStringW(L"Not found Sound!\n");
-	}
 	m_pAudioSource->SetClip(ac);
 	m_pAudioSource->Play();
 }
@@ -130,27 +134,25 @@ void CScene::Exit()
 
 	m_pBackGround = nullptr;
 
-	//m_vMapSize = Vector2(0.0f, 0.0f);
-
 	CColliderManager::Clear();
 }
 
 void CScene::AddGameObject(CGameObject* _pGameObj, const LAYER_TYPE _eLayerType)
 {
-	m_vecLayers[(UINT)_eLayerType]->AddGameObject(_pGameObj);
+	m_vecLayers[static_cast<UINT>(_eLayerType)]->AddGameObject(_pGameObj);
 }
 
 void CScene::EraseGameObject(CGameObject* _pGameObj)
 {
 	LAYER_TYPE layerType = _pGameObj->GetLayerType();
-	m_vecLayers[(UINT)layerType]->EraseGameObject(_pGameObj);
+	m_vecLayers[static_cast<UINT>(layerType)]->EraseGameObject(_pGameObj);
 }
 
 void CScene::createLayers()
 {
-	m_vecLayers.resize((UINT)LAYER_TYPE::LT_End);
+	m_vecLayers.resize(static_cast<UINT>(LAYER_TYPE::LT_End));
 
-	for (size_t i = 0; i < (UINT)LAYER_TYPE::LT_End; i++)
+	for (size_t i = 0; i < static_cast<UINT>(LAYER_TYPE::LT_End); i++)
 	{
 		m_vecLayers[i] = new CLayer();
 	}

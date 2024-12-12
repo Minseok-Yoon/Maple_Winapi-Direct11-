@@ -1,11 +1,14 @@
 #include "CShader.h"
 #include "../Component/CRenderer.h"
+#include "../Manager/CResourceManager.h"
+
+bool CShader::bWireframe = false;
 
 CShader::CShader() :
 	CResource(RESOURCE_TYPE::RT_Shader),
-	m_eRasterizerState(RASTERIZER_STATE::RS_SolidBack),
-	m_eBlendState(BLEND_STATE::BS_AlphaBlend),
-	m_eDepthStencilState(DEPTHSTENCIL_STATE::DS_LessEqual)
+	m_RasterizerState(RASTERIZER_STATE::RS_SolidBack),
+	m_BlendState(BLEND_STATE::BS_AlphaBlend),
+	m_DepthStencilState(DEPTHSTENCIL_STATE::DS_LessEqual)
 {
 }
 
@@ -13,11 +16,11 @@ CShader::~CShader()
 {
 }
 
-HRESULT CShader::Load(const wstring& _strPath)
+HRESULT CShader::Load(const std::wstring& path)
 {
-	size_t fineNameBeginOffset = _strPath.rfind(L"\\") + 1;
-	size_t fineNameEndOffset = _strPath.length() - fineNameBeginOffset;
-	const wstring fileName(_strPath.substr(fineNameBeginOffset, fineNameEndOffset));
+	size_t fineNameBeginOffset = path.rfind(L"\\") + 1;
+	size_t fineNameEndOffset = path.length() - fineNameBeginOffset;
+	const std::wstring fileName(path.substr(fineNameBeginOffset, fineNameEndOffset));
 
 	if (!Create(SHADER_STAGE::SS_VS, fileName))
 		return S_FALSE;
@@ -27,7 +30,7 @@ HRESULT CShader::Load(const wstring& _strPath)
 	return S_OK;
 }
 
-bool CShader::Create(const SHADER_STAGE _eShaderStage, const wstring& _strFileName)
+bool CShader::Create(SHADER_STAGE _eShaderStage, const wstring& _strFileName)
 {
 	if (_eShaderStage == SHADER_STAGE::SS_VS)
 		CreateVertexShader(_strFileName);
@@ -55,13 +58,29 @@ bool CShader::CreatePixelShader(const wstring& _strFileName)
 
 void CShader::Bind()
 {
-	// BindVS(CGraphicDevice_DX11.cpp)->VSSetShader(d3d11.h)
-	if (m_VS)
+	if (bWireframe)
+	{
+		CShader* wireframeShader = CResourceManager::Find<CShader>(L"WireframeShader");
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> wireframeShaderVS = wireframeShader->GetVS();
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> wireframeShaderPS = wireframeShader->GetPS();
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> wireframeRasterizerState
+			= renderer::rasterizerStates[static_cast<UINT>(RASTERIZER_STATE::RS_WireFrame)];
+
+		GetDevice()->BindVS(wireframeShaderVS.Get());
+		GetDevice()->BindPS(wireframeShaderPS.Get());
+		GetDevice()->BindRasterizerState(wireframeRasterizerState.Get());
+		GetDevice()->BindBlendState(renderer::blendStates[static_cast<UINT>(m_BlendState)].Get(), nullptr, 0xffffff);
+		GetDevice()->BindDepthStencilState(renderer::depthStencilStates[static_cast<UINT>(m_DepthStencilState)].Get(), 0);
+
+		return;
+	}
+
+	if(m_VS)
 		GetDevice()->BindVS(m_VS.Get());
 	if (m_PS)
 		GetDevice()->BindPS(m_PS.Get());
 
-	GetDevice()->BindRasterizerState(renderer::rasterizerStates[(UINT)m_eRasterizerState].Get());
-	GetDevice()->BindBlendState(renderer::blendStates[(UINT)m_eBlendState].Get(), nullptr, 0xffffff);
-	GetDevice()->BindDepthStencilState(renderer::depthStencilStates[(UINT)m_eDepthStencilState].Get(), 0);
+	GetDevice()->BindRasterizerState(renderer::rasterizerStates[static_cast<UINT>(m_RasterizerState)].Get());
+	GetDevice()->BindBlendState(renderer::blendStates[static_cast<UINT>(m_BlendState)].Get(), nullptr, 0xffffff);
+	GetDevice()->BindDepthStencilState(renderer::depthStencilStates[static_cast<UINT>(m_DepthStencilState)].Get(), 0);
 }

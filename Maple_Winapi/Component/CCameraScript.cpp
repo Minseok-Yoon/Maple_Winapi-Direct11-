@@ -3,7 +3,9 @@
 #include "CRigidBody.h"
 #include "../Manager/CKeyManager.h"
 #include "../Manager/CTimeManager.h"
+#include "../Manager/CResourceManager.h"
 #include "../Object/CGameObject.h"
+#include "../Object/CObject.h"
 
 CCameraScript::CCameraScript()
 {
@@ -23,17 +25,17 @@ void CCameraScript::Update()
 	math::Vector3 vPos = tr->GetPosition();
 
 	if (KEY_HOLD(KEY_CODE::A))
-		vPos += 20.0f * -tr->Right() * DeltaTime;
+		vPos += 200.0f * -tr->Right() * CTimeManager::GetfDeltaTime();
 	if (KEY_HOLD(KEY_CODE::W))
-		vPos += 20.0f * tr->Forward() * DeltaTime;
+		vPos += 200.0f * tr->Forward() * CTimeManager::GetfDeltaTime();
 	if (KEY_HOLD(KEY_CODE::D))
-		vPos += 20.0f * tr->Right() * DeltaTime;
+		vPos += 200.0f * tr->Right() * CTimeManager::GetfDeltaTime();
 	if (KEY_HOLD(KEY_CODE::S))
-		vPos += 20.0f * -tr->Forward() * DeltaTime;
+		vPos += 200.0f * -tr->Forward() * CTimeManager::GetfDeltaTime();
 	if (KEY_HOLD(KEY_CODE::E))
-		vPos += 20.0f * tr->Up() * DeltaTime;
+		vPos += 200.0f * tr->Up() * CTimeManager::GetfDeltaTime();
 	if (KEY_HOLD(KEY_CODE::Q))
-		vPos += 20.0f * -tr->Up() * DeltaTime;
+		vPos += 200.0f * -tr->Up() * CTimeManager::GetfDeltaTime();
 
 	tr->SetPosition(vPos);
 }

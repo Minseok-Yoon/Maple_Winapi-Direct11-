@@ -108,7 +108,6 @@ enum class LAYER_TYPE
 
 enum class COMPONENT_TYPE
 {
-	CT_Camera,
 	CT_Transform,
 	CT_Collider,
 	CT_RigidBody,
@@ -116,6 +115,7 @@ enum class COMPONENT_TYPE
 	CT_Script,
 	CT_SpriteRenderer,
 	CT_Animator,
+	CT_Camera,
 	CT_AudioListener,
 	CT_AudioSource,
 	CT_End

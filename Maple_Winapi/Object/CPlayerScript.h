@@ -6,7 +6,7 @@ class CPlayerScript : public CScript
 {
 public:
 	CPlayerScript();
-	~CPlayerScript();
+	virtual ~CPlayerScript();
 
 	void Init() override;
 	void Update() override;
@@ -25,5 +25,5 @@ private:
 
 private:
 	PLAYER_STATE		m_ePlayerState;
-	class CAnimator* m_pAnimator;
+	class CAnimator*	m_pAnimator;
 };

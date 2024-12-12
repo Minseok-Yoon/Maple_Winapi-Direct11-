@@ -20,5 +20,5 @@ public:
 public:
     void Init(int _iDamage, Vector2& _vPosition, bool _bIsCri, CDamageManager* _pManager, int i = 1);
     virtual void Update();
-    virtual void Render(HDC _dc);
+    virtual void Render();
 };

@@ -10,9 +10,13 @@ void LoadScenes()
 
 	CSceneManager::LoadScene(L"LoadingScene");
 
-	const wchar_t* currentSceneName = CSceneManager::GetCurrentSceneName();
+	/*CSceneManager::CreateScene<CScene_Start>(L"StartScene");
+
+	CSceneManager::LoadScene(L"StartScene");*/
+
+	/*const wchar_t* currentSceneName = CSceneManager::GetCurrentSceneName();
 
 	std::wstringstream ss;
 	ss << L"CurScene: " << currentSceneName << "\n";
-	OutputDebugStringW(ss.str().c_str());
+	OutputDebugStringW(ss.str().c_str());*/
 }

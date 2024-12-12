@@ -3,8 +3,6 @@
 
 class CResourceManager
 {
-	SINGLETON(CResourceManager);
-
 public:
 	template <typename T>
 	static T* Find(const wstring& _strKey)

@@ -33,17 +33,17 @@ void CAudioSource::Render()
 {
 }
 
-void CAudioSource::Play()
+void CAudioSource::Play() const
 {
 	m_pAudioClip->Play();
 }
 
-void CAudioSource::Stop()
+void CAudioSource::Stop() const
 {
 	m_pAudioClip->Stop();
 }
 
-void CAudioSource::SetLoop(bool _bLoop)
+void CAudioSource::SetLoop(bool _bLoop) const
 {
 	m_pAudioClip->SetLoop(_bLoop);
 }

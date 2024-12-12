@@ -10,7 +10,7 @@ public:
 	static void Init();
 	static void Update();
 	static void LateUpdate();
-	static void Render(HDC _Hdc);
+	static void Render();
 	static void OnLoad(UI_TYPE _eUIType);
 	static void OnComplete(CUI* _pAddUI);
 	static void OnFail();

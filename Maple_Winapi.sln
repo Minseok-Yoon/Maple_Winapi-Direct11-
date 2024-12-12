@@ -7,7 +7,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Maple_Winapi\Mapl
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shader", "Shader\Shader.vcxitems", "{E4110BAC-E7D7-479B-A584-5CA607B509D6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor_Engine", "Editor_Engine\Editor_Engine.vcxitems", "{8BD72FCC-B5CE-480A-A358-5E010EF9AD38}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Editor_Engine\Editor_Engine.vcxitems*{8bd72fcc-b5ce-480a-a358-5e010ef9ad38}*SharedItemsImports = 9
+		Editor_Engine\Editor_Engine.vcxitems*{d3aa0462-0b90-4413-ba16-d9c8774c8de1}*SharedItemsImports = 4
+		Shader\Shader.vcxitems*{e4110bac-e7d7-479b-a584-5ca607b509d6}*SharedItemsImports = 9
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86

@@ -5,19 +5,19 @@ class CLoadingScene : public CScene
 {
 public:
 	CLoadingScene();
-	~CLoadingScene();
+	virtual ~CLoadingScene();
 
 	void Init() override;
 	void Update() override;
 	void LateUpdate() override;
 	void Render() override;
 
+	void Enter(const wstring& _strBackGroundName, const wstring& _strAudioName) override;
 	void Enter() override;
 	void Exit() override;
 
 private:
 	void resourcesLoad(std::mutex& _pMutex);
-	void RenderLoadingImage();
 
 private:
 	bool			m_bLoadCompleted;

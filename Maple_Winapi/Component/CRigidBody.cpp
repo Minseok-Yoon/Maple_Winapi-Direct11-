@@ -28,14 +28,14 @@ void CRigidBody::Update()
 	m_vAccel = m_vForce / m_fMass;
 
 	// 속도에 가속도를 더한다.
-	m_vVelocity += m_vAccel * min(fDeltaTime, 0.016f);
+	m_vVelocity += m_vAccel * min(CTimeManager::GetfDeltaTime(), 0.016f);
 
 	// 마찰력에 의한 반대방향으로의 가속도
 	if (!(m_vVelocity == Vector2(0.0f, 0.0f)))
 	{
 		Vector2 vFriction = -m_vVelocity;
 		vFriction.Normalize();
-		vFriction = vFriction * m_fFriction * m_fMass * fDeltaTime;
+		vFriction = vFriction * m_fFriction * m_fMass * CTimeManager::GetfDeltaTime();
 
 		if (m_vVelocity.Length() <= vFriction.Length())
 		{
@@ -76,7 +76,7 @@ void CRigidBody::Move()
 {
 	CTransform* tr = GetOwner()->GetComponent<CTransform>();
 	Vector3 vPos = tr->GetPosition();
-	vPos = vPos + m_vVelocity * fDeltaTime;
+	vPos = vPos + m_vVelocity * CTimeManager::GetfDeltaTime();
 	tr->SetPosition(vPos);
 
 	m_vForce = Vector2::One;

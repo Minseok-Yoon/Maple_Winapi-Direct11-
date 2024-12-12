@@ -6,6 +6,7 @@
 namespace renderer
 {
 	extern CCamera* mainCamera;
+	extern CGameObject* selectedObject;
 	extern CConstantBuffer* constantBuffers[(UINT)CB_TYPE::CT_End];
 
 	extern Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[(UINT)SAMPLE_TYPE::ST_End];

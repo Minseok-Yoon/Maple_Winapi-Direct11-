@@ -21,11 +21,12 @@
 #include "../Component/CSpriteRenderer.h"
 #include "../Object/CObject.h"
 #include "../Component/CBoxCollider2D.h"
+#include "../Component/CCameraScript.h"
 
 CScene_Start::CScene_Start()
 {
-	CResourceManager::Load<CTexture>(L"BG", L"../Resources/Texture/StartPanel.bmp");
-	//CResourceManager::Load<CTexture>(L"StartBtn", L"../Resources/Texture/StartBtn.bmp");
+	CTexture* bgTexture = CResourceManager::Load<CTexture>(L"BG", L"../Resources/Texture/StartPanel.bmp");
+	CAudioClip* ac = CResourceManager::Load<CAudioClip>(L"BGSound", L"../Resources/Sound/MoonlightShadow.wav");
 }
 
 CScene_Start::~CScene_Start()
@@ -34,12 +35,14 @@ CScene_Start::~CScene_Start()
 
 void CScene_Start::Enter(const wstring& _strBackGroundName, const wstring& _strAudioName)
 {
-	// 배경 음악 로드 및 재생
-	CAudioClip* ac = CResourceManager::Load<CAudioClip>(L"BGSound", L"../Resources/Texture/MoonlightShadow.wav");
-
 	CScene::Enter(L"BG", L"BGSound");
 
-	CUIManager::Push(UI_TYPE::UT_Button);
+	//CUIManager::Push(UI_TYPE::UT_Button);
+}
+
+void CScene_Start::Enter()
+{
+	CScene::Enter();
 }
 
 void CScene_Start::Exit()
@@ -54,22 +57,14 @@ void CScene_Start::Init()
 {
 	CScene::Init();
 
-	//// 카메라 설정
-	//CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
-	//CCamera* cameraComp = camera->AddComponent<CCamera>();
-	//cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
-	//cameraComp->SetSize(200.0f);
+	// 카메라 설정
+	CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
+	CCamera* cameraComp = camera->AddComponent<CCamera>();
+	cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+	//cameraComp->SetSize(100.0f);
 
-	// 시작 버튼 UI 객체 가져오기
-	/*CBtnUI* pBtn = static_cast<CBtnUI*>(CUIManager::GetUI(UI_TYPE::UT_Button));
-	pBtn->SetName(L"StartBtn");
-	if (pBtn)
-	{
-		CTexture* pBtnTexture = CResourceManager::Find<CTexture>(L"StartBtn");
-		pBtn->SetBtnTexture(pBtnTexture);
-
-		pBtn->SetBtnPosition(Vector2(200.0f, 200.0f));
-	}*/
+	CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
+	renderer::mainCamera = cameraComp;
 }
 
 void CScene_Start::Update()
@@ -80,6 +75,11 @@ void CScene_Start::Update()
 void CScene_Start::LateUpdate()
 {
 	CScene::LateUpdate();
+
+	if (KEY_TAP(KEY_CODE::Y))
+	{
+		CSceneManager::LoadScene(L"Stage01", L"Stage01_BG", L"Stage01_BGSound");
+	}
 }
 
 void CScene_Start::Render()

@@ -5,9 +5,9 @@ class CConstantBuffer : public GpuBuffer
 {
 public:
 	CConstantBuffer(CB_TYPE _eCBType);
-	~CConstantBuffer();
+	virtual ~CConstantBuffer();
 
-	bool Create(UINT _iSize, void* data = NULL);
+	bool Create(UINT _iSize, void* data = nullptr);
 
 	void SetData(void* data) const;
 	void Bind(SHADER_STAGE _eShaderStage) const;

@@ -18,5 +18,5 @@ public:
 
     bool Init();
     void Update();
-    void Render(HDC _dc);
+    void Render();
 };

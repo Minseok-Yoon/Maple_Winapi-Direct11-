@@ -30,8 +30,9 @@
 CScene_Stage01::CScene_Stage01() :
 	m_pPlayer(nullptr)
 {
-	CResourceManager::Load<CTexture>(L"Stage01_BG", L"../Resources/Texture/Main.bmp");
-	/*CResourceManager::Load<CTexture>(L"Player", L"Content/texture/Player/Player.bmp");*/
+	CResourceManager::Load<CTexture>(L"Stage01_BG", L"../Resources/Texture/Rehelleun.png");
+	CAudioClip* ac = CResourceManager::Load<CAudioClip>(L"Stage01_BGSound", L"../Resources/Sound/LachelntheIllusionCity.mp3");
+	//CResourceManager::Load<CTexture>(L"Player", L"Content/texture/Player/Player.bmp");
 }
 
 CScene_Stage01::~CScene_Stage01()
@@ -42,10 +43,14 @@ void CScene_Stage01::Init()
 {
 	CScene::Init();
 
-	//// 플레이어 애니메이션 설정
-	//CAnimator* plAnimator = m_pPlayer->AddComponent<CAnimator>();
-	//plAnimator->AddFrameAnimation(L"WalkRight", L"texture\\Player\\Walk\\Right\\%d.bmp", 4, Vector2(0.0f, 0.0f), 54.f, 65.f, 0.f, 0.f, 0.3f);
-	////plAnimator->Play(L"WalkRight", false);
+	// 카메라 설정
+	CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
+	CCamera* cameraComp = camera->AddComponent<CCamera>();
+	cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+	//cameraComp->SetSize(100.0f);
+
+	CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
+	renderer::mainCamera = cameraComp;
 }
 
 void CScene_Stage01::Update()
@@ -104,10 +109,7 @@ void CScene_Stage01::Render()
 
 void CScene_Stage01::Enter(const wstring& _strBackGroundName, const wstring& _strAudioName)
 {
-	// 배경 음악 로드 및 재생
-	CAudioClip* ac = CResourceManager::Load<CAudioClip>(L"BGSound1", L"../Resources/Sound/The Beginnig of The Adventure.mp3");
-
-	CScene::Enter(L"Stage01_BG", L"BGSound1");
+	CScene::Enter(L"Stage01_BG", L"Stage01_BGSound");
 
 	//// 카메라 설정
 	//CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_Particle, Vector3(0.0f, 0.0f, 0.0f));

@@ -5,8 +5,6 @@ class CScene;
 class CSceneManager
 {
 public:
-	SINGLETON(CSceneManager);
-
 	template <typename T>
 	static CScene* CreateScene(const wstring& _strName)
 	{

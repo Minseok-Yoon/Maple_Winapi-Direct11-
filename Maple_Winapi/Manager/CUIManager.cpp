@@ -62,7 +62,7 @@ void CUIManager::LateUpdate()
 	}
 }
 
-void CUIManager::Render(HDC _Hdc)
+void CUIManager::Render()
 {
 	if (m_stUI.size() <= 0)
 		return;
@@ -82,7 +82,7 @@ void CUIManager::Render(HDC _Hdc)
 
 	for (CUI* ui : buff)
 	{
-		ui->Render(_Hdc);
+		ui->Render();
 		m_stUI.push(ui);
 	}
 }

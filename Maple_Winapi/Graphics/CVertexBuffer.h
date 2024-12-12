@@ -5,16 +5,10 @@ class CVertexBuffer : public GpuBuffer
 {
 public:
 	CVertexBuffer();
-	~CVertexBuffer();
+	virtual ~CVertexBuffer();
 
 	bool Create(const vector<Vertex>& _vecVertexes);
 	void Bind();
-	//void BindVertexBuffer(UINT _iStartSlot, UINT _iNumBuffers, ID3D11Buffer* 
-	//	const* _ppVertexBuffers, const UINT* _pStrides, const UINT* _pOffsets);	// 정점 버퍼를 GPU에 바인딩
-
-private:
-	/*UINT offset = 0;
-	UINT vectexSize = sizeof(Vertex);*/
 };
 
 // 정점을 담고 있는 buffer 클래스이다.

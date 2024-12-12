@@ -37,9 +37,6 @@
     <Filter Include="Engine\04. Manager\DamageManager">
       <UniqueIdentifier>{87697990-165d-44cc-aae6-0fbc95f8ea68}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\04. Manager\KeyManager">
-      <UniqueIdentifier>{72328a13-aeb6-4aab-a79a-b231af2a6262}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\04. Manager\PathManager">
       <UniqueIdentifier>{a420055e-3962-4884-acd2-8995224c48a2}</UniqueIdentifier>
     </Filter>
@@ -48,9 +45,6 @@
     </Filter>
     <Filter Include="Engine\04. Manager\SceneManager">
       <UniqueIdentifier>{8faadbc9-7a89-4b56-a206-b442473aa090}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\04. Manager\TimeManager">
-      <UniqueIdentifier>{a1c9204f-fde7-439b-a3a8-aea073afa1b4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\04. Manager\UIManager">
       <UniqueIdentifier>{ba0206c4-f492-400f-8650-60d9d745a89e}</UniqueIdentifier>
@@ -208,6 +202,15 @@
     <Filter Include="Engine\09. Component\Camera\Renderer">
       <UniqueIdentifier>{9dd576a8-070f-4fff-bf2e-d09370144d8c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\04. Manager\Helpers">
+      <UniqueIdentifier>{b317882f-3c50-4043-87d3-7f83c8585e4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\04. Manager\Helpers\TimeManager">
+      <UniqueIdentifier>{a1c9204f-fde7-439b-a3a8-aea073afa1b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\04. Manager\Helpers\KeyManager">
+      <UniqueIdentifier>{72328a13-aeb6-4aab-a79a-b231af2a6262}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -247,7 +250,7 @@
       <Filter>Engine\04. Manager\DamageManager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\CKeyManager.h">
-      <Filter>Engine\04. Manager\KeyManager</Filter>
+      <Filter>Engine\04. Manager\Helpers\KeyManager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\CPathManager.h">
       <Filter>Engine\04. Manager\PathManager</Filter>
@@ -259,7 +262,7 @@
       <Filter>Engine\04. Manager\SceneManager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\CTimeManager.h">
-      <Filter>Engine\04. Manager\TimeManager</Filter>
+      <Filter>Engine\04. Manager\Helpers\TimeManager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\CUIManager.h">
       <Filter>Engine\04. Manager\UIManager</Filter>
@@ -329,9 +332,6 @@
     </ClInclude>
     <ClInclude Include="Resource\CAudioClip.h">
       <Filter>Engine\08. Resource\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource\CShader.h">
-      <Filter>Engine\08. Resource\Graphics\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Resource\CMesh.h">
       <Filter>Engine\08. Resource\Mesh</Filter>
@@ -426,6 +426,9 @@
     <ClInclude Include="Struct.h">
       <Filter>Engine\01. Header</Filter>
     </ClInclude>
+    <ClInclude Include="Resource\CShader.h">
+      <Filter>Engine\08. Resource\Graphics\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -447,7 +450,7 @@
       <Filter>Engine\04. Manager\DamageManager</Filter>
     </ClCompile>
     <ClCompile Include="Manager\CKeyManager.cpp">
-      <Filter>Engine\04. Manager\KeyManager</Filter>
+      <Filter>Engine\04. Manager\Helpers\KeyManager</Filter>
     </ClCompile>
     <ClCompile Include="Manager\CPathManager.cpp">
       <Filter>Engine\04. Manager\PathManager</Filter>
@@ -459,7 +462,7 @@
       <Filter>Engine\04. Manager\SceneManager</Filter>
     </ClCompile>
     <ClCompile Include="Manager\CTimeManager.cpp">
-      <Filter>Engine\04. Manager\TimeManager</Filter>
+      <Filter>Engine\04. Manager\Helpers\TimeManager</Filter>
     </ClCompile>
     <ClCompile Include="Manager\CUIManager.cpp">
       <Filter>Engine\04. Manager\UIManager</Filter>
@@ -526,9 +529,6 @@
     </ClCompile>
     <ClCompile Include="Resource\CAudioClip.cpp">
       <Filter>Engine\08. Resource\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Resource\CShader.cpp">
-      <Filter>Engine\08. Resource\Graphics\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Resource\CMesh.cpp">
       <Filter>Engine\08. Resource\Mesh</Filter>
@@ -614,11 +614,11 @@
     <ClCompile Include="Component\CRenderer.cpp">
       <Filter>Engine\09. Component\Camera\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\CGraphics.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\CVertexBuffer.cpp">
       <Filter>Engine\13. Graphics\GpuBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource\CShader.cpp">
+      <Filter>Engine\08. Resource\Graphics\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -633,5 +633,10 @@
     <Image Include="Maple_Winapi.ico">
       <Filter>리소스 파일</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\imgui-master\examples\example_win32_directx9\imgui.ini">
+      <Filter>소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>
