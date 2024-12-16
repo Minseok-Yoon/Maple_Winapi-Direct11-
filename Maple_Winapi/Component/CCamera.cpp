@@ -7,6 +7,26 @@ extern CCore core;
 Matrix CCamera::ViewMatrix = Matrix::Identity;
 Matrix CCamera::ProjectionMatrix =Matrix::Identity;
 
+RECT CCamera::GetClipRect()
+{
+	RECT clipRect = {};
+	if (m_useWorldRect)
+	{
+		clipRect = m_worldRect;
+	}
+	else
+	{
+		const float halfWidth = m_fSize * m_fAspectRatio / 2.0f;
+		const float halfHeight = m_fSize / 2.0f;
+
+		clipRect.left = static_cast<LONG>(m_center.x - halfWidth);
+		clipRect.right = static_cast<LONG>(m_center.x + halfWidth);
+		clipRect.top = static_cast<LONG>(m_center.y - halfHeight);
+		clipRect.bottom = static_cast<LONG>(m_center.y + halfHeight);
+	}
+	return clipRect;
+}
+
 CCamera::CCamera() :
 	CComponent(COMPONENT_TYPE::CT_Camera),
 	m_eProjectionType(PROJECTION_TYPE::PT_Perspective),
@@ -27,9 +47,6 @@ CCamera::~CCamera()
 
 void CCamera::Init()
 {
-	// Core 클래스에서 위치 값을 받아온다.
-	//m_vResolution = CCore::GetInst()->GetResolution();
-	//m_pVeilTex = CTexture::Create(L"CameraVeil", (UINT)m_vResolution.x, (UINT)m_vResolution.y);
 }
 
 void CCamera::Update()
@@ -81,6 +98,8 @@ void CCamera::LateUpdate()
 {
 	CreateViewMatrix();
 	CreateProjectionMatrix(m_eProjectionType);
+
+	AdjustToWorldRect();
 
 	ViewMatrix = m_ViewMatrix;
 	ProjectionMatrix = m_ProjectionMatrix;
@@ -195,4 +214,99 @@ void CCamera::CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType)
 		m_ProjectionMatrix = Matrix::CreateOrthographicLH(width / m_fSize, height / m_fSize, m_fNear, m_fFar);
 		break;
 	}
+}
+
+void CCamera::AdjustToWorldRect()
+{
+	if (!m_useWorldRect)
+		return;
+
+	const RECT clipRect = GetClipRect();
+
+	// X축 이동 제한
+	if (clipRect.right - clipRect.left > m_worldRect.right - m_worldRect.left)
+	{
+		m_center.x = (m_worldRect.left + m_worldRect.right) / 2.0f;
+	}
+	else
+	{
+		m_center.x = std::clamp(m_center.x,
+			m_worldRect.left + (clipRect.right - clipRect.left) / 2.0f,
+			m_worldRect.right - (clipRect.right - clipRect.left) / 2.0f);
+	}
+
+	// Y축 이동 제한
+	if (clipRect.bottom - clipRect.top > m_worldRect.bottom - m_worldRect.top)
+	{
+		m_center.y = (m_worldRect.top + m_worldRect.bottom) / 2.0f;
+	}
+	else
+	{
+		m_center.y = std::clamp(m_center.y,
+			m_worldRect.top + (clipRect.bottom - clipRect.top) / 2.0f,
+			m_worldRect.bottom - (clipRect.bottom - clipRect.top) / 2.0f);
+	}
+}
+
+void CCamera::ChangeDisplayMode(int _iMode)
+{
+	m_displayMode = _iMode;
+
+	switch (m_displayMode)
+	{
+	case 0: // 800x600
+		core.SetWidth(800);
+		core.SetHeight(600);
+		break;
+	case 1: // 1024x768
+		core.SetWidth(1024);
+		core.SetHeight(768);
+		break;
+	case 2: // 1268x760
+		core.SetWidth(1268);
+		core.SetHeight(768);
+		break;
+	case 3: // 1366x768
+		core.SetWidth(1366);
+		core.SetHeight(768);
+		break;
+	case 4: // Fullscreen
+		core.SetWidth(1600);
+		core.SetHeight(900);
+		break;
+	default:
+		ChangeDisplayMode(0); // Default to 800x600
+		break;
+	}
+}
+
+RECT CCamera::MeasureDrawRect(int _iSpriteWidth, int _iSpriteHeight, const XMFLOAT2& position, const XMFLOAT2& origin, bool _bflipX)
+{
+	RECT drawingRect;
+	drawingRect.left = static_cast<LONG>(position.x - origin.x);
+	drawingRect.top = static_cast<LONG>(position.y - origin.y);
+	drawingRect.right = drawingRect.left + _iSpriteWidth;
+	drawingRect.bottom = drawingRect.top + _iSpriteHeight;
+
+	if (_bflipX) {
+		drawingRect.left -= _iSpriteWidth;
+		drawingRect.right -= _iSpriteWidth;
+	}
+
+	return drawingRect;
+}
+
+Vector2 CCamera::CameraToWorld(const Vector2& _vCameraPoint)
+{
+	Vector2 worldPoint = _vCameraPoint;
+	worldPoint.x += m_center.x - (m_fSize * m_fAspectRatio) / 2.0f;
+	worldPoint.y += m_center.y - (m_fSize / 2.0f);
+	return worldPoint;
+}
+
+bool CCamera::CheckSpriteVisible(const RECT& _tSpriteRect)
+{
+	RECT clip = GetClipRect();
+	return !(_tSpriteRect.right < clip.left || _tSpriteRect.left > clip.right ||
+		_tSpriteRect.bottom < clip.top || _tSpriteRect.top > clip.bottom);
 }

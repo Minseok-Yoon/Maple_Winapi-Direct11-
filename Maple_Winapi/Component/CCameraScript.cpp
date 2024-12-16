@@ -6,6 +6,7 @@
 #include "../Manager/CResourceManager.h"
 #include "../Object/CGameObject.h"
 #include "../Object/CObject.h"
+#include "../Component/CCamera.h"
 
 CCameraScript::CCameraScript()
 {

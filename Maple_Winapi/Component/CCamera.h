@@ -30,6 +30,8 @@ public:
 	void SetProjectionType(const PROJECTION_TYPE _eProjectionType) { m_eProjectionType = _eProjectionType; }
 	void SetSize(const float _fSize) { m_fSize = _fSize; }
 
+	RECT GetClipRect();
+
 	CCamera();
 	virtual ~CCamera();
 
@@ -44,6 +46,13 @@ public:
 	void CreateViewMatrix();
 	void CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType);
 
+	void AdjustToWorldRect();
+	void ChangeDisplayMode(int _iMode);
+
+	RECT MeasureDrawRect(int _iSpriteWidth, int _iSpriteHeight, const XMFLOAT2& position, const XMFLOAT2& origin, bool _bflipX);
+	Vector2 CameraToWorld(const Vector2& _vCameraPoint);
+	bool CheckSpriteVisible(const RECT& _tSpriteRect);
+
 private:
 	static Matrix	ViewMatrix;
 	static Matrix	ProjectionMatrix;
@@ -55,6 +64,15 @@ private:
 	float			m_fNear;
 	float			m_fFar;
 	float			m_fSize;
+
+	int m_width;  // 화면 너비
+	int m_height; // 화면 높이
+
+	XMFLOAT2		m_center;				 // 카메라 중심 좌표
+	int				m_displayMode;           // 디스플레이 모드
+	bool			m_useWorldRect;			 // 월드 경계 사용 여부
+	RECT			m_worldRect;             // 월드 경계
+	RECT			m_clipRect;              // 현재 클립 영역
 
 	list<tCamEffect>	m_listCamEffect;		// 순차적으로 효과를 처리하기 위해 vector말고 list로 사용
 	class CTexture* m_pVeilTex;				// 카메라 가림막 택스처(검은색으로)

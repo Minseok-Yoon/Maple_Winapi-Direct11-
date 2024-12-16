@@ -47,7 +47,6 @@ void CScene_Stage01::Init()
 	CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
 	CCamera* cameraComp = camera->AddComponent<CCamera>();
 	cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
-	//cameraComp->SetSize(100.0f);
 
 	CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
 	renderer::mainCamera = cameraComp;

@@ -38,7 +38,6 @@ int CCore::Init(HWND _hWnd, UINT _iWidth, UINT _iHeight)
 	m_hWnd = _hWnd;
 
 	adjustWindowRect(_hWnd, _iWidth, _iHeight);
-	//createBackBuffer(_ptResolution);
 
 	CTimeManager::GetInst()->Init();
 	CKeyManager::GetInst()->Init();
@@ -50,7 +49,6 @@ int CCore::Init(HWND _hWnd, UINT _iWidth, UINT _iHeight)
 	CFmod::Init();
 	CColliderManager::GetInst()->Init();
 	CUIManager::GetInst()->Init();
-	//CPathManager::GetInst()->Init();
 	CSceneManager::Init();
 	CDamageManager::GetInst()->Init();
 
@@ -88,7 +86,6 @@ void CCore::Render()
 	CColliderManager::GetInst()->Render();
 	CUIManager::GetInst()->Render();
 	CSceneManager::Render();
-	//copyRenderTarget(m_hBackDC, m_hDC);
 }
 
 void CCore::Present()
@@ -98,7 +95,6 @@ void CCore::Present()
 
 void CCore::Destroy()
 {
-	//CSceneManager::Destroy();
 }
 
 void CCore::Release()
@@ -120,8 +116,6 @@ void CCore::progress()
 	Render();
 
 	Destroy();
-
-	//CEventManager::GetInst()->Update();
 }
 
 void CCore::adjustWindowRect(HWND _hWnd, UINT _iWidth, UINT _iHeight)
@@ -136,39 +130,6 @@ void CCore::adjustWindowRect(HWND _hWnd, UINT _iWidth, UINT _iHeight)
 	SetWindowPos(_hWnd, nullptr, 0, 0, m_iWidth, m_iHeight, 0);
 	ShowWindow(_hWnd, true);
 }
-
-//void CCore::createBackBuffer(POINT _ptResolution)
-//{
-//	// 백버퍼 생성
-//	m_hBackBitmap = CreateCompatibleBitmap(m_hDC, _ptResolution.x, _ptResolution.y);
-//	m_hBackDC = CreateCompatibleDC(m_hDC);
-//
-//	// 백버퍼 비트맵을 설정
-//	HBITMAP oldBitMap = (HBITMAP)SelectObject(m_hBackDC, m_hBackBitmap);
-//	DeleteObject(oldBitMap);
-//#pragma region
-//	//// 백버퍼 크기 확인을 위한 코드 추가
-//	//BITMAP bitmap;
-//	//GetObject(m_hBackBitmap, sizeof(BITMAP), &bitmap);
-//
-//	//// 출력 메시지를 문자열로 변환하여 디버그 출력 창에 보낸다
-//	//char debugMsg[128];
-//	//sprintf_s(debugMsg, "백버퍼 크기: 너비 = %d, 높이 = %d\n", bitmap.bmWidth, bitmap.bmHeight);
-//	//OutputDebugStringA(debugMsg);
-//#pragma endregion
-//}
-
-//void CCore::copyRenderTarget(HDC _hBackDC, HDC _hDC)
-//{
-//	BitBlt(m_hDC, 0, 0, m_ptResolution.x, m_ptResolution.y,
-//		m_hBackDC, 0, 0, SRCCOPY);
-//}
-
-//void CCore::clear()
-//{
-//	SelectGDI gdi(m_hBackDC, BRUSH_TYPE::BT_Black);
-//	::Rectangle(m_hBackDC, -1, -1, m_ptResolution.x + 1, m_ptResolution.y + 1);
-//}
 
 void CCore::createHBrush()
 {

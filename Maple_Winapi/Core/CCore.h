@@ -19,7 +19,10 @@ public:
 
 	HWND	GetMainHWnd() { return m_hWnd; }
 	
+	void SetWidth(UINT _iWidth) { m_iWidth = _iWidth; }
 	UINT GetWidth() { return m_iWidth; }
+
+	void SetHeight(UINT _iHeight) { m_iHeight = _iHeight; }
 	UINT GetHeight() { return m_iHeight; }
 
 	HBRUSH	GetBrush(BRUSH_TYPE _eBrush) { return m_arrBrush[(UINT)_eBrush]; }
@@ -30,14 +33,12 @@ public:
 
 private:
 	void adjustWindowRect(HWND _hWnd, UINT _iWidth, UINT _iHeight);
-	//void createBackBuffer(POINT _ptResolution);
-	//void copyRenderTarget(HDC _hBackDC, HDC _hDC);
 
 	void createHBrush();
 	void createHPen();
 
 private:
-	HWND		m_hWnd;								// 메인 윈도우 핸들
+	HWND		m_hWnd;									// 메인 윈도우 핸들
 	HBRUSH		m_arrBrush[(UINT)BRUSH_TYPE::BT_END];	// 브러쉬 배열 생성
 	HPEN		m_arrPen[(UINT)PEN_TYPE::PT_End];		// 펜 배열 생성
 
