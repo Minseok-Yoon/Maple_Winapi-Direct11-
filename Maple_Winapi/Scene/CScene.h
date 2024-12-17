@@ -26,19 +26,17 @@ public:
 
 	CLayer* GetLayer(const LAYER_TYPE _eLayerType) { return m_vecLayers[static_cast<UINT>(_eLayerType)]; }
 
-	//void SetMapSize(Vector2 _vMapSize) { m_vMapSize = _vMapSize; }
-	//Vector2 GetMapSize() { return m_vMapSize; }
-
 private:
 	void createLayers();
 
+public:
+	class CBackGround* m_pBackGround;
+
 protected:
-	class CBackGround*	m_pBackGround;
 	class CAudioSource* m_pAudioSource;
 
 private:
 	vector<CLayer*>		m_vecLayers;
-	//Vector2		m_vMapSize;
 };
 
 // 세계 구성: 전체 게임 세계는 여러개의 큰 지역으로 나뉘고, 각 지역은 다시 여러개의 작은 장소나 던전으로 구성된다.

@@ -441,6 +441,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 , suggested_rect->right - suggested_rect->left, suggested_rect->bottom - suggested_rect->top, SWP_NOZORDER | SWP_NOACTIVATE);
         }
         break;
+    case WM_KEYDOWN:
+        if (wParam == VK_RETURN && (GetAsyncKeyState(VK_MENU) & 0x8000))
+        {
+            core.ToggleFullScreen();
+        }
+        break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

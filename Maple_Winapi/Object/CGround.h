@@ -1,5 +1,6 @@
 #pragma once
 #include "CGameObject.h"
+#include "../Resource/CTexture.h"
 
 class CColliderPixel;
 
@@ -13,4 +14,10 @@ public:
     virtual void Update() override;
     virtual void LateUpdate() override;
     virtual void Render() override;
+
+    void SetBackGroundTexture(CTexture* _pBackGroundTexture) { m_pBackGroundTexture = _pBackGroundTexture; }
+    CTexture* GetBackGroundTexture() const { return m_pBackGroundTexture; }
+
+private:
+    CTexture* m_pBackGroundTexture;
 };

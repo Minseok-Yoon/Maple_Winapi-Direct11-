@@ -28,8 +28,24 @@ public:
 	Matrix GetProjectionMatrix() { return m_ProjectionMatrix; }
 
 	void SetProjectionType(const PROJECTION_TYPE _eProjectionType) { m_eProjectionType = _eProjectionType; }
+	PROJECTION_TYPE GetProjectionType() const { return m_eProjectionType; }
 	void SetSize(const float _fSize) { m_fSize = _fSize; }
 
+	void SetOrthographic(float left, float right, float top, float bottom)
+	{
+		m_left = left;
+		m_right = right;
+		m_top = top;
+		m_bottom = bottom;
+	}
+
+	// 정사영 카메라의 시야 범위 반환
+	float GetLeft() const { return m_left; }
+	float GetRight() const { return m_right; }
+	float GetTop() const { return m_top; }
+	float GetBottom() const { return m_bottom; }
+
+	// 클립 영역 가져오기
 	RECT GetClipRect();
 
 	CCamera();
@@ -67,6 +83,7 @@ private:
 
 	int m_width;  // 화면 너비
 	int m_height; // 화면 높이
+	float m_left, m_right, m_top, m_bottom; // 정사영 카메라의 시야 범위
 
 	XMFLOAT2		m_center;				 // 카메라 중심 좌표
 	int				m_displayMode;           // 디스플레이 모드

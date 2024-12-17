@@ -37,6 +37,7 @@ CCamera::CCamera() :
 	m_fFar(1000.0f),
 	m_fSize(1.0f),
 	m_pVeilTex(nullptr),
+	m_left(-1.0f), m_right(1.0f), m_top(1.0f), m_bottom(-1.0f),
 	m_listCamEffect{}
 {
 }
@@ -223,28 +224,41 @@ void CCamera::AdjustToWorldRect()
 
 	const RECT clipRect = GetClipRect();
 
-	// X축 이동 제한
-	if (clipRect.right - clipRect.left > m_worldRect.right - m_worldRect.left)
+	// 텍스처 경계 영역의 가로, 세로 크기 계산
+	const float worldWidth = static_cast<float>(m_worldRect.right - m_worldRect.left);
+	const float worldHeight = static_cast<float>(m_worldRect.bottom - m_worldRect.top);
+
+	// 카메라 클립 영역의 가로, 세로 크기 계산
+	const float clipWidth = static_cast<float>(clipRect.right - clipRect.left);
+	const float clipHeight = static_cast<float>(clipRect.bottom - clipRect.top);
+
+	// 카메라의 이동 제한 계산
+	if (clipWidth <= worldWidth)
 	{
+		m_center.x = std::clamp(
+			m_center.x,
+			m_worldRect.left + clipWidth / 2.0f,
+			m_worldRect.right - clipWidth / 2.0f
+		);
+	}
+	else
+	{
+		// 텍스처가 카메라보다 작으면 중심 고정
 		m_center.x = (m_worldRect.left + m_worldRect.right) / 2.0f;
 	}
-	else
-	{
-		m_center.x = std::clamp(m_center.x,
-			m_worldRect.left + (clipRect.right - clipRect.left) / 2.0f,
-			m_worldRect.right - (clipRect.right - clipRect.left) / 2.0f);
-	}
 
-	// Y축 이동 제한
-	if (clipRect.bottom - clipRect.top > m_worldRect.bottom - m_worldRect.top)
+	if (clipHeight <= worldHeight)
 	{
-		m_center.y = (m_worldRect.top + m_worldRect.bottom) / 2.0f;
+		m_center.y = std::clamp(
+			m_center.y,
+			m_worldRect.top + clipHeight / 2.0f,
+			m_worldRect.bottom - clipHeight / 2.0f
+		);
 	}
 	else
 	{
-		m_center.y = std::clamp(m_center.y,
-			m_worldRect.top + (clipRect.bottom - clipRect.top) / 2.0f,
-			m_worldRect.bottom - (clipRect.bottom - clipRect.top) / 2.0f);
+		// 텍스처가 카메라보다 작으면 중심 고정
+		m_center.y = (m_worldRect.top + m_worldRect.bottom) / 2.0f;
 	}
 }
 

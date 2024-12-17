@@ -31,6 +31,8 @@ public:
 	bool	IsLoaded() const { return m_bLoaded; }
 	void	IsLoaded(bool _bLoaded) { m_bLoaded = _bLoaded; }
 
+	void ToggleFullScreen();
+
 private:
 	void adjustWindowRect(HWND _hWnd, UINT _iWidth, UINT _iHeight);
 
@@ -47,4 +49,7 @@ private:
 
 	bool		m_bLoaded;
 	unique_ptr<CGraphicDevice_DX11>		m_GraphicDevice;
+
+	bool		m_bFullScreen;
+	RECT		m_tWindowRect;
 };

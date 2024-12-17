@@ -1,6 +1,5 @@
 #include "CCore.h"
 #include "../Manager/CTimeManager.h"
-//#include "../Manager/CPathManager.h"
 #include "../Manager/CSceneManager.h"
 #include "../Manager/CResourceManager.h"
 #include "../Manager/CKeyManager.h"
@@ -17,6 +16,7 @@ CCore::CCore() :
 	m_hWnd(nullptr),
 	m_iWidth(0),
 	m_iHeight(0),
+	m_bFullScreen(false),
 	m_arrBrush{},
 	m_arrPen{},
 	m_bLoaded(false)
@@ -57,6 +57,11 @@ int CCore::Init(HWND _hWnd, UINT _iWidth, UINT _iHeight)
 
 void CCore::Update()
 {
+	if (GetAsyncKeyState(VK_RETURN) & 0x8000 && (GetAsyncKeyState(VK_MENU) & 0x8000)) // Alt+Enter
+	{
+		ToggleFullScreen();
+	}
+
 	// Manager Update
 	CTimeManager::GetInst()->Update();
 	CKeyManager::GetInst()->Update();
@@ -116,6 +121,36 @@ void CCore::progress()
 	Render();
 
 	Destroy();
+}
+
+void CCore::ToggleFullScreen()
+{
+	if (!m_bFullScreen)
+	{
+		// 현재 창 크기 저장
+		GetWindowRect(m_hWnd, &m_tWindowRect);
+
+		// 전체 화면 전환
+		SetWindowLong(m_hWnd, GWL_STYLE, WS_POPUP); // 테두리 없는 스타일
+		SetWindowPos(m_hWnd, HWND_TOP, 0, 0,
+			GetSystemMetrics(SM_CXSCREEN), // 화면 너비
+			GetSystemMetrics(SM_CYSCREEN), // 화면 높이
+			SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+		ShowWindow(m_hWnd, SW_MAXIMIZE);
+	}
+	else
+	{
+		// 창 모드로 전환
+		SetWindowLong(m_hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW); // 기본 창 스타일 복원
+		SetWindowPos(m_hWnd, HWND_TOP, m_tWindowRect.left, m_tWindowRect.top,
+			m_tWindowRect.right - m_tWindowRect.left, // 저장된 창 너비
+			m_tWindowRect.bottom - m_tWindowRect.top, // 저장된 창 높이
+			SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+		ShowWindow(m_hWnd, SW_NORMAL);
+	}
+
+	// 상태 토글
+	m_bFullScreen = !m_bFullScreen;
 }
 
 void CCore::adjustWindowRect(HWND _hWnd, UINT _iWidth, UINT _iHeight)
