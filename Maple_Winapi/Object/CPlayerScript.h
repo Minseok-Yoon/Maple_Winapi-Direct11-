@@ -20,10 +20,12 @@ public:
 private:
 	void idle();
 	void move();
+	void prone();
 	void jump();
 	void attack();
 
 private:
 	PLAYER_STATE		m_ePlayerState;
 	class CAnimator*	m_pAnimator;
+	int					m_iDir;
 };

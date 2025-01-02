@@ -9,6 +9,8 @@
 #include "../Scene/CScene_Stage02.h"*/
 #include "../Manager/CKeyManager.h"
 
+#include "../Scene/CTestScene.h"
+
 extern CCore core;
 
 CLoadingScene::CLoadingScene() :
@@ -117,12 +119,13 @@ void CLoadingScene::resourcesLoad(std::mutex& _pMutex)
 
         _pMutex.lock();
         {
-            CResourceManager::Load<CTexture>(L"BG", L"../Resources/Texture/StartPanel.bmp");
+            //CResourceManager::Load<CTexture>(L"Player", L"../Resources/Texture/Player/Player.bmp");
 
             renderer::Init();
 
             CSceneManager::CreateScene<CScene_Start>(L"StartScene");
             CSceneManager::CreateScene<CScene_Stage01>(L"Stage01");
+            CSceneManager::CreateScene<CTestScene>(L"TestScene");
         }
         _pMutex.unlock();
 

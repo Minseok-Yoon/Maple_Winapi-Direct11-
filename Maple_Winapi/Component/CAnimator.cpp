@@ -1,10 +1,13 @@
 #include "CAnimator.h"
+#include "../Component/CSpriteRenderer.h"
+#include "../Object/CGameObject.h"
 
 CAnimator::CAnimator() :
 	CComponent(COMPONENT_TYPE::CT_Animator),
 	m_mapAnimations{},
 	m_pCurAnimation(nullptr),
-	m_bRepeat(false)
+	m_bRepeat(false),
+	m_pSpriteRenderer(nullptr)
 {
 }
 
@@ -32,17 +35,32 @@ void CAnimator::Update()
 {
 	if (m_pCurAnimation)
 	{
-		m_pCurAnimation->Update();
+		m_pCurAnimation->Update(); // 현재 애니메이션 업데이트
 
-		tEvents* events = FindEvents(m_pCurAnimation->GetName());
-
-		if (m_pCurAnimation->IsFinish() == true)
+		if (m_pSpriteRenderer)
 		{
+			// 애니메이션에서 현재 프레임 텍스처 가져오기
+			CTexture* curFrmTexture = m_pCurAnimation->GetCurrentFrameTexture();
+			if (curFrmTexture)
+			{
+				m_pSpriteRenderer->SetTexture(curFrmTexture); // 현재 프레임 텍스처 설정
+				OutputDebugStringW(L"Frame updated\n"); // 디버그 출력
+			}
+		}
+
+		// 애니메이션이 끝났다면
+		if (m_pCurAnimation->IsFinish())
+		{
+			tEvents* events = FindEvents(m_pCurAnimation->GetName());
+
 			if (events)
 				events->tCompleteEvent();
 
-			if (m_bRepeat == true)
+			// 반복 재생 설정이 되어 있다면 애니메이션을 리셋하여 반복
+			if (m_bRepeat)
+			{
 				m_pCurAnimation->ResetAnimation();
+			}
 		}
 	}
 }
@@ -54,8 +72,15 @@ void CAnimator::LateUpdate()
 void CAnimator::Render()
 {
 	// 현재 애니메이션이 존재하는 경우
-	if (nullptr != m_pCurAnimation)
-		m_pCurAnimation->Render();	// 현재 애니메이션을 렌더링합니다.
+	if (m_pCurAnimation)
+	{
+		m_pCurAnimation->Render();  // 애니메이션 렌더링 호출
+		OutputDebugStringW(L"Rendering current animation\n");
+	}
+	else
+	{
+		OutputDebugStringW(L"No animation to render\n");
+	}
 }
 
 // 애니메이션 생성(애니메이션 이름, 택스쳐, 좌상단, 프레임 크기, 오프셋, 프레임카운트, 지속시간)
@@ -113,45 +138,6 @@ void CAnimator::CreateFrameAnimation(const wstring& _strName, const vector<wstri
 	m_mapAnimations.insert(make_pair(_strName, animation));
 }
 
-//void CAnimator::CreateAnimationByFolder(const wstring& _strName, const wstring& _strPath,
-//	Vector2 _vOffset, float _fDuration)
-//{
-//	CAnimation* animation = nullptr;
-//	animation = FindAnimation(_strName);
-//	if (animation != nullptr)
-//		return;
-//
-//	int fileCount = 0;
-//	filesystem::path fs(_strPath);
-//	vector<CTexture*> images = {};
-//	for (auto& p : filesystem::recursive_directory_iterator(fs))
-//	{
-//		wstring fileName = p.path().filename();
-//		wstring fullName = p.path();
-//
-//		CTexture* texture = CResourceManager::Load<CTexture>(fileName, fullName);
-//		images.push_back(texture);
-//		fileCount++;
-//	}
-//
-//	UINT sheetWidth = images[0]->GetWidth() * fileCount;
-//	UINT sheetHeight = images[0]->GetHeight();
-//	CTexture* spriteSheet = CTexture::Create(_strName, sheetWidth, sheetHeight);
-//
-//	UINT imageWidth = images[0]->GetWidth();
-//	UINT imageHeight = images[0]->GetHeight();
-//
-//	for (size_t i = 0; i < images.size(); i++)
-//	{
-//		BitBlt(spriteSheet->GetHdc(), i * imageWidth, 0,
-//			imageWidth, imageHeight, images[i]->GetHdc(), 0, 0, SRCCOPY);
-//	}
-//
-//	CreateAltasAnimation(_strName, spriteSheet,
-//		Vector2(0.0f, 0.0f), Vector2(imageWidth, imageHeight),
-//		_vOffset, fileCount, _fDuration);
-//}
-
 void CAnimator::AddFrameAnimation(const wstring& _strName, const wchar_t* _pFilePath, int _iFrameMax,
 	Vector2 _vLeftTop, float _fSizeX, float _fSizeY, float _fOffsetX, float _fOffsetY, float _fDuration)
 {
@@ -188,22 +174,49 @@ void CAnimator::Play(const wstring& _strName, bool _bRepeat)
 	if (animation == nullptr)
 		return;
 
-	if (m_pCurAnimation)
+	// 애니메이션 프레임 갱신을 위한 코드
+	if (m_pCurAnimation != animation)
 	{
-		tEvents* currentEvents = FindEvents(m_pCurAnimation->GetName());
+		if (m_pCurAnimation)
+		{
+			tEvents* currentEvents = FindEvents(m_pCurAnimation->GetName());
+			if (currentEvents)
+				currentEvents->tEndEvent();
+		}
 
-		if (currentEvents)
-			currentEvents->tEndEvent();
+		tEvents* nextEvents = FindEvents(animation->GetName());
+		if (nextEvents)
+			nextEvents->tStratEvent();
+
+		m_pCurAnimation = animation;
+		m_pCurAnimation->ResetAnimation(); // 애니메이션을 초기화
+		m_bRepeat = _bRepeat;
 	}
 
-	tEvents* nextEvents = FindEvents(animation->GetName());
+	// 애니메이션 진행 중 텍스처 출력
+	CTexture* currentTexture = m_pCurAnimation->GetCurrentFrameTexture();
+	if (currentTexture)
+	{
+		wstring debugMessage = L"현재 출력 중인 텍스처: " + currentTexture->GetFilePath() + L"\n";
+		OutputDebugString(debugMessage.c_str());
+	}
+}
 
-	if (nextEvents)
-		nextEvents->tStratEvent();
+bool CAnimator::End() const
+{
+	if (m_pCurAnimation != nullptr)
+		return m_pCurAnimation->IsFinish();
 
-	m_pCurAnimation = animation;
-	m_pCurAnimation->ResetAnimation();
-	m_bRepeat = _bRepeat;
+	return false;
+}
+
+void CAnimator::ResetAnimation()
+{
+	if (m_pCurAnimation != nullptr)
+	{
+		m_pCurAnimation->SetCurrentFrame(0);
+		m_pCurAnimation->ResetAnimation();
+	}
 }
 
 CAnimator::tEvents* CAnimator::FindEvents(const wstring& _strName)

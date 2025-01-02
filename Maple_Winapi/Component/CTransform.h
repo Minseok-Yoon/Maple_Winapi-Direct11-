@@ -16,6 +16,8 @@ public:
 
 	void Bind() const;
 
+	void LookAt(const Vector3& targetPosition);
+
 	void SetParent(CTransform* _pParent) { m_pParent = _pParent; }
 	CTransform* GetParent() { return m_pParent; }
 

@@ -7,26 +7,6 @@ extern CCore core;
 Matrix CCamera::ViewMatrix = Matrix::Identity;
 Matrix CCamera::ProjectionMatrix =Matrix::Identity;
 
-RECT CCamera::GetClipRect()
-{
-	RECT clipRect = {};
-	if (m_useWorldRect)
-	{
-		clipRect = m_worldRect;
-	}
-	else
-	{
-		const float halfWidth = m_fSize * m_fAspectRatio / 2.0f;
-		const float halfHeight = m_fSize / 2.0f;
-
-		clipRect.left = static_cast<LONG>(m_center.x - halfWidth);
-		clipRect.right = static_cast<LONG>(m_center.x + halfWidth);
-		clipRect.top = static_cast<LONG>(m_center.y - halfHeight);
-		clipRect.bottom = static_cast<LONG>(m_center.y + halfHeight);
-	}
-	return clipRect;
-}
-
 CCamera::CCamera() :
 	CComponent(COMPONENT_TYPE::CT_Camera),
 	m_eProjectionType(PROJECTION_TYPE::PT_Perspective),
@@ -35,9 +15,9 @@ CCamera::CCamera() :
 	m_fAspectRatio(0.0f),
 	m_fNear(1.0f),
 	m_fFar(1000.0f),
-	m_fSize(1.0f),
+	m_fSize(1.0f), // Size가 올라갈수록 확대되어 보여진다.
 	m_pVeilTex(nullptr),
-	m_left(-1.0f), m_right(1.0f), m_top(1.0f), m_bottom(-1.0f),
+	m_pTargetObject(nullptr),
 	m_listCamEffect{}
 {
 }
@@ -93,14 +73,39 @@ void CCamera::Update()
 	//else if (m_vLookPosition.y > vMapSize.y - vResolution.y)
 	//	m_vLookPosition.y = (vMapSize.y - vResolution.y) - 10.f;
 #pragma endregion
+	float width = core.GetWidth();
+	float height = core.GetHeight();
+
+	if (m_pTargetObject)
+	{
+		if (m_pTargetObject->IsDead())
+		{
+			m_pTargetObject = nullptr;
+		}
+		else
+		{
+			CTransform* tr = GetOwner()->GetComponent<CTransform>();
+			math::Vector3 targetPos = tr->GetPosition();
+
+			// 카메라 위치 계산 (타겟 위치에서 일정 거리만큼 떨어져 있게 설정)
+			math::Vector3 cameraPos = targetPos + Vector3(0.0f, 0.0f, -10.0f);  // 예시로 z축으로 10만큼 뒤에 배치
+
+			// 카메라의 위치와 회전 업데이트
+			CTransform* cameraTransform = GetOwner()->GetComponent<CTransform>();
+			cameraTransform->SetPosition(cameraPos);
+
+			// 카메라가 타겟을 향하도록 설정 (타겟이 바라보는 방향으로 카메라 회전)
+			math::Vector3 forward = (targetPos - cameraPos);  // 타겟 방향으로 정규화된 벡터
+			forward.Normalize();
+			cameraTransform->LookAt(targetPos);
+		}
+	}
 }
 
 void CCamera::LateUpdate()
 {
 	CreateViewMatrix();
 	CreateProjectionMatrix(m_eProjectionType);
-
-	AdjustToWorldRect();
 
 	ViewMatrix = m_ViewMatrix;
 	ProjectionMatrix = m_ProjectionMatrix;
@@ -195,6 +200,9 @@ void CCamera::CreateViewMatrix()
 	const Vector3 forward = tr->Forward();
 
 	m_ViewMatrix = Matrix::CreateLookToLH(pos, forward, up);
+
+	// 디버깅: ViewMatrix 확인
+	assert(m_ViewMatrix != Matrix::Identity);
 }
 
 void CCamera::CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType)
@@ -215,112 +223,7 @@ void CCamera::CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType)
 		m_ProjectionMatrix = Matrix::CreateOrthographicLH(width / m_fSize, height / m_fSize, m_fNear, m_fFar);
 		break;
 	}
-}
 
-void CCamera::AdjustToWorldRect()
-{
-	if (!m_useWorldRect)
-		return;
-
-	const RECT clipRect = GetClipRect();
-
-	// 텍스처 경계 영역의 가로, 세로 크기 계산
-	const float worldWidth = static_cast<float>(m_worldRect.right - m_worldRect.left);
-	const float worldHeight = static_cast<float>(m_worldRect.bottom - m_worldRect.top);
-
-	// 카메라 클립 영역의 가로, 세로 크기 계산
-	const float clipWidth = static_cast<float>(clipRect.right - clipRect.left);
-	const float clipHeight = static_cast<float>(clipRect.bottom - clipRect.top);
-
-	// 카메라의 이동 제한 계산
-	if (clipWidth <= worldWidth)
-	{
-		m_center.x = std::clamp(
-			m_center.x,
-			m_worldRect.left + clipWidth / 2.0f,
-			m_worldRect.right - clipWidth / 2.0f
-		);
-	}
-	else
-	{
-		// 텍스처가 카메라보다 작으면 중심 고정
-		m_center.x = (m_worldRect.left + m_worldRect.right) / 2.0f;
-	}
-
-	if (clipHeight <= worldHeight)
-	{
-		m_center.y = std::clamp(
-			m_center.y,
-			m_worldRect.top + clipHeight / 2.0f,
-			m_worldRect.bottom - clipHeight / 2.0f
-		);
-	}
-	else
-	{
-		// 텍스처가 카메라보다 작으면 중심 고정
-		m_center.y = (m_worldRect.top + m_worldRect.bottom) / 2.0f;
-	}
-}
-
-void CCamera::ChangeDisplayMode(int _iMode)
-{
-	m_displayMode = _iMode;
-
-	switch (m_displayMode)
-	{
-	case 0: // 800x600
-		core.SetWidth(800);
-		core.SetHeight(600);
-		break;
-	case 1: // 1024x768
-		core.SetWidth(1024);
-		core.SetHeight(768);
-		break;
-	case 2: // 1268x760
-		core.SetWidth(1268);
-		core.SetHeight(768);
-		break;
-	case 3: // 1366x768
-		core.SetWidth(1366);
-		core.SetHeight(768);
-		break;
-	case 4: // Fullscreen
-		core.SetWidth(1600);
-		core.SetHeight(900);
-		break;
-	default:
-		ChangeDisplayMode(0); // Default to 800x600
-		break;
-	}
-}
-
-RECT CCamera::MeasureDrawRect(int _iSpriteWidth, int _iSpriteHeight, const XMFLOAT2& position, const XMFLOAT2& origin, bool _bflipX)
-{
-	RECT drawingRect;
-	drawingRect.left = static_cast<LONG>(position.x - origin.x);
-	drawingRect.top = static_cast<LONG>(position.y - origin.y);
-	drawingRect.right = drawingRect.left + _iSpriteWidth;
-	drawingRect.bottom = drawingRect.top + _iSpriteHeight;
-
-	if (_bflipX) {
-		drawingRect.left -= _iSpriteWidth;
-		drawingRect.right -= _iSpriteWidth;
-	}
-
-	return drawingRect;
-}
-
-Vector2 CCamera::CameraToWorld(const Vector2& _vCameraPoint)
-{
-	Vector2 worldPoint = _vCameraPoint;
-	worldPoint.x += m_center.x - (m_fSize * m_fAspectRatio) / 2.0f;
-	worldPoint.y += m_center.y - (m_fSize / 2.0f);
-	return worldPoint;
-}
-
-bool CCamera::CheckSpriteVisible(const RECT& _tSpriteRect)
-{
-	RECT clip = GetClipRect();
-	return !(_tSpriteRect.right < clip.left || _tSpriteRect.left > clip.right ||
-		_tSpriteRect.bottom < clip.top || _tSpriteRect.top > clip.bottom);
+	// 프로젝션 매트릭스 생성 로직
+	assert(m_ProjectionMatrix != Matrix::Identity);
 }

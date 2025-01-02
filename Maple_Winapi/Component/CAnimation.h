@@ -46,6 +46,12 @@ public:
 
 	void SetAnimator(class CAnimator* _pAnimator) { m_pAnimator = _pAnimator; }
 
+	CTexture* GetCurrentFrameTexture() const;
+	void SetFinish(bool _bFinish) { m_bFinish = _bFinish; }
+	void SetCurrentFrame(int _iFrame);
+
+	void ResetTime();
+
 private:
 	ANIMATION_STATE		m_eAnimationState;
 	vector<tAnimFrm>	m_vecAnimationFrm;		// 모든 프레임 정보

@@ -16,6 +16,8 @@ CTexture::~CTexture()
 
 HRESULT CTexture::Load(const wstring& _strPath)
 {
+	m_strFilePath = _strPath;
+
 #pragma region ≈ÿΩ∫√≥
 	//wstring ext = _strPath.substr(_strPath.find_last_of(L".") + 1);
 

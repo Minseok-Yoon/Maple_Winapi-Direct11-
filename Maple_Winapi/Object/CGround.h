@@ -15,7 +15,7 @@ public:
     virtual void LateUpdate() override;
     virtual void Render() override;
 
-    void SetBackGroundTexture(CTexture* _pBackGroundTexture) { m_pBackGroundTexture = _pBackGroundTexture; }
+    void SetBackGroundTexture(CTexture* _pBackGroundTexture);
     CTexture* GetBackGroundTexture() const { return m_pBackGroundTexture; }
 
 private:

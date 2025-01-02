@@ -24,6 +24,9 @@ public:
     TextureSize GetTextureSize() const { return m_tTextureSize; }
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetSRV() { return m_SRV; }
 
+    const wstring& GetFilePath() const { return m_strFilePath; }
+    void SetFilePath(const wstring& _filePath) { m_strFilePath = _filePath; }
+
 private:
     TextureSize     m_tTextureSize;
     ScratchImage    m_Image;
@@ -33,4 +36,6 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>    m_SRV;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView>      m_RTV;
+
+    wstring m_strFilePath; // 텍스처 파일 경로
 };

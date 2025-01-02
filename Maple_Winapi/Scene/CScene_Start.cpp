@@ -23,6 +23,8 @@
 #include "../Component/CBoxCollider2D.h"
 #include "../Component/CCameraScript.h"
 
+#include "../Object/CPlayer.h"
+
 CScene_Start::CScene_Start()
 {
 	CTexture* bgTexture = CResourceManager::Load<CTexture>(L"BG", L"../Resources/Texture/StartPanel.bmp");
@@ -36,8 +38,6 @@ CScene_Start::~CScene_Start()
 void CScene_Start::Enter(const wstring& _strBackGroundName, const wstring& _strAudioName)
 {
 	CScene::Enter(L"BG", L"BGSound");
-
-	//CUIManager::Push(UI_TYPE::UT_Button);
 }
 
 void CScene_Start::Enter()
@@ -61,7 +61,6 @@ void CScene_Start::Init()
 	CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
 	CCamera* cameraComp = camera->AddComponent<CCamera>();
 	cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
-	//cameraComp->SetSize(100.0f);
 
 	CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
 	renderer::mainCamera = cameraComp;
@@ -79,6 +78,10 @@ void CScene_Start::LateUpdate()
 	if (KEY_TAP(KEY_CODE::Y))
 	{
 		CSceneManager::LoadScene(L"Stage01", L"Stage01_BG", L"Stage01_BGSound");
+	}
+	if (KEY_TAP(KEY_CODE::U))
+	{
+		CSceneManager::LoadScene(L"TestScene");
 	}
 }
 

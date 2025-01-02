@@ -32,7 +32,7 @@ CScene_Stage01::CScene_Stage01() :
 {
 	CResourceManager::Load<CTexture>(L"Stage01_BG", L"../Resources/Texture/Rehelleun.png");
 	CAudioClip* ac = CResourceManager::Load<CAudioClip>(L"Stage01_BGSound", L"../Resources/Sound/LachelntheIllusionCity.mp3");
-	//CResourceManager::Load<CTexture>(L"Player", L"Content/texture/Player/Player.bmp");
+	//CResourceManager::Load<CTexture>(L"PLAYER", L"../Resources/Texture/Player/Player.bmp");
 }
 
 CScene_Stage01::~CScene_Stage01()
@@ -50,6 +50,8 @@ void CScene_Stage01::Init()
 
 	CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
 	renderer::mainCamera = cameraComp;
+
+	
 }
 
 void CScene_Stage01::Update()

@@ -211,6 +211,9 @@
     <Filter Include="Engine\04. Manager\Helpers\KeyManager">
       <UniqueIdentifier>{72328a13-aeb6-4aab-a79a-b231af2a6262}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\06. Scene\TestScene">
+      <UniqueIdentifier>{ac548467-0676-4748-8282-8489aa9b2098}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -429,6 +432,9 @@
     <ClInclude Include="Resource\CShader.h">
       <Filter>Engine\08. Resource\Graphics\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="Scene\CTestScene.h">
+      <Filter>Engine\06. Scene\TestScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -619,6 +625,9 @@
     </ClCompile>
     <ClCompile Include="Resource\CShader.cpp">
       <Filter>Engine\08. Resource\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\CTestScene.cpp">
+      <Filter>Engine\06. Scene\TestScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

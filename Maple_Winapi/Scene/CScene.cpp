@@ -97,16 +97,21 @@ void CScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioNa
 
 	// 배경 텍스처 로드
 	CTexture* bgTexture = CResourceManager::Find<CTexture>(_strBackGroundName);
+	if (bgTexture != nullptr)
+	{
+		// 텍스처 설정
+		m_pBackGround->SetBackGroundTexture(bgTexture);
 
-	// 텍스처 크기 설정하기
-	CTexture::TextureSize textureSize = bgTexture->GetTextureSize();
-	if (textureSize.width <= iWidth || textureSize.height <= iHeight)
-	{
-		backGroundTr->SetScale(Vector3(iWidth, iHeight, 0.0f));
-	}
-	else
-	{
-		backGroundTr->SetScale(Vector3(textureSize.width, textureSize.height, 0.0f));
+		// 텍스처 크기 설정하기
+		CTexture::TextureSize textureSize = bgTexture->GetTextureSize();
+		if (textureSize.width <= iWidth || textureSize.height <= iHeight)
+		{
+			backGroundTr->SetScale(Vector3(iWidth, iHeight, 0.0f));
+		}
+		else
+		{
+			backGroundTr->SetScale(Vector3(textureSize.width, textureSize.height, 0.0f));
+		}
 	}
 
 	// 스프라이트 렌더러 설정

@@ -1,7 +1,10 @@
 #include "CPlayer.h"
 
 
-CPlayer::CPlayer()
+CPlayer::CPlayer() :
+	m_fAttackDelayTime(1.2f),  // 공격 후 0.2초 동안 대기
+	m_fElapsedTime(0.0f),
+	m_bAttackCycle(false)
 {
 }
 

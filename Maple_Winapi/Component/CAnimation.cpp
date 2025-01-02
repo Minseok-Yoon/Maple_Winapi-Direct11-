@@ -27,21 +27,23 @@ void CAnimation::Update()
 	if (m_bFinish)
 		return;
 
+	// 애니메이션 진행 시간 축적
 	m_fAccTime += CTimeManager::GetfDeltaTime();
 
-	if (m_fAccTime >= m_vecAnimationFrm[m_iCurFrm].fDuration)
+	// 프레임의 지속 시간이 초과되면 다음 프레임으로 넘어가기
+	if (m_fAccTime > m_vecAnimationFrm[m_iCurFrm].fDuration)
 	{
 		m_fAccTime = 0.0f;
-		if (m_iCurFrm <= m_vecAnimationFrm.size() - 1)
+
+		// 현재 프레임이 마지막 프레임이 아니면, 다음 프레임으로 진행
+		if (m_iCurFrm < m_vecAnimationFrm.size() - 1)
 		{
-			++m_iCurFrm;
+			m_iCurFrm++;
 		}
 		else
 		{
-			if (m_eAnimationState == ANIMATION_STATE::AS_Finish)
-			{
-				m_bFinish = true;
-			}
+			// 마지막 프레임에 도달하면 애니메이션 종료
+			m_bFinish = true;
 		}
 	}
 }
@@ -101,4 +103,22 @@ void CAnimation::ResetAnimation()
 	m_fAccTime = 0.0f;	// 시간 누적 초기화
 	m_iCurFrm = 0;		// 첫 번째 프레임으로 설정
 	m_bFinish = false;	// 재생 끝 상태 초기화
+}
+
+CTexture* CAnimation::GetCurrentFrameTexture() const
+{
+	if (m_iCurFrm >= 0 && m_iCurFrm < m_vecAnimationFrm.size())
+	{
+		return m_vecAnimationFrm[m_iCurFrm].pTexture; // 해당 프레임의 텍스처 반환
+	}
+	return nullptr;
+}
+
+void CAnimation::SetCurrentFrame(int _iFrame)
+{
+	if (_iFrame >= 0 && _iFrame < m_vecAnimationFrm.size())  // 유효한 프레임 번호 체크
+	{
+		m_iCurFrm = _iFrame;  // 프레임 설정
+		m_fAccTime = 0.0f;   // 시간 리셋
+	}
 }

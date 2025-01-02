@@ -37,3 +37,17 @@ void CBackGround::Render()
 {
     CGameObject::Render();
 }
+
+void CBackGround::SetBackGroundTexture(CTexture* _pBackGroundTexture)
+{
+    m_pBackGroundTexture = _pBackGroundTexture;
+    if (m_pBackGroundTexture != nullptr)
+    {
+        CSpriteRenderer* sr = GetComponent<CSpriteRenderer>();
+        if (sr == nullptr)
+        {
+            sr = AddComponent<CSpriteRenderer>();
+        }
+        sr->SetTexture(m_pBackGroundTexture);
+    }
+}
