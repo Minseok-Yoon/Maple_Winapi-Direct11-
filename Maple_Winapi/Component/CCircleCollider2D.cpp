@@ -6,7 +6,6 @@
 #include "../Module/SelectGDI.h"
 
 CCircleCollider2D::CCircleCollider2D() :
-	CCollider(COLLIDER_TYPE::CT_Circle2D),
 	m_fRadius(0.0f)
 {
 }

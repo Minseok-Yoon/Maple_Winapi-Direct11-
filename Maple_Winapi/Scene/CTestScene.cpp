@@ -12,6 +12,7 @@
 #include "../Component/CRigidBody.h"
 #include "../Component/CAnimator.h"
 #include "../Core/CCore.h"
+#include "../Component/CCollider.h"
 
 extern CCore core;
 
@@ -122,6 +123,9 @@ void CTestScene::Init()
     CPlayerScript* playerScript = pPlayer->AddComponent<CPlayerScript>();
 
     pPlayer->AddComponent<CRigidBody>();
+
+    CCollider* playerCol = pPlayer->AddComponent<CCollider>();
+    playerCol->SetScale(Vector2(54.0f, 65.0f));
 
     renderer::selectedObject = pPlayer;
 }

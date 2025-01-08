@@ -4,14 +4,14 @@
 class CCollider : public CComponent
 {
 public:
-	CCollider(COLLIDER_TYPE _eColliderType);
-	~CCollider();
+	CCollider();
+	virtual ~CCollider();
 
 public:
-	virtual void Init();
-	virtual void Update();
-	virtual void LateUpdate();
-	virtual void Render();
+	void Init() override;
+	void Update() override;
+	void LateUpdate() override;
+	void Render() override;
 
 	// 충돌 시점 함수
 	virtual void OnCollisionEnter(class CCollider* _pOther);	// 충돌 진입 시

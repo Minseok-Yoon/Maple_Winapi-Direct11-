@@ -1,5 +1,8 @@
 #include "CPlayer.h"
-
+#include "../Component/CCollider.h"
+#include "../Component/CBoxCollider2D.h"
+#include "../Object/CGameObject.h"
+#include "../Component/CComponent.h"
 
 CPlayer::CPlayer() :
 	m_fAttackDelayTime(1.2f),  // 공격 후 0.2초 동안 대기
@@ -30,4 +33,10 @@ void CPlayer::LateUpdate()
 void CPlayer::Render()
 {
 	CGameObject::Render();
+
+	CCollider* col = GetComponent<CCollider>();
+	if (col && col->IsRenderCollidersEnabled())
+	{
+		col->Render();
+	}
 }

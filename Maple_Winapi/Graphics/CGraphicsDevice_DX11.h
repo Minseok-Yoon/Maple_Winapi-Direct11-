@@ -86,8 +86,8 @@ inline CGraphicDevice_DX11*& GetDevice()
 	return device;
 }
 
-//inline CGraphicDevice_DX11*& GetDeviceContext()
-//{
-//	static CGraphicDevice_DX11* context = nullptr;
-//	return context;
-//}
+inline ID3D11DeviceContext*& GetDeviceContext()
+{
+	static ID3D11DeviceContext* context = GetDevice()->GetID3D11DeviceContext().Get();
+	return context;
+}

@@ -8,9 +8,12 @@
 #include "../Core/CCore.h"
 #include "../Component/CPixelCollider.h"
 #include "../Component/CSpriteRenderer.h"
+#include "../Component/CPixelCollider.h"
+#include "../Manager/CSceneManager.h"
 
 CBackGround::CBackGround() :
-    m_pBackGroundTexture(nullptr)
+    m_pBackGroundTexture(nullptr),
+    m_pPixBackGround(nullptr)
 {
 }
 
@@ -21,6 +24,18 @@ CBackGround::~CBackGround()
 void CBackGround::Init()
 {
     CGameObject::Init();
+
+    m_pPixBackGround = new CPixelCollider();
+
+    const wchar_t* currentSceneName = CSceneManager::GetCurrentSceneName();
+
+    if (currentSceneName == L"TestScene")
+    {
+        if (!m_pPixBackGround->SetPixelInfo(L"../Resources/Texture/MainPixel.png"))
+        {
+            OutputDebugStringA("Failed to set pixel collider for Stage 01.\n");
+        }
+    }
 }
 
 void CBackGround::Update()

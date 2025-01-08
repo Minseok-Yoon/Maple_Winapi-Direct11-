@@ -97,6 +97,7 @@ enum class LAYER_TYPE
 {
 	LT_None,
 	LT_BackGround,
+	LT_PixelBackGround,
 	LT_Player,
 	LT_Monster,
 	LT_Floor,
@@ -114,6 +115,7 @@ enum class COMPONENT_TYPE
 	CT_Gravity,
 	CT_Script,
 	CT_SpriteRenderer,
+	CT_LineRenderer,
 	CT_Animator,
 	CT_Camera,
 	CT_AudioListener,

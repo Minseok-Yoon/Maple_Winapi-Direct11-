@@ -179,6 +179,7 @@
     <ClInclude Include="Component\CCollider.h" />
     <ClInclude Include="Component\CComponent.h" />
     <ClInclude Include="Component\CGravity.h" />
+    <ClInclude Include="Component\CLineRenderer.h" />
     <ClInclude Include="Component\CPixelCollider.h" />
     <ClInclude Include="Component\CRenderer.h" />
     <ClInclude Include="Component\CRigidBody.h" />
@@ -232,6 +233,7 @@
     <ClInclude Include="Resource\CTexture.h" />
     <ClInclude Include="Scene\CDontDestroyOnLoad.h" />
     <ClInclude Include="Scene\CLoadingScene.h" />
+    <ClInclude Include="Scene\CRectDrawScene.h" />
     <ClInclude Include="Scene\CScene.h" />
     <ClInclude Include="Scene\CScene_Stage01.h" />
     <ClInclude Include="Scene\CScene_Stage02.h" />
@@ -253,6 +255,7 @@
     <ClCompile Include="Component\CCollider.cpp" />
     <ClCompile Include="Component\CComponent.cpp" />
     <ClCompile Include="Component\CGravity.cpp" />
+    <ClCompile Include="Component\CLineRenderer.cpp" />
     <ClCompile Include="Component\CPixelCollider.cpp" />
     <ClCompile Include="Component\CRenderer.cpp" />
     <ClCompile Include="Component\CRigidBody.cpp" />
@@ -300,6 +303,7 @@
     <ClCompile Include="Resource\CTexture.cpp" />
     <ClCompile Include="Scene\CDontDestroyOnLoad.cpp" />
     <ClCompile Include="Scene\CLoadingScene.cpp" />
+    <ClCompile Include="Scene\CRectDrawScene.cpp" />
     <ClCompile Include="Scene\CScene.cpp" />
     <ClCompile Include="Scene\CScene_Stage01.cpp" />
     <ClCompile Include="Scene\CScene_Stage02.cpp" />

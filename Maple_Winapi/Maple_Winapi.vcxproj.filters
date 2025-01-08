@@ -214,6 +214,9 @@
     <Filter Include="Engine\06. Scene\TestScene">
       <UniqueIdentifier>{ac548467-0676-4748-8282-8489aa9b2098}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\09. Component\LineRenderer">
+      <UniqueIdentifier>{435e30f9-165f-4e56-a4f4-d9982e11990c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -435,6 +438,12 @@
     <ClInclude Include="Scene\CTestScene.h">
       <Filter>Engine\06. Scene\TestScene</Filter>
     </ClInclude>
+    <ClInclude Include="Scene\CRectDrawScene.h">
+      <Filter>Engine\06. Scene\TestScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\CLineRenderer.h">
+      <Filter>Engine\09. Component\LineRenderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -628,6 +637,12 @@
     </ClCompile>
     <ClCompile Include="Scene\CTestScene.cpp">
       <Filter>Engine\06. Scene\TestScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\CRectDrawScene.cpp">
+      <Filter>Engine\06. Scene\TestScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\CLineRenderer.cpp">
+      <Filter>Engine\09. Component\LineRenderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

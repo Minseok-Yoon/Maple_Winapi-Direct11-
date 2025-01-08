@@ -36,6 +36,9 @@ public:
 	void SetTarget(CGameObject* _pTarget) { m_pTargetObject = _pTarget; }
 	CGameObject* GetTarget() { return m_pTargetObject; }
 
+	Vector3 CaluatePosition(Vector3 _vPos) { return _vPos - m_vDistance; }
+	Vector2 CaluatePosition2D(Vector2 _vPos) { return _vPos - m_vDistance; }
+
 	CCamera();
 	virtual ~CCamera();
 
@@ -65,6 +68,8 @@ private:
 	Matrix			m_ProjectionMatrix;
 	float			m_fNear;
 	float			m_fFar;
+
+	Vector3			m_vDistance;
 
 	list<tCamEffect>	m_listCamEffect;		// 순차적으로 효과를 처리하기 위해 vector말고 list로 사용
 	class CTexture* m_pVeilTex;				// 카메라 가림막 택스처(검은색으로)

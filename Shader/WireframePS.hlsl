@@ -18,6 +18,7 @@ struct VSOutput
 
 float4 main(VSOutput input) : SV_Target
 {
-    float4 color = float4(0.0f, 0.0f, 0.0f, 1.0f);
-    return color;
+    /*float4 color = float4(255.0f, 0.0f, 0.0f, 1.0f);
+    return color;*/
+    return input.color;
 }

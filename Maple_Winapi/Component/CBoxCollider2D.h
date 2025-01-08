@@ -1,6 +1,8 @@
 #pragma once
 #include "CCollider.h"
 
+using namespace math;
+
 class CBoxCollider2D : public CCollider
 {
 public:

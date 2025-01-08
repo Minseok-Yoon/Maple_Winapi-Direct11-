@@ -20,11 +20,11 @@ public:
 	CTexture* GetTexture() { return m_pTexture; }
 
 	void SetMaterial(CMaterial* _pMaterial) { m_pMaterial = _pMaterial; }
-	
+
+	void SetMesh(CMesh* _pMesh) { m_pMesh = _pMesh; }
 
 private:
 	CTexture*	m_pTexture;
 	CMaterial*	m_pMaterial;
 	CMesh*		m_pMesh;
 };
-

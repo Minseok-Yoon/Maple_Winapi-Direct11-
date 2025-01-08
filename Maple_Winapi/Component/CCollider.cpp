@@ -6,9 +6,8 @@
 UINT CCollider::g_iNextID = 1;
 bool CCollider::g_bRenderColliders = false;
 
-CCollider::CCollider(COLLIDER_TYPE _eColliderType) :
+CCollider::CCollider() :
 	CComponent(COMPONENT_TYPE::CT_Collider),
-	m_eColliderType(_eColliderType),
 	m_iID(g_iNextID++),
 	m_vScale(Vector2(1.0f, 1.0f)),
 	m_bEnable(true)

@@ -10,6 +10,7 @@ Matrix CCamera::ProjectionMatrix =Matrix::Identity;
 CCamera::CCamera() :
 	CComponent(COMPONENT_TYPE::CT_Camera),
 	m_eProjectionType(PROJECTION_TYPE::PT_Perspective),
+	m_vDistance(Vector3(0.0f, 0.0f, 0.0f)),
 	m_ViewMatrix(Matrix::Identity),
 	m_ProjectionMatrix(Matrix::Identity),
 	m_fAspectRatio(0.0f),

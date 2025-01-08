@@ -10,6 +10,7 @@
 #include "../Manager/CKeyManager.h"
 
 #include "../Scene/CTestScene.h"
+#include "../Scene/CRectDrawScene.h"
 
 extern CCore core;
 
@@ -126,6 +127,7 @@ void CLoadingScene::resourcesLoad(std::mutex& _pMutex)
             CSceneManager::CreateScene<CScene_Start>(L"StartScene");
             CSceneManager::CreateScene<CScene_Stage01>(L"Stage01");
             CSceneManager::CreateScene<CTestScene>(L"TestScene");
+            CSceneManager::CreateScene<CRectDrawScene>(L"DrawRectScene");
         }
         _pMutex.unlock();
 

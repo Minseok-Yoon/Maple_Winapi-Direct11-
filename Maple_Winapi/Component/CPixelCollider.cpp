@@ -2,8 +2,7 @@
 #include "CPixelCollider.h"
 #include "../Manager/CPathManager.h"
 
-CPixelCollider::CPixelCollider() :
-	CCollider(COLLIDER_TYPE::CT_Pixel)
+CPixelCollider::CPixelCollider()
 {
 	m_iWidth = 0;
 	m_iHeight = 0;

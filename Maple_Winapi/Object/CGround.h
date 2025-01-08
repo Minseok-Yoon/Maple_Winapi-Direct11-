@@ -2,7 +2,7 @@
 #include "CGameObject.h"
 #include "../Resource/CTexture.h"
 
-class CColliderPixel;
+class CPixelCollider;
 
 class CBackGround : public CGameObject
 {
@@ -18,6 +18,9 @@ public:
     void SetBackGroundTexture(CTexture* _pBackGroundTexture);
     CTexture* GetBackGroundTexture() const { return m_pBackGroundTexture; }
 
+    CPixelCollider* GetPixelCollider() const { return m_pPixBackGround; }
+
 private:
-    CTexture* m_pBackGroundTexture;
+    CTexture*       m_pBackGroundTexture;
+    CPixelCollider* m_pPixBackGround;
 };

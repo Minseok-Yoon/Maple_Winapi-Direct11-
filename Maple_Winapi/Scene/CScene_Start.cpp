@@ -83,6 +83,11 @@ void CScene_Start::LateUpdate()
 	{
 		CSceneManager::LoadScene(L"TestScene");
 	}
+
+	if (KEY_TAP(KEY_CODE::O))
+	{
+		CSceneManager::LoadScene(L"DrawRectScene");
+	}
 }
 
 void CScene_Start::Render()
