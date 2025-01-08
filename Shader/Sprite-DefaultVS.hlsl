@@ -5,6 +5,7 @@ struct VSInput
     float3 pos : POSITION;
     float4 color : COLOR;
     float2 uv : TEXCOORD;
+    float isLine : TEXCOORD1;
 };
 
 struct VSOutput
@@ -12,6 +13,7 @@ struct VSOutput
     float4 pos : SV_Position;
     float4 color : COLOR;
     float2 uv : TEXCOORD;
+    float isLine : TEXCOORD1;
 };
 
 VSOutput main(VSInput input)
@@ -25,6 +27,7 @@ VSOutput main(VSInput input)
     output.pos = projPos;
     output.color = input.color;
     output.uv = input.uv;
+    output.isLine = input.isLine;
 
     return output;
 }

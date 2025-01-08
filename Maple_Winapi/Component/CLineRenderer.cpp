@@ -43,11 +43,21 @@ void CLineRenderer::Render()
     if (m_Vertices.empty() || m_pVertexBuffer == nullptr)
         return;
 
+    // 원하는 오프셋 값 (예: (1.0f, 1.0f, 0.0f))
+    Vector3 offset(-0.5f, 0.0f, 0.0f);  // 이동할 방향
+
     // Vertex Buffer에 데이터 업로드
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     HRESULT hr = GetDeviceContext()->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if (SUCCEEDED(hr))
     {
+        // 각 Vertex에 오프셋 적용
+        for (auto& vertex : m_Vertices)
+        {
+            vertex.pos += offset;  // 위치에 오프셋 더하기
+            vertex.isLine = 1.0f;
+        }
+
         memcpy(mappedResource.pData, m_Vertices.data(), sizeof(Vertex) * m_Vertices.size());
         GetDeviceContext()->Unmap(m_pVertexBuffer, 0);
     }

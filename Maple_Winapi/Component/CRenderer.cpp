@@ -181,18 +181,22 @@ namespace renderer
 		vertexes[0].pos = Vector3(-0.5f, 0.5f, 0.0f);
 		vertexes[0].color = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
 		vertexes[0].uv = Vector2(0.0f, 0.0f);
+		vertexes[0].isLine = 0.0f;  // 선분 여부 설정
 
 		vertexes[1].pos = Vector3(0.5f, 0.5f, 0.0f);
 		vertexes[1].color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 		vertexes[1].uv = Vector2(1.0f, 0.0f);
+		vertexes[1].isLine = 0.0f;  // 선분 여부 설정
 
 		vertexes[2].pos = Vector3(0.5f, -0.5f, 0.0f);
 		vertexes[2].color = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
 		vertexes[2].uv = Vector2(1.0f, 1.0f);
+		vertexes[2].isLine = 0.0f;  // 선분 여부 설정
 
 		vertexes[3].pos = Vector3(-0.5f, -0.5f, 0.0f);
 		vertexes[3].color = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
 		vertexes[3].uv = Vector2(0.0f, 1.0f);
+		vertexes[3].isLine = 0.0f;  // 선분 여부 설정
 
 		indices.push_back(0);
 		indices.push_back(2);
@@ -202,7 +206,8 @@ namespace renderer
 		indices.push_back(1);
 		indices.push_back(2);
 
-		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[3] = {};
+		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[4] = {};  // 배열 크기 4로 확장
+
 		inputLayoutDesces[0].AlignedByteOffset = 0;
 		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[0].InputSlot = 0;
@@ -222,10 +227,17 @@ namespace renderer
 		inputLayoutDesces[2].InputSlot = 0;
 		inputLayoutDesces[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputLayoutDesces[2].SemanticName = "TEXCOORD";
-		inputLayoutDesces[2].SemanticIndex = 0;
+		inputLayoutDesces[2].SemanticIndex = 0;  // 첫 번째 텍스처 좌표
+
+		inputLayoutDesces[3].AlignedByteOffset = 36;  // isLine의 오프셋 (기존 오프셋에 4바이트 추가)
+		inputLayoutDesces[3].Format = DXGI_FORMAT_R32_FLOAT;
+		inputLayoutDesces[3].InputSlot = 0;
+		inputLayoutDesces[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[3].SemanticName = "TEXCOORD";  // 세만틱 이름을 "TEXCOORD"로 사용
+		inputLayoutDesces[3].SemanticIndex = 1;  // "TEXCOORD1"로 설정
 
 		CShader* spriteShader = CResourceManager::Find<CShader>(L"Sprite-Default-Shader");
-		mesh->SetVertexBufferParams(3, inputLayoutDesces, spriteShader->GetVSBlob()->GetBufferPointer(), spriteShader->GetVSBlob()->GetBufferSize());
+		mesh->SetVertexBufferParams(4, inputLayoutDesces, spriteShader->GetVSBlob()->GetBufferPointer(), spriteShader->GetVSBlob()->GetBufferSize());
 
 		mesh->CreateVB(vertexes);
 		mesh->CreateIB(indices);
