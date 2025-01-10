@@ -44,7 +44,7 @@ void CLineRenderer::Render()
         return;
 
     // 원하는 오프셋 값 (예: (1.0f, 1.0f, 0.0f))
-    Vector3 offset(-0.5f, 0.0f, 0.0f);  // 이동할 방향
+    Vector3 offset(0.0f, 0.0f, 0.0f);  // 이동할 방향
 
     // Vertex Buffer에 데이터 업로드
     D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -71,20 +71,43 @@ void CLineRenderer::Render()
     GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
     GetDeviceContext()->Draw((UINT)m_Vertices.size(), 0);
+}
 
-    // 색상 값 OutputDebugString으로 출력
-    char colorMessage[100];
-    sprintf_s(colorMessage, "LineRenderer Color: R=%.2f, G=%.2f, B=%.2f, A=%.2f\n", m_LineColor.x, m_LineColor.y, m_LineColor.z, m_LineColor.w);
-    OutputDebugStringA(colorMessage);  // 색상 값 출력
+//void CLineRenderer::DrawRectangle(const Vector3& _vPosition, const Vector2& _vSize, const Vector4& _vColor)
+//{
+//    std::vector<Vector3> points = {
+//        _vPosition,
+//        Vector3(_vPosition.x + _vSize.x, _vPosition.y, _vPosition.z),
+//        Vector3(_vPosition.x + _vSize.x, _vPosition.y + _vSize.y, _vPosition.z),
+//        Vector3(_vPosition.x, _vPosition.y + _vSize.y, _vPosition.z),
+//        _vPosition
+//    };
+//
+//    // 색상을 함께 설정하여 LineRenderer로 전달
+//    this->SetLineData(points, _vColor);
+//    this->Render();  // 사각형 그리기
+//}
+
+void CLineRenderer::SetShape(const Vector3& _vBottomLeft, const Vector3& _vTopRight, const Vector4& _vColor)
+{
+    m_Vertices.clear();
+
+    // 사각형의 네 꼭짓점
+    m_Vertices.push_back({ _vBottomLeft, _vColor });                         // 왼쪽 아래
+    m_Vertices.push_back({ Vector3(_vTopRight.x, _vBottomLeft.y, -2.0f), _vColor }); // 오른쪽 아래
+    m_Vertices.push_back({ _vTopRight, _vColor });                          // 오른쪽 위
+    m_Vertices.push_back({ Vector3(_vBottomLeft.x, _vTopRight.y, -2.0f), _vColor }); // 왼쪽 위
+    m_Vertices.push_back({ _vBottomLeft, _vColor });                        // 닫힌 선
+
+    m_LineColor = _vColor;
 }
 
 void CLineRenderer::SetLineData(const std::vector<Vector3>& points, const Vector4& color)
 {
     m_Vertices.clear();
-    m_LineColor = color;
-
     for (const auto& point : points)
     {
-        m_Vertices.push_back({ point, color }); // 초기화 시 색상 설정
+        m_Vertices.push_back({ point, color }); // 색상 설정
     }
+    m_LineColor = color; // 라인 색상 설정
 }

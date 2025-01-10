@@ -25,7 +25,7 @@ float4 main(VSOutput input) : SV_Target
     return color;*/
     //float4 texColor = sprite.Sample(anisotropicSampler, input.uv);
     //return texColor * input.color; // 텍스처 색상과 Vertex 색상을 곱함
-    if (input.isLine > 0.5)
+    if (input.isLine == 1.0)
     {
         return input.color;
     }

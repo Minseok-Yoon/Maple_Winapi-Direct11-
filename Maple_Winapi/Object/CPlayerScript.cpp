@@ -32,9 +32,9 @@ void CPlayerScript::Update()
 	{
 		CAnimator* animator = pPlayer->GetComponent<CAnimator>();
 
-		CCollider* col = pPlayer->GetComponent<CCollider>();
+		/*CCollider* col = pPlayer->GetComponent<CCollider>();
 		col->SetOffsetPos(Vector2(0.0f, 0.0f));
-		col->SetScale(Vector2(54.0f, 65.0f));
+		col->SetScale(Vector2(54.0f, 65.0f));*/
 	}
 
 	switch (m_ePlayerState)

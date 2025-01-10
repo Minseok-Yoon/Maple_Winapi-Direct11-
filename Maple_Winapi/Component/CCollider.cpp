@@ -1,6 +1,7 @@
 #include "CCollider.h"
 #include "../Object/CGameObject.h"
 #include "../Component/CScript.h"
+#include "../Component/CLineRenderer.h"
 #include "../Module/SelectGDI.h"
 
 UINT CCollider::g_iNextID = 1;
@@ -10,7 +11,10 @@ CCollider::CCollider() :
 	CComponent(COMPONENT_TYPE::CT_Collider),
 	m_iID(g_iNextID++),
 	m_vScale(Vector2(1.0f, 1.0f)),
-	m_bEnable(true)
+	m_bEnable(true),
+	m_vBottomLeft(Vector3(-0.5f, -0.5f, -1.0f)), // 기본 크기
+	m_vTopRight(Vector3(0.5f, 0.5f, -1.0f)),    // 기본 크기
+	m_vColor(Vector4(0.0f, 0.0f, 255.0f, 100.0f)) // 기본 색상 (파란색)
 {
 }
 
@@ -24,6 +28,7 @@ void CCollider::Init()
 
 void CCollider::Update()
 {
+	RectCollider();
 }
 
 void CCollider::LateUpdate()
@@ -53,4 +58,14 @@ void CCollider::OnCollisionExit(CCollider* _pOther)
 {
 	CScript* sr = GetOwner()->GetComponent<CScript>();
 	sr->OnCollisionExit(_pOther);
+}
+
+void CCollider::RectCollider()
+{
+	CLineRenderer* lineRenderer = GetOwner()->GetComponent<CLineRenderer>();
+	if (lineRenderer == nullptr)
+	{
+		lineRenderer = GetOwner()->AddComponent<CLineRenderer>();
+	}
+	lineRenderer->SetShape(m_vBottomLeft, m_vTopRight, m_vColor);
 }

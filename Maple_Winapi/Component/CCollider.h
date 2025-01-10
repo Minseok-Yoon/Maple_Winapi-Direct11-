@@ -18,6 +18,8 @@ public:
 	virtual void OnCollisionStay(class CCollider* _pOther);		// 충돌 중
 	virtual void OnCollisionExit(class CCollider* _pOther);		// 충돌 해제 시
 
+	void RectCollider();
+
 	COLLIDER_TYPE GetColliderType() { return m_eColliderType; }
 
 	static void ToggleRenderColliders() { g_bRenderColliders = !g_bRenderColliders; }
@@ -56,4 +58,8 @@ private:
 	int				m_iLayer;
 
 	string			m_strColTag;
+
+	Vector3			m_vBottomLeft;
+	Vector3			m_vTopRight;
+	Vector4			m_vColor;
 };
