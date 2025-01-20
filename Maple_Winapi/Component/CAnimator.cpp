@@ -44,7 +44,7 @@ void CAnimator::Update()
 			if (curFrmTexture)
 			{
 				m_pSpriteRenderer->SetTexture(curFrmTexture); // 현재 프레임 텍스처 설정
-				OutputDebugStringW(L"Frame updated\n"); // 디버그 출력
+				//OutputDebugStringW(L"Frame updated\n"); // 디버그 출력
 			}
 		}
 
@@ -75,11 +75,11 @@ void CAnimator::Render()
 	if (m_pCurAnimation)
 	{
 		m_pCurAnimation->Render();  // 애니메이션 렌더링 호출
-		OutputDebugStringW(L"Rendering current animation\n");
+		//OutputDebugStringW(L"Rendering current animation\n");
 	}
 	else
 	{
-		OutputDebugStringW(L"No animation to render\n");
+		//OutputDebugStringW(L"No animation to render\n");
 	}
 }
 
@@ -194,12 +194,12 @@ void CAnimator::Play(const wstring& _strName, bool _bRepeat)
 	}
 
 	// 애니메이션 진행 중 텍스처 출력
-	CTexture* currentTexture = m_pCurAnimation->GetCurrentFrameTexture();
+	/*CTexture* currentTexture = m_pCurAnimation->GetCurrentFrameTexture();
 	if (currentTexture)
 	{
 		wstring debugMessage = L"현재 출력 중인 텍스처: " + currentTexture->GetFilePath() + L"\n";
 		OutputDebugString(debugMessage.c_str());
-	}
+	}*/
 }
 
 bool CAnimator::End() const

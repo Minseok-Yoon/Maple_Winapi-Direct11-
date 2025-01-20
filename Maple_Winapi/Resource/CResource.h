@@ -5,6 +5,7 @@ class CResource abstract : public CEntity
 {
 public:
 	CResource(RESOURCE_TYPE _eResourceType);
+	CResource();
 	virtual ~CResource();
 
 	virtual HRESULT Load(const wstring& _strPath) = 0;

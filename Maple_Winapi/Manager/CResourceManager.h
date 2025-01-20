@@ -16,6 +16,7 @@ public:
 		return dynamic_cast<T*>(iter->second);
 	}
 
+
 	template <typename T>
 	static T* Load(const wstring& _strKey, const wstring& _strPath)
 	{

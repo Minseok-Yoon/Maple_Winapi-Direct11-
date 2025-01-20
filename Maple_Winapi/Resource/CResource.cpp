@@ -5,6 +5,10 @@ CResource::CResource(RESOURCE_TYPE _eResourceType) :
 {
 }
 
+CResource::CResource()
+{
+}
+
 CResource::~CResource()
 {
 }

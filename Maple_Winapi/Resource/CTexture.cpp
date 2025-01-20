@@ -6,8 +6,24 @@ extern CCore core;
 
 CTexture::CTexture() :
 	CResource(RESOURCE_TYPE::RT_Texture),
+	m_iWidth(0),
+	m_iHeight(0),
 	m_Desc{}
 {
+}
+
+CTexture::CTexture(Microsoft::WRL::ComPtr<ID3D11Texture2D> texture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv) : 
+	m_Texture(texture),
+	m_SRV(srv)
+{
+	if (texture)
+	{
+		texture->GetDesc(&m_Desc);
+		m_iWidth = m_Desc.Width;
+		m_iHeight = m_Desc.Height;
+		m_tTextureSize = { m_Desc.Width, m_Desc.Height };
+		m_Resource = m_Texture; // Texture를 Resource로 설정
+	}
 }
 
 CTexture::~CTexture()
@@ -69,23 +85,23 @@ HRESULT CTexture::Load(const wstring& _strPath)
 	// 파일 경로가 유효한지 확인
 	std::filesystem::path filePath(_strPath);
 
-	wstringstream debugStream;
+	/*wstringstream debugStream;
 	debugStream << L"Checking file path: " << _strPath << L"\n";
-	OutputDebugStringW(debugStream.str().c_str());
+	OutputDebugStringW(debugStream.str().c_str());*/
 
 	// 파일이 존재하는지 확인
 	if (!std::filesystem::exists(filePath))
 	{
-		std::wstringstream ss;
+		/*std::wstringstream ss;
 		ss << L"File does not exist: " << _strPath << "\n";
-		OutputDebugStringW(ss.str().c_str());
+		OutputDebugStringW(ss.str().c_str());*/
 		return S_FALSE;
 	}
 	else
 	{
-		std::wstringstream ss;
+		/*std::wstringstream ss;
 		ss << L"File exist: " << _strPath << "\n";
-		OutputDebugStringW(ss.str().c_str());
+		OutputDebugStringW(ss.str().c_str());*/
 	}
 
 	wstring ext
@@ -106,9 +122,9 @@ HRESULT CTexture::Load(const wstring& _strPath)
 		HRESULT hr = LoadFromWICFile(_strPath.c_str(), WIC_FLAGS::WIC_FLAGS_NONE, nullptr, m_Image);
 		if(FAILED(hr))
 		{
-			std::wstringstream ss;
+			/*std::wstringstream ss;
 			ss << L"Failed to load WIC file: " << _strPath << L", HRESULT: " << std::hex << hr << L"\n";
-			OutputDebugStringW(ss.str().c_str());
+			OutputDebugStringW(ss.str().c_str());*/
 			return hr; // 실패 시 반환
 		}
 
@@ -142,6 +158,17 @@ HRESULT CTexture::Load(const wstring& _strPath)
 void CTexture::Bind(SHADER_STAGE _eShaderStage, UINT startSlot)
 {
 	GetDevice()->SetShaderResource(_eShaderStage, startSlot, m_SRV.GetAddressOf());
+}
+
+bool CTexture::GetDesc(D3D11_TEXTURE2D_DESC& desc) const
+{
+	if (!m_Texture) {
+		//OutputDebugStringA("Texture is null in GetDesc.\n");
+		return false;
+	}
+
+	m_Texture->GetDesc(&desc);
+	return true;
 }
 
 //CTexture* CTexture::Create(const wstring& _strName, UINT _iWidth, UINT _iHeight)

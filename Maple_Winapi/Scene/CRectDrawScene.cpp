@@ -15,13 +15,14 @@
 #include "../Object/CPlayerScript.h"
 #include "../Component/CAnimator.h"
 #include "../Component/CRigidBody.h"
+#include "../Manager/CCollisionManager.h"
 
 extern CCore core;
 
 CRectDrawScene::CRectDrawScene() :
     m_pLineRenderer(nullptr)
 {
-    CResourceManager::Load<CTexture>(L"MainCol", L"../Resources/Texture/MainPixel.png");
+    //CResourceManager::Load<CTexture>(L"MainCol", L"../Resources/Texture/MainPixel.png");
 	CTexture* player = CResourceManager::Load<CTexture>(L"PLAYER", L"../Resources/Texture/Player/Player.bmp");
 }
 
@@ -33,38 +34,6 @@ CRectDrawScene::~CRectDrawScene()
 void CRectDrawScene::Enter()
 {
 	CScene::Enter();
-
-	CBackGround* bg = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
-	CTransform* bgTr = bg->GetComponent<CTransform>();
-	bgTr->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-
-	// 배경 텍스처 로드
-	CTexture* bgTexture = CResourceManager::Find<CTexture>(L"MainCol");
-	if (bgTexture != nullptr)
-	{
-		CTexture::TextureSize textureSize = bgTexture->GetTextureSize();
-		float textureWidth = static_cast<float>(textureSize.width);
-		float textureHeight = static_cast<float>(textureSize.height);
-
-		// 화면 해상도를 가져오기
-		float resolutionWidth = core.GetWidth();
-		float resolutionHeight = core.GetHeight();
-
-		// 텍스처가 화면을 완전히 덮도록 비율 계산
-		float scaleX = resolutionWidth / textureWidth;
-		float scaleY = resolutionHeight / textureHeight;
-
-		// 더 큰 비율로 설정하여 텍스처가 화면을 덮도록 조정
-		float scale = scaleX > scaleY ? scaleX : scaleY;
-
-		// 배경 크기를 스케일링
-		bgTr->SetScale(Vector3(textureWidth, textureHeight, 1.0f));
-		bg->SetBackGroundTexture(bgTexture);
-	}
-
-	// 배경 렌더러 설정
-	CSpriteRenderer* bgSr = bg->AddComponent<CSpriteRenderer>();
-	bgSr->SetTexture(bgTexture);
 }
 
 void CRectDrawScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioName)
@@ -79,6 +48,13 @@ void CRectDrawScene::Exit()
 void CRectDrawScene::Init()
 {
     CScene::Init();
+
+    CBackGround* bg = Instantiate<CBackGround>(LAYER_TYPE::LT_PixelBackGround);
+    bg->Init();
+    // 배경 텍스처 생성
+    bg->CreateTextureFromPixel();
+    CTransform* tr = bg->GetComponent<CTransform>();
+    tr->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
 
     // 카메라 설정
     CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
@@ -103,11 +79,17 @@ void CRectDrawScene::Init()
     CAnimator* animator = pPlayer->AddComponent<CAnimator>();
     animator->SetSpriteRenderer(sr);
     pPlayer->AddComponent<CPlayerScript>();
+
+	CPlayerScript* plSr = pPlayer->GetComponent<CPlayerScript>();
+	plSr->SetPixelCollider(bg->GetPixelCollider());
+
     pPlayer->AddComponent<CRigidBody>();
 
     pPlayer->AddComponent<CCollider>();
 
     renderer::selectedObject = pPlayer;
+
+	CColliderManager::CollisionLayerCheck(LAYER_TYPE::LT_Player, LAYER_TYPE::LT_BackGround, true);
 }
 
 void CRectDrawScene::Update()

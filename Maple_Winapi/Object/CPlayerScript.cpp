@@ -9,11 +9,13 @@
 #include "../Component/CTransform.h"
 #include "../Component/CRigidBody.h"
 #include "../Component/CRenderer.h"
+#include "../Component/CPixelCollider.h"
 
 CPlayerScript::CPlayerScript() :
 	m_ePlayerState(PLAYER_STATE::PS_Idle),
 	m_iDir(1),
-	m_pAnimator(nullptr)
+	m_pAnimator(nullptr),
+	m_pPixelCollider(nullptr)
 {
 }
 
@@ -27,14 +29,12 @@ void CPlayerScript::Init()
 
 void CPlayerScript::Update()
 {
+	CheckPixelColor();
+
 	CGameObject* pPlayer = renderer::selectedObject;
 	if (pPlayer != nullptr)
 	{
 		CAnimator* animator = pPlayer->GetComponent<CAnimator>();
-
-		/*CCollider* col = pPlayer->GetComponent<CCollider>();
-		col->SetOffsetPos(Vector2(0.0f, 0.0f));
-		col->SetScale(Vector2(54.0f, 65.0f));*/
 	}
 
 	switch (m_ePlayerState)
@@ -76,6 +76,215 @@ void CPlayerScript::OnCollisionStay(CCollider* _pOther)
 
 void CPlayerScript::OnCollisionExit(CCollider* _pOther)
 {
+}
+
+vector<Vector3> CPlayerScript::GetCollisionPoints(const Vector3& _vPos, int _iPlayerWidthHalf, int _iPlayerHeightHalf)
+{
+	vector<Vector3> collisionPoints;       // 충돌 좌표를 저장
+	int offsetY = _iPlayerHeightHalf;
+
+	// 현재 위치의 정수 좌표로 계산
+	int x = static_cast<int>(_vPos.x);
+	int y = static_cast<int>(_vPos.y + offsetY);
+
+	// 좌우 충돌 검사 좌표를 계산
+	int xLeft = x - _iPlayerWidthHalf;
+	int xRight = x + _iPlayerWidthHalf;
+
+	// 상하 충돌 검사 좌표를 계산
+	int yTop = y - 10.f;
+	int yBottom = y + _iPlayerHeightHalf;
+
+	// 충돌좌표에 벡터를 추가
+	collisionPoints.emplace_back(Vector3(x, y, 0.0f));
+	collisionPoints.emplace_back(Vector3(xLeft, y, 0.0f));
+	collisionPoints.emplace_back(Vector3(xRight, y, 0.0f));
+	collisionPoints.emplace_back(Vector3(x, yTop, 0.0f));
+
+	return collisionPoints;
+}
+
+bool CPlayerScript::CheckPixelCollision(int _iPosX, int _iPosY, PIXEL& _pPixel, const string& _colTag)
+{
+	//// 좌표가 픽셀 충돌 객체의 범위 내에 있는지 확인
+	//if (_iPosX >= 0 && _iPosX < m_pPixelCollider->GetWidth() && _iPosY >= 0 && _iPosY < m_pPixelCollider->GetHeight()) {
+	//	_pPixel = m_pPixelCollider->GetPixelColor(_iPosX, _iPosY);
+
+	//	// 충돌 태그에 따라 충돌 여부를 판정
+	//	if (_colTag == "StageColl") {
+	//		return (_pPixel.r == 255 && _pPixel.g == 0 && _pPixel.b == 255);
+	//	}
+	//	else if (_colTag == "StageColl") {
+	//		return (_pPixel.r == 255 && _pPixel.g == 255 && _pPixel.b == 255);
+	//	}
+	//	/*
+	//	else if (_colTag == "Wall") {
+	//		return (_pPixel.r == 0 && _pPixel.g == 255 && _pPixel.b == 255);
+	//	}
+	//	else if (_colTag == "Rope") {
+	//		return (_pPixel.r == 0 && _pPixel.g == 128 && _pPixel.b == 0);
+	//	}*/
+	//}
+	//else {
+	//	OutputDebugStringA("Player position out of bounds.\n");
+	//}
+	//return false;
+	if (!m_pPixelCollider) {
+		OutputDebugStringA("Pixel collider not set.\n");
+		return false;
+	}
+
+	// 픽셀 좌표가 충돌 객체의 범위 내인지 확인
+	if (_iPosX >= 0 && _iPosX < m_pPixelCollider->GetWidth() &&
+		_iPosY >= 0 && _iPosY < m_pPixelCollider->GetHeight()) {
+
+		// 픽셀 데이터 가져오기
+		_pPixel = m_pPixelCollider->GetPixelColor(_iPosX, _iPosY);
+
+		// 디버그 출력
+		char debugMsg[100];
+		sprintf_s(debugMsg, "Pixel Color - X: %d, Y: %d, R: %d, G: %d, B: %d\n", _iPosX, _iPosY, _pPixel.r, _pPixel.g, _pPixel.b);
+		OutputDebugStringA(debugMsg);
+
+		// 충돌 조건 확인
+		if (_colTag == "StageColl") {
+			return (_pPixel.r == 255 && _pPixel.g == 0 && _pPixel.b == 255);
+		}
+		else if (_colTag == "WallColl") {
+			return (_pPixel.r == 255 && _pPixel.g == 255 && _pPixel.b == 255);
+		}
+	}
+	else {
+		OutputDebugStringA("Pixel position out of bounds.\n");
+	}
+	return false;
+}
+
+void CPlayerScript::UpdateCollisionState(bool& _bIsColiding, bool _bCollisionDetected, const string& _strColTag, void(CPlayerScript::* onEnter)(), void(CPlayerScript::* onExit)())
+{
+	if (_bCollisionDetected) {
+		if (!_bIsColiding) {
+			_bIsColiding = true;
+			(this->*onEnter)();
+		}
+	}
+	else {
+		if (_bIsColiding) {
+			_bIsColiding = false;
+			(this->*onExit)();
+		}
+	}
+}
+
+void CPlayerScript::CheckPixelColor()
+{
+	// 스테이지 충돌 및 벽, 로프 충돌 상태를 나타내는 정적 변수
+	static bool isCollidingWithStage = false;
+	static bool isCollidingWithWall = false;
+	static bool isCollidingWithRope = false;
+
+	// 픽셀 충돌 객체가 존재한다면
+	if (m_pPixelCollider) {
+		CTransform* tr = GetOwner()->GetComponent<CTransform>();
+		Vector3 vPos = tr->GetPosition();
+
+		int playerWidthHalf = 17;
+		int playerHeightHalf = 32;
+
+		auto collisionPoints = GetCollisionPoints(vPos, playerWidthHalf, playerHeightHalf);
+		m_vecCollisionPoint.clear(); // 충돌 위치 벡터 초기화
+
+		// 충돌 감지 플래그 초기화
+		bool stageCollisionDetected = false;
+		bool wallCollisionDetected = false;
+		bool ropeCollisionDetected = false;
+
+		PIXEL pixel;
+
+		// 스테이지 충돌 검사
+		const auto& stagePoint = collisionPoints[0];
+		if (CheckPixelCollision(stagePoint.x, stagePoint.y, pixel, "StageColl")) {
+			m_vecCollisionPoint.emplace_back(stagePoint);
+			stageCollisionDetected = true;
+
+			// 픽셀 색상 디버깅
+			char debugMsg[100];
+			sprintf_s(debugMsg, "Pixel Collider Color - R: %d, G: %d, B: %d\n", pixel.r, pixel.g, pixel.b);
+			OutputDebugStringA(debugMsg);
+
+			CCollider* collider = GetOwner()->GetComponent<CCollider>();
+			if (collider) {
+				collider->SetCollisionDetected(true);
+			}
+		}
+		else {
+			CCollider* collider = GetOwner()->GetComponent<CCollider>();
+			if (collider) {
+				collider->SetCollisionDetected(false);
+			}
+		}
+
+		//// 벽 충돌 검사
+		//for (size_t i = 1; i <= 2; ++i) {
+		//	const auto& point = collisionPoints[i];
+		//	if (CheckPixelCollision(point.x, point.y, pixel, "Wall")) {
+		//		m_CollisionPoint.emplace_back(point);
+		//		wallCollisionDetected = true;
+		//	}
+		//}
+
+		//// 로프 충돌 검사
+		//const auto& ropePoint = collisionPoints.back();
+		//int ropeCollisionRadius = 10; // 로프 충돌 범위 반경
+
+		//for (int dx = -ropeCollisionRadius; dx <= ropeCollisionRadius; dx += 1) { // X축 방향으로 좌표 검사
+		//	if (CheckPixelCollision(ropePoint.x + dx, ropePoint.y, pixel, "Rope")) {
+		//		m_CollisionPoint.emplace_back(Vec2(ropePoint.x + dx, ropePoint.y));
+		//		ropeCollisionDetected = true;
+		//		m_vRopePos = Vec2(ropePoint.x + dx, ropePoint.y); // 로프 위치 업데이트
+		//	}
+		//}
+
+		UpdateCollisionState(isCollidingWithStage, stageCollisionDetected, "StageColl", &CPlayerScript::OnStageCollisionEnter, &CPlayerScript::OnStageCollisionExit);
+		//UpdateCollisionState(isCollidingWithWall, wallCollisionDetected, "Wall", &CPlayer::OnWallCollisionEnter, &CPlayer::OnWallCollisionExit);
+		//UpdateCollisionState(isCollidingWithRope, ropeCollisionDetected, "Rope", &CPlayer::OnRopeCollisionEnter, &CPlayer::OnRopeCollisionExit);
+	}
+	else {
+		OutputDebugStringA("Pixel collider not set.\n");
+	}
+}
+
+void CPlayerScript::OnStageCollisionEnter() {
+	CCollider tempCollider;
+	tempCollider.SetColTag("StageColl");
+	OnStageCollisionEnter(&tempCollider);
+}
+
+void CPlayerScript::OnStageCollisionExit() {
+	CCollider tempCollider;
+	tempCollider.SetColTag("StageColl");
+	OnStageCollisionExit(&tempCollider);
+}
+
+void CPlayerScript::OnStageCollisionEnter(CCollider* _pOther)
+{
+	if (_pOther->GetColTag() == "StageColl")
+	{
+	}
+}
+
+void CPlayerScript::OnStageCollision(CCollider* _pOther)
+{
+	if (_pOther->GetColTag() == "StageColl")
+	{
+	}
+}
+
+void CPlayerScript::OnStageCollisionExit(CCollider* _pOther)
+{
+	if (_pOther->GetColTag() == "StageColl")
+	{
+	}
 }
 
 void CPlayerScript::idle()
@@ -153,11 +362,11 @@ void CPlayerScript::move()
 	}
 	if (KEY_HOLD(KEY_CODE::UP))
 	{
-		rb->AddForce(Vector2(0.0f, -100.0f));
+		rb->AddForce(Vector2(0.0f, 100.0f));
 	}
 	if (KEY_HOLD(KEY_CODE::DOWN))
 	{
-		rb->AddForce(Vector2(0.0f, 100.0f));
+		rb->AddForce(Vector2(0.0f, -100.0f));
 	}
 
 	if (KEY_AWAY(KEY_CODE::RIGHT) || KEY_AWAY(KEY_CODE::LEFT) ||

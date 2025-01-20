@@ -35,7 +35,7 @@ void CPathManager::Init()
 	ss << L"file: " << m_szContentPath << std::endl;
 
 	// 변환된 문자열을 출력창에 출력
-	OutputDebugString(ss.str().c_str());
+	//OutputDebugString(ss.str().c_str());
 }
 
 wstring CPathManager::GetRelativePath(const wchar_t* _filepath)

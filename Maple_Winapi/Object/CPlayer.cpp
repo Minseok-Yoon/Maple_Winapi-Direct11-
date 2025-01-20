@@ -33,10 +33,4 @@ void CPlayer::LateUpdate()
 void CPlayer::Render()
 {
 	CGameObject::Render();
-
-	CCollider* col = GetComponent<CCollider>();
-	if (col && col->IsRenderCollidersEnabled())
-	{
-		col->Render();
-	}
 }

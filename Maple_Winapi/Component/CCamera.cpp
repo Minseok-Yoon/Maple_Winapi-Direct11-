@@ -74,9 +74,11 @@ void CCamera::Update()
 	//else if (m_vLookPosition.y > vMapSize.y - vResolution.y)
 	//	m_vLookPosition.y = (vMapSize.y - vResolution.y) - 10.f;
 #pragma endregion
+	// 클라이언트 크기를 가져와 너비와 높이 저장
 	float width = core.GetWidth();
 	float height = core.GetHeight();
 
+	// 타겟 객체가 있는 경우
 	if (m_pTargetObject)
 	{
 		if (m_pTargetObject->IsDead())

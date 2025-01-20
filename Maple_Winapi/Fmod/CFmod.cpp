@@ -20,9 +20,9 @@ void CFmod::Init()
 
     result = m_pSystem->initialize(1024, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, extraDriverData);
     if (result != FMOD_OK) {
-        std::wstringstream ws;
+        /*std::wstringstream ws;
         ws << L"FMOD System initialization failed: " << FMOD_ErrorString(result) << L"\n";
-        OutputDebugStringW(ws.str().c_str());
+        OutputDebugStringW(ws.str().c_str());*/
         return;
     }
 

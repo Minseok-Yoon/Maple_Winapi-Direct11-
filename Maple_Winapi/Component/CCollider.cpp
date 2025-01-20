@@ -40,6 +40,14 @@ void CCollider::Render()
 	// 충돌체가 비활성화된 경우, 또는 렌더링이 비활성화된 경우 렌더링 중단
 	if (!m_bEnable || !g_bRenderColliders)
 		return;
+
+	// 충돌 상태에 따라 색상 변경
+	if (m_iCol) {
+		m_vColor = Vector4(255.0f, 0.0f, 0.0f, 100.0f); // 충돌 시 빨간색
+	}
+	else {
+		m_vColor = Vector4(0.0f, 0.0f, 255.0f, 100.0f); // 기본 파란색
+	}
 }
 
 void CCollider::OnCollisionEnter(CCollider* _pOther)

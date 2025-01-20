@@ -20,6 +20,8 @@ public:
 
 	void RectCollider();
 
+	void SetCollisionDetected(bool _bDetected) { m_bCollisionDetected = _bDetected; }
+
 	COLLIDER_TYPE GetColliderType() { return m_eColliderType; }
 
 	static void ToggleRenderColliders() { g_bRenderColliders = !g_bRenderColliders; }
@@ -52,6 +54,7 @@ private:
 	Vector2			m_vScale;		// 충돌체의 크기
 
 	UINT			m_iID;			// 충돌체 고유한 ID 값
+	UINT			m_iCol;
 
 	bool			m_bEnable;
 
@@ -62,4 +65,6 @@ private:
 	Vector3			m_vBottomLeft;
 	Vector3			m_vTopRight;
 	Vector4			m_vColor;
+
+	bool			m_bCollisionDetected;
 };

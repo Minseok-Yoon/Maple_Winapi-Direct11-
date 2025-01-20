@@ -15,10 +15,19 @@ public:
     virtual void LateUpdate() override;
     virtual void Render() override;
 
+    void CreateTextureFromPixel();
     void SetBackGroundTexture(CTexture* _pBackGroundTexture);
     CTexture* GetBackGroundTexture() const { return m_pBackGroundTexture; }
 
-    CPixelCollider* GetPixelCollider() const { return m_pPixBackGround; }
+    CPixelCollider* GetPixelCollider() const 
+    { 
+        if (m_pPixBackGround == nullptr)
+        {
+            OutputDebugStringA("CBackGround::GetPixelCollider: m_pPixBackGround is nullptr.\n");
+        }
+
+        return m_pPixBackGround; 
+    }
 
 private:
     CTexture*       m_pBackGroundTexture;

@@ -264,9 +264,6 @@
     <ClInclude Include="Manager\CResourceManager.h">
       <Filter>Engine\04. Manager\ResourceManager</Filter>
     </ClInclude>
-    <ClInclude Include="Manager\CSceneManager.h">
-      <Filter>Engine\04. Manager\SceneManager</Filter>
-    </ClInclude>
     <ClInclude Include="Manager\CTimeManager.h">
       <Filter>Engine\04. Manager\Helpers\TimeManager</Filter>
     </ClInclude>
@@ -443,6 +440,9 @@
     </ClInclude>
     <ClInclude Include="Component\CLineRenderer.h">
       <Filter>Engine\09. Component\LineRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\CSceneManager.h">
+      <Filter>Engine\04. Manager\SceneManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
