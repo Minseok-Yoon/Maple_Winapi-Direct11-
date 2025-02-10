@@ -14,8 +14,8 @@ class CCamera : public CComponent
 public:
 	enum class PROJECTION_TYPE
 	{
-		PT_Perspective,
-		PT_Orthographic
+		PT_Perspective,			// 원근 투영
+		PT_Orthographic			// 직교 투영
 	};
 
 	static void SetGpuViewMatrix(const Matrix& matrix) { ViewMatrix = matrix; }

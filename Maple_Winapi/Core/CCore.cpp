@@ -157,12 +157,12 @@ void CCore::adjustWindowRect(HWND _hWnd, UINT _iWidth, UINT _iHeight)
 {
 	// 해상도에 맞게 윈도우 크기 조정
 	RECT rt = { 0, 0, static_cast<LONG>(_iWidth), static_cast<LONG>(_iHeight) };	// 좌상단(0, 0) ~ 우하단(1280, 760)
-	AdjustWindowRect(&rt, WS_OVERLAPPEDWINDOW, false);
+	::AdjustWindowRect(&rt, WS_OVERLAPPEDWINDOW, false);
 
 	m_iWidth = rt.right - rt.left;
 	m_iHeight = rt.bottom - rt.top;
 
-	SetWindowPos(_hWnd, nullptr, 0, 0, m_iWidth, m_iHeight, 0);
+	SetWindowPos(_hWnd, nullptr, 0, 0, _iWidth, _iHeight, 0);
 	ShowWindow(_hWnd, true);
 }
 

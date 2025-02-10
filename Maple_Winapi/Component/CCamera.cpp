@@ -2,14 +2,16 @@
 #include "../Object/CGameObject.h"
 #include "../Component/CTransform.h"
 #include "../Core/CCore.h"
+#include "../Manager/CSceneManager.h"
+#include "../Scene/CScene.h"
 
 extern CCore core;
-Matrix CCamera::ViewMatrix = Matrix::Identity;
-Matrix CCamera::ProjectionMatrix =Matrix::Identity;
+Matrix CCamera::ViewMatrix = Matrix::Identity;			// 뷰 매트릭스
+Matrix CCamera::ProjectionMatrix =Matrix::Identity;		// 투영 매트릭스
 
 CCamera::CCamera() :
 	CComponent(COMPONENT_TYPE::CT_Camera),
-	m_eProjectionType(PROJECTION_TYPE::PT_Perspective),
+	m_eProjectionType(PROJECTION_TYPE::PT_Perspective),	// 투영 타입
 	m_vDistance(Vector3(0.0f, 0.0f, 0.0f)),
 	m_ViewMatrix(Matrix::Identity),
 	m_ProjectionMatrix(Matrix::Identity),
@@ -29,6 +31,15 @@ CCamera::~CCamera()
 
 void CCamera::Init()
 {
+	CComponent::Init();
+
+	CScene* curscene = CSceneManager::GetCurScene();
+
+	if (curscene == nullptr)
+	{
+		OutputDebugStringA("현재 씬이 없습니다.");
+		return;
+	}
 }
 
 void CCamera::Update()
@@ -74,35 +85,35 @@ void CCamera::Update()
 	//else if (m_vLookPosition.y > vMapSize.y - vResolution.y)
 	//	m_vLookPosition.y = (vMapSize.y - vResolution.y) - 10.f;
 #pragma endregion
-	// 클라이언트 크기를 가져와 너비와 높이 저장
-	float width = core.GetWidth();
-	float height = core.GetHeight();
+	//// 클라이언트 크기를 가져와 너비와 높이 저장
+	//float width = core.GetWidth();
+	//float height = core.GetHeight();
 
-	// 타겟 객체가 있는 경우
-	if (m_pTargetObject)
-	{
-		if (m_pTargetObject->IsDead())
-		{
-			m_pTargetObject = nullptr;
-		}
-		else
-		{
-			CTransform* tr = GetOwner()->GetComponent<CTransform>();
-			math::Vector3 targetPos = tr->GetPosition();
+	//// 타겟 객체가 있는 경우
+	//if (m_pTargetObject)
+	//{
+	//	if (m_pTargetObject->IsDead())
+	//	{
+	//		m_pTargetObject = nullptr;
+	//	}
+	//	else
+	//	{
+	//		CTransform* tr = GetOwner()->GetComponent<CTransform>();
+	//		math::Vector3 targetPos = tr->GetPosition();
 
-			// 카메라 위치 계산 (타겟 위치에서 일정 거리만큼 떨어져 있게 설정)
-			math::Vector3 cameraPos = targetPos + Vector3(0.0f, 0.0f, -10.0f);  // 예시로 z축으로 10만큼 뒤에 배치
+	//		// 카메라 위치 계산 (타겟 위치에서 일정 거리만큼 떨어져 있게 설정)
+	//		math::Vector3 cameraPos = targetPos + Vector3(0.0f, 0.0f, -10.0f);  // 예시로 z축으로 10만큼 뒤에 배치
 
-			// 카메라의 위치와 회전 업데이트
-			CTransform* cameraTransform = GetOwner()->GetComponent<CTransform>();
-			cameraTransform->SetPosition(cameraPos);
+	//		// 카메라의 위치와 회전 업데이트
+	//		CTransform* cameraTransform = GetOwner()->GetComponent<CTransform>();
+	//		cameraTransform->SetPosition(cameraPos);
 
-			// 카메라가 타겟을 향하도록 설정 (타겟이 바라보는 방향으로 카메라 회전)
-			math::Vector3 forward = (targetPos - cameraPos);  // 타겟 방향으로 정규화된 벡터
-			forward.Normalize();
-			cameraTransform->LookAt(targetPos);
-		}
-	}
+	//		// 카메라가 타겟을 향하도록 설정 (타겟이 바라보는 방향으로 카메라 회전)
+	//		math::Vector3 forward = (targetPos - cameraPos);  // 타겟 방향으로 정규화된 벡터
+	//		forward.Normalize();
+	//		cameraTransform->LookAt(targetPos);
+	//	}
+	//}
 }
 
 void CCamera::LateUpdate()

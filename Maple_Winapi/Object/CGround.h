@@ -15,6 +15,7 @@ public:
     virtual void LateUpdate() override;
     virtual void Render() override;
 
+    bool CheckCollision(int playerX, int playerY);
     void CreateTextureFromPixel();
     void SetBackGroundTexture(CTexture* _pBackGroundTexture);
     CTexture* GetBackGroundTexture() const { return m_pBackGroundTexture; }

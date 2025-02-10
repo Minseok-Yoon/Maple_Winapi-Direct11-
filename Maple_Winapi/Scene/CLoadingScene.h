@@ -12,15 +12,11 @@ public:
 	void LateUpdate() override;
 	void Render() override;
 
-	void Enter(const wstring& _strBackGroundName, const wstring& _strAudioName) override;
-	void Enter() override;
-	void Exit() override;
-
 private:
 	void resourcesLoad(std::mutex& _pMutex);
 
 private:
-	bool			m_bLoadCompleted;
+	atomic<bool>	m_bLoadCompleted;
 	std::thread* m_pResourcesLoadThread;
 	std::mutex m_pMutualExclusion;
 };

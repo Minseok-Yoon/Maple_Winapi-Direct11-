@@ -15,128 +15,113 @@ CPixelCollider::CPixelCollider() :
 
 CPixelCollider::~CPixelCollider()
 {
-
 }
 
 bool CPixelCollider::SetPixelInfo(const wstring& _pFileName)
 {
-#pragma region SetPixelInfo
-	//wstring filePath = CPathManager::GetInst()->GetContentPath();
-	//filePath += _pFileName;
-
-	//FILE* file = nullptr;
-
-	//_wfopen_s(&file, filePath.c_str(), L"rb");
-	//// 파일 열기 실패
-	//assert(file);
-
-	//BITMAPFILEHEADER	fh;
-	//BITMAPINFOHEADER	ih;
-
-	//fread(&fh, sizeof(fh), 1, file);
-	//fread(&ih, sizeof(ih), 1, file);
-
-	//m_iWidth = ih.biWidth;
-	//m_iHeight = ih.biHeight;
-
-	//m_vecPixel.clear();
-
-	//m_vecPixel.resize(m_iWidth * m_iHeight);
-
-	//fread(&m_vecPixel[0], sizeof(PIXEL), m_vecPixel.size(), file);
-
-	//fclose(file);
-
-	//PPIXEL pPixelArr = new PIXEL[m_iWidth];		// 한줄짜리 픽셀 배열
-
-	//// 위 아래를 반전시켜준다.
-	//for (int i = 0; i < m_iHeight / 2; ++i)
-	//{
-	//	// 현재 인덱스의 픽셀 한 줄을 저장해둔다.
-	//	memcpy(pPixelArr, &m_vecPixel[i * m_iWidth], sizeof(PIXEL) * m_iWidth);
-	//	memcpy(&m_vecPixel[i * m_iWidth], &m_vecPixel[(m_iHeight - i - 1) * m_iWidth],
-	//		sizeof(PIXEL) * m_iWidth);
-	//	memcpy(&m_vecPixel[(m_iHeight - i - 1) * m_iWidth], pPixelArr,
-	//		sizeof(PIXEL) * m_iWidth);
-	//}
-
-	//delete[] pPixelArr;
-
-	//fclose(file);
-	//OutputDebugStringA("Pixel data loaded successfully.\n");
-
-	//return true;
-#pragma endregion
-	// 1. CTexture를 통해 텍스처 로드
+	// 텍스처 객체 생성
 	m_pTexture = std::make_shared<CTexture>();
 	if (FAILED(m_pTexture->Load(_pFileName))) {
-		OutputDebugStringA("Failed to load texture in SetPixelInfo.\n");
+		OutputDebugStringA("Failed to load texture.\n");
 		return false;
 	}
 
-	// 2. 텍스처의 정보를 가져오기
+	// 파일 확장자 확인
+	bool isBmp = (_pFileName.substr(_pFileName.find_last_of(L".") + 1) == L"bmp");
+
+	// 텍스처의 설명 가져오기
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	if (!m_pTexture->GetDesc(textureDesc)) {
-		OutputDebugStringA("Failed to get texture description in SetPixelInfo.\n");
+		OutputDebugStringA("Failed to get texture description.\n");
 		return false;
+	}
+
+	// 텍스처의 포맷 가져오기
+	DXGI_FORMAT format = textureDesc.Format;
+	if (format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB) {
+		OutputDebugStringA("Texture format is SRGB. Processing as UNORM.\n");
+		format = DXGI_FORMAT_B8G8R8A8_UNORM; // SRGB를 UNORM처럼 처리
 	}
 
 	m_iWidth = textureDesc.Width;
 	m_iHeight = textureDesc.Height;
 
-	// 3. Staging Texture 생성
+	// Staging Texture 생성
 	textureDesc.Usage = D3D11_USAGE_STAGING;
 	textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 	textureDesc.BindFlags = 0;
 
 	HRESULT hr = GetDevice()->CreateTexture2D(&textureDesc, nullptr, &m_pStagingTexture);
 	if (FAILED(hr)) {
-		OutputDebugStringA("Failed to create staging texture in SetPixelInfo.\n");
+		OutputDebugStringA("Failed to create staging texture.\n");
 		return false;
 	}
 
-	// 4. 원본 텍스처를 스테이징 텍스처로 복사
+	// 원본 텍스처 데이터를 복사
 	GetDeviceContext()->CopyResource(m_pStagingTexture.Get(), m_pTexture->GetTexture().Get());
 
-	// 5. 스테이징 텍스처에서 데이터 읽기
+	// 픽셀 데이터 읽기
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	hr = GetDeviceContext()->Map(m_pStagingTexture.Get(), 0, D3D11_MAP_READ, 0, &mappedResource);
 	if (FAILED(hr)) {
-		OutputDebugStringA("Failed to map staging texture in SetPixelInfo.\n");
+		OutputDebugStringA("Failed to map staging texture.\n");
 		return false;
 	}
 
-	// 6. 픽셀 데이터를 읽어들여 저장
-	uint32_t* pData = (uint32_t*)mappedResource.pData;
+	if (!mappedResource.pData) {
+		OutputDebugStringA("Mapped resource data is null/\n");
+		return false;
+	}
 
+	// 매핑된 데이터를 32비트 배열로 변환
+	uint32_t* pData = reinterpret_cast<uint32_t*>(mappedResource.pData);
 	m_vecPixel.clear();
 	m_vecPixel.resize(m_iWidth * m_iHeight);
 
 	for (int y = 0; y < m_iHeight; ++y) {
+		uint32_t* row = reinterpret_cast<uint32_t*>(reinterpret_cast<BYTE*>(pData) + y * mappedResource.RowPitch);
 		for (int x = 0; x < m_iWidth; ++x) {
-			uint32_t pixel = pData[y * m_iWidth + x];
-			// 픽셀 데이터를 배열에 저장 (PIXEL 구조체에 맞는 방식으로)
+			uint32_t pixel = row[x];
+
 			PIXEL pixelValue;
-			pixelValue.r = (pixel >> 16) & 0xFF; // Red
-			pixelValue.g = (pixel >> 8) & 0xFF;  // Green
-			pixelValue.b = pixel & 0xFF;         // Blue
-			pixelValue.a = (pixel >> 24) & 0xFF; // Alpha
-			m_vecPixel[y * m_iWidth + x] = pixelValue;
+			pixelValue.r = (pixel & 0xFF);
+			pixelValue.g = ((pixel >> 8) & 0xFF);
+			pixelValue.b = ((pixel >> 16) & 0xFF);
+			pixelValue.a = (pixel >> 24) & 0xFF;
+
+			int index = isBmp ? ((m_iHeight - 1 - y) * m_iWidth + x) : (y * m_iWidth + x);
+			m_vecPixel[index] = pixelValue;
 		}
 	}
 
-	// 7. 언맵
+	//for (size_t i = 0; i < m_vecPixel.size(); ++i) {
+	//	PIXEL& p = m_vecPixel[i];
+
+	//	// BGRA → RGBA 변환
+	//	swap(m_vecPixel[i].r, m_vecPixel[i].b);  // 직접 swap 적용
+
+	//	char buf[128];
+	//	sprintf_s(buf, "Pixel[%zu]: R=%d, G=%d, B=%d, A=%d\n",
+	//		i, m_vecPixel[i].r, m_vecPixel[i].g, m_vecPixel[i].b, m_vecPixel[i].a);
+	//	OutputDebugStringA(buf);
+	//}
+
 	GetDeviceContext()->Unmap(m_pStagingTexture.Get(), 0);
-
-	OutputDebugStringA("Pixel data loaded and stored successfully.\n");
-
 	return true;
 }
 
 PIXEL CPixelCollider::GetPixelColor(int x, int y)
 {
+	// 중심 좌표 계산
+	int centerX = m_iWidth / 2;
+	int centerY = m_iHeight / 2;
+
+	// 입력 좌표를 중심 기준 좌표로 변환
+	int localX = centerX + x;       // 중심 기준 X 변환
+	int localY = centerY - y;       // 중심 기준 Y 변환 (반전 포함)
+
 	// 1. 좌표 유효성 검사
-	if (x < 0 || x >= m_iWidth || y < 0 || y >= m_iHeight)
+	if (localX < 0 || localX >= m_iWidth || localY < 0 || localY >= m_iHeight)
 	{
 		return { 0, 0, 0, 0 }; // 잘못된 좌표는 투명도 포함 검정색 반환
 	}
@@ -158,11 +143,30 @@ PIXEL CPixelCollider::GetPixelColor(int x, int y)
 	BYTE* pData = reinterpret_cast<BYTE*>(mappedResource.pData);
 	UINT rowPitch = mappedResource.RowPitch;
 
-	BYTE* pixelData = pData + (y * rowPitch) + (x * 4); // RGBA (4바이트)
+	BYTE* pixelData = pData + (localY * rowPitch) + (localX * 4); // RGBA (4바이트)
 	PIXEL pixel = { pixelData[0], pixelData[1], pixelData[2], pixelData[3] }; // RGBA 순서
 
 	pContext->Unmap(m_pStagingTexture.Get(), 0);
 	return pixel;
+}
+
+bool CPixelCollider::IsColliding(int worldX, int worldY)
+{
+	// 월드 좌표 -> 로컬 좌표 변환
+	int localX = worldX - m_iOriginX;
+	int localY = worldY - m_iOriginY;
+
+	// 텍스처 좌표 범위 확인
+	if (localX < 0 || localX >= m_iWidth || localY < 0 || localY >= m_iHeight) {
+		return false; // 충돌 없음
+	}
+
+	// 픽셀 데이터 확인
+	PIXEL pixel = m_vecPixel[localY * m_iWidth + localX];
+	if (pixel.a > 0) { // 투명도가 0보다 크면 충돌
+		return true;
+	}
+	return false;
 }
 
 void CPixelCollider::Init()

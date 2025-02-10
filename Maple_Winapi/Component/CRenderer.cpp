@@ -265,8 +265,6 @@ namespace renderer
 		CResourceManager::Insert(L"TriangleMaterial", triangleMaterial);
 
 		auto* spriteMaterial = new CMaterial();
-		//CTexture* texture = CResourceManager::Find<CTexture>(L"Player");
-		//spriteMaterial->SetAlbedoTexture(texture);
 		spriteMaterial->SetShader(CResourceManager::Find<CShader>(L"Sprite-Default-Shader"));
 		CResourceManager::Insert(L"Sprite-Default-Material", spriteMaterial);
 	}

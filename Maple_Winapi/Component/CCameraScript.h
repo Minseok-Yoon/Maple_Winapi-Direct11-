@@ -12,4 +12,9 @@ public:
 	void Update() override;
 	void LateUpdate() override;
 	void Render() override;
+
+	float Clamp(float value, float minVal, float maxVal);
+
+private:
+	Vector2			m_vLookPosition;
 };

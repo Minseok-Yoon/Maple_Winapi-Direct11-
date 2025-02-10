@@ -28,6 +28,8 @@ public:
     static void ColliderCollision(CCollider* _pColLeft, CCollider* _pColRight);
     static bool Intersect(CCollider* _pColLeft, CCollider* _pColRight);
 
+    static bool Collision(const class CCollisionParameter& _Collision);
+
 private:
     static bitset<(UINT)LAYER_TYPE::LT_End>	m_CollisionLayerMatrix[(UINT)LAYER_TYPE::LT_End];
     static unordered_map<UINT64, bool>		m_CollisionMap;

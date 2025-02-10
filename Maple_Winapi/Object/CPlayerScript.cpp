@@ -85,7 +85,7 @@ vector<Vector3> CPlayerScript::GetCollisionPoints(const Vector3& _vPos, int _iPl
 
 	// 현재 위치의 정수 좌표로 계산
 	int x = static_cast<int>(_vPos.x);
-	int y = static_cast<int>(_vPos.y + offsetY);
+	int y = static_cast<int>(_vPos.y);
 
 	// 좌우 충돌 검사 좌표를 계산
 	int xLeft = x - _iPlayerWidthHalf;
@@ -129,12 +129,13 @@ bool CPlayerScript::CheckPixelCollision(int _iPosX, int _iPosY, PIXEL& _pPixel, 
 	//	OutputDebugStringA("Player position out of bounds.\n");
 	//}
 	//return false;
+	// 중심 기준으로 좌표 변환
+
 	if (!m_pPixelCollider) {
 		OutputDebugStringA("Pixel collider not set.\n");
 		return false;
 	}
 
-	// 픽셀 좌표가 충돌 객체의 범위 내인지 확인
 	if (_iPosX >= 0 && _iPosX < m_pPixelCollider->GetWidth() &&
 		_iPosY >= 0 && _iPosY < m_pPixelCollider->GetHeight()) {
 
@@ -142,22 +143,44 @@ bool CPlayerScript::CheckPixelCollision(int _iPosX, int _iPosY, PIXEL& _pPixel, 
 		_pPixel = m_pPixelCollider->GetPixelColor(_iPosX, _iPosY);
 
 		// 디버그 출력
-		char debugMsg[100];
-		sprintf_s(debugMsg, "Pixel Color - X: %d, Y: %d, R: %d, G: %d, B: %d\n", _iPosX, _iPosY, _pPixel.r, _pPixel.g, _pPixel.b);
+		char debugMsg[200];
+		sprintf_s(debugMsg, "Pixel Collision Debug - Pos(%d, %d), Color(R=%d, G=%d, B=%d)\n",
+			_iPosX, _iPosY, _pPixel.r, _pPixel.g, _pPixel.b);
 		OutputDebugStringA(debugMsg);
 
-		// 충돌 조건 확인
 		if (_colTag == "StageColl") {
 			return (_pPixel.r == 255 && _pPixel.g == 0 && _pPixel.b == 255);
 		}
-		else if (_colTag == "WallColl") {
-			return (_pPixel.r == 255 && _pPixel.g == 255 && _pPixel.b == 255);
-		}
 	}
-	else {
-		OutputDebugStringA("Pixel position out of bounds.\n");
-	}
+	OutputDebugStringA("Pixel position out of bounds or no collision.\n");
 	return false;
+
+	//// 중심 기준으로 좌표 변환
+	//int centerX = m_pPixelCollider->GetWidth() / 2;
+	//int centerY = m_pPixelCollider->GetHeight() / 2;
+
+	//int localX = _iPosX + centerX;  // 정중앙을 기준으로 변환
+	//int localY = centerY - _iPosY;  // Y축 방향 반전 및 정중앙 기준 변환
+
+	//if (localX >= 0 && localX < m_pPixelCollider->GetWidth() &&
+	//	localY >= 0 && localY < m_pPixelCollider->GetHeight()) {
+
+	//	// 픽셀 데이터 가져오기
+	//	_pPixel = m_pPixelCollider->GetPixelColor(localX, localY);
+
+	//	// 디버그 출력
+	//	char debugMsg[200];
+	//	sprintf_s(debugMsg, "Pixel Collision Debug - LocalPos(%d, %d), Color(R=%d, G=%d, B=%d)\n",
+	//		localX, localY, _pPixel.r, _pPixel.g, _pPixel.b);
+	//	OutputDebugStringA(debugMsg);
+
+	//	if (_colTag == "StageColl") {
+	//		return (_pPixel.r == 255 && _pPixel.g == 0 && _pPixel.b == 255);
+	//	}
+	//}
+
+	//OutputDebugStringA("Pixel position out of bounds or no collision.\n");
+	//return false;
 }
 
 void CPlayerScript::UpdateCollisionState(bool& _bIsColiding, bool _bCollisionDetected, const string& _strColTag, void(CPlayerScript::* onEnter)(), void(CPlayerScript::* onExit)())

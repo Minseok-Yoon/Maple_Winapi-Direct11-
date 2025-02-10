@@ -26,6 +26,8 @@ public:
 
 	CLayer* GetLayer(const LAYER_TYPE _eLayerType) { return m_vecLayers[static_cast<UINT>(_eLayerType)]; }
 
+	CBackGround* GetBackGround() const { return m_pBackGround; }
+
 private:
 	void createLayers();
 

@@ -217,6 +217,9 @@
     <Filter Include="Engine\09. Component\LineRenderer">
       <UniqueIdentifier>{435e30f9-165f-4e56-a4f4-d9982e11990c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\14. Test">
+      <UniqueIdentifier>{8d3605d9-6232-4131-bfc8-571d6c5c1598}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -444,6 +447,18 @@
     <ClInclude Include="Manager\CSceneManager.h">
       <Filter>Engine\04. Manager\SceneManager</Filter>
     </ClInclude>
+    <ClInclude Include="sample.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\CPixScene.h">
+      <Filter>Engine\06. Scene\TestScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\CDrawCollisionBox.h">
+      <Filter>Engine\14. Test</Filter>
+    </ClInclude>
+    <ClInclude Include="CMath4.h">
+      <Filter>Engine\14. Test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -643,6 +658,15 @@
     </ClCompile>
     <ClCompile Include="Component\CLineRenderer.cpp">
       <Filter>Engine\09. Component\LineRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\CPixScene.cpp">
+      <Filter>Engine\06. Scene\TestScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\CDrawCollisionBox.cpp">
+      <Filter>Engine\14. Test</Filter>
+    </ClCompile>
+    <ClCompile Include="CMath4.cpp">
+      <Filter>Engine\14. Test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

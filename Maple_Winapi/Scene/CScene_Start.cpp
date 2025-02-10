@@ -23,8 +23,6 @@
 #include "../Component/CBoxCollider2D.h"
 #include "../Component/CCameraScript.h"
 
-#include "../Object/CPlayer.h"
-
 CScene_Start::CScene_Start()
 {
 	CTexture* bgTexture = CResourceManager::Load<CTexture>(L"BG", L"../Resources/Texture/StartPanel.bmp");
@@ -87,6 +85,11 @@ void CScene_Start::LateUpdate()
 	if (KEY_TAP(KEY_CODE::O))
 	{
 		CSceneManager::LoadScene(L"DrawRectScene");
+	}
+
+	if (KEY_TAP(KEY_CODE::P))
+	{
+		CSceneManager::LoadScene(L"PixScene");
 	}
 }
 

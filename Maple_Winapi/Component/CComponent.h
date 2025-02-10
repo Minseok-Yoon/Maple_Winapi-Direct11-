@@ -20,6 +20,6 @@ public:
 	COMPONENT_TYPE GetComponentType() { return m_eComponentType; }
 
 private:
-	CGameObject* m_pOwner;
+	CGameObject*	m_pOwner;
 	COMPONENT_TYPE	m_eComponentType;
 };

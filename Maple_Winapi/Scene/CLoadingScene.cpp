@@ -1,16 +1,16 @@
-#include "CLoadingScene.h"
+Ôªø#include "CLoadingScene.h"
 #include "../Core/CCore.h"
 #include "../Manager/CSceneManager.h"
 #include "../Manager/CResourceManager.h"
 #include "../Resource/CTexture.h"
 #include "../Component/CRenderer.h"
 #include "../Scene/CScene_Start.h"
-#include "../Scene/CScene_Stage01.h"/*
-#include "../Scene/CScene_Stage02.h"*/
+#include "../Scene/CScene_Stage01.h"
 #include "../Manager/CKeyManager.h"
 
 #include "../Scene/CTestScene.h"
 #include "../Scene/CRectDrawScene.h"
+#include "../Scene/CPixScene.h"
 
 extern CCore core;
 
@@ -23,7 +23,11 @@ CLoadingScene::CLoadingScene() :
 
 CLoadingScene::~CLoadingScene()
 {
-    m_pResourcesLoadThread->join();
+    // Ïä§Î†àÎìúÍ∞Ä Ï¢ÖÎ£åÎêòÏóàÎäîÏßÄ ÌôïÏù∏ÌïòÍ≥† joinÌò∏Ï∂ú
+    if (m_pResourcesLoadThread && m_pResourcesLoadThread->joinable())
+    {
+        m_pResourcesLoadThread->join();
+    }
 
 	delete m_pResourcesLoadThread;
 	m_pResourcesLoadThread = nullptr;
@@ -41,10 +45,9 @@ void CLoadingScene::Update()
 
 void CLoadingScene::LateUpdate()
 {
-    // ≈ÿΩ∫√≥∏¶ ∑ª¥ı∏µ
-    if (m_bLoadCompleted)
+    // ÌÖçÏä§Ï≤òÎ•º Î†åÎçîÎßÅ
+    if (m_bLoadCompleted.load()) // atomic Î≥ÄÏàò ÏÇ¨Ïö©
     {
-        // ∑Œµ˘ øœ∑· Ω√ √≥∏Æ
         CSceneManager::LoadScene(L"StartScene", L"BG", L"BGSound");
     }
 }
@@ -53,85 +56,23 @@ void CLoadingScene::Render()
 {
 }
 
-void CLoadingScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioName)
-{
-}
-
-void CLoadingScene::Enter()
-{
-}
-
-void CLoadingScene::Exit()
-{
-}
-
 void CLoadingScene::resourcesLoad(std::mutex& _pMutex)
 {
-    //auto startTime = std::chrono::steady_clock::now();
-
-    //while (true)
-    //{
-    //    if (core.IsLoaded() == true)
-    //        break;
-
-    //    auto currentTime = std::chrono::steady_clock::now();
-    //    if (std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count() > 5)
-    //    {
-    //        OutputDebugStringW(L"TimeOut waiting for core to load.\n");
-    //        break;
-    //    }
-
-    //    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    //}
-
-    //_pMutex.lock();
-    //{
-    //    // ∏Æº“Ω∫ ∑Œµ˘
-    //    wstring texturePath = L"../Resources/Texture/StartPanel.bmp";
-    //    if (CResourceManager::Load<CTexture>(L"BG", texturePath))
-    //    {
-    //        wstringstream ws;
-    //        ws << L"Resource loaded successfully: " << texturePath << "\n";
-    //        OutputDebugStringW(ws.str().c_str());
-    //    }
-    //    else
-    //    {
-    //        wstringstream ws;
-    //        ws << L"Failed to load resource: " << texturePath << "\n";
-    //        OutputDebugStringW(ws.str().c_str());
-    //    }
-
-    //    renderer::Init();
-
-    //    // æ¿ ª˝º∫
-    //    CSceneManager::CreateScene<CScene_Start>(L"StartScene");
-    //    /*CSceneManager::CreateScene<CScene_Stage01>(L"Stage01");
-    //    CSceneManager::CreateScene<CScene_Stage02>(L"Stage02");*/
-    //}
-    //_pMutex.unlock();
-
-    //// ∑Œµ˘ øœ∑· º≥¡§
-    //m_bLoadCompleted = true;
-
-    while (true)
+    while (!core.IsLoaded() && !m_bLoadCompleted) // Ï∂îÍ∞Ä Ï°∞Í±¥ Ï∂îÍ∞Ä
     {
-        if (core.IsLoaded() == true)
-            break;
-
         _pMutex.lock();
         {
-            //CResourceManager::Load<CTexture>(L"Player", L"../Resources/Texture/Player/Player.bmp");
-
             renderer::Init();
 
             CSceneManager::CreateScene<CScene_Start>(L"StartScene");
-            CSceneManager::CreateScene<CScene_Stage01>(L"Stage01");
+            /*CSceneManager::CreateScene<CScene_Stage01>(L"Stage01");
             CSceneManager::CreateScene<CTestScene>(L"TestScene");
-            CSceneManager::CreateScene<CRectDrawScene>(L"DrawRectScene");
+            CSceneManager::CreateScene<CRectDrawScene>(L"DrawRectScene");*/
+            CSceneManager::CreateScene<CPixScene>(L"PixScene");
         }
         _pMutex.unlock();
 
         CSceneManager::SetCurScene(L"LoadingScene");
-        m_bLoadCompleted = true;
+        m_bLoadCompleted.store(true);
     }
 }

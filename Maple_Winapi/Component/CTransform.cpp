@@ -27,14 +27,17 @@ void CTransform::Update()
 
 void CTransform::LateUpdate()
 {
+	// 월드 행렬 계산
 	Matrix scale = Matrix::CreateScale(m_vScale.x, m_vScale.y, m_vScale.z);
 	Matrix rotation = Matrix::CreateRotationX(math::Radian(m_vRotation.x));
 	rotation *= Matrix::CreateRotationY(math::Radian(m_vRotation.y));
 	rotation *= Matrix::CreateRotationZ(math::Radian(m_vRotation.z));
 	Matrix translation = Matrix::CreateTranslation(m_vPosition);
 
+	// 변환 행렬 생성
 	m_tWorldMatrix = scale * rotation * translation;
 
+	// 방향 벡터 갱신
 	m_vForward = Vector3::TransformNormal(Vector3::Forward, rotation);
 	m_vRight = Vector3::TransformNormal(Vector3::Right, rotation);
 	m_vUp = Vector3::TransformNormal(Vector3::Up, rotation);

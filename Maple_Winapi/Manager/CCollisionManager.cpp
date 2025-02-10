@@ -4,9 +4,11 @@
 #include "../Component/CCollider.h"
 #include "../Component/CTransform.h"
 #include "../Object/CGameObject.h"
+#include "../Test/CDrawCollisionBox.h"
 
 bitset<(UINT)LAYER_TYPE::LT_End> CColliderManager::m_CollisionLayerMatrix[(UINT)LAYER_TYPE::LT_End] = {};
 unordered_map<UINT64, bool> CColliderManager::m_CollisionMap = {};
+function<bool(const class CCollisionParameter& _Collision)> ArrCollFunction[static_cast<int>(COLLIDER_TYPE::CT_End)][static_cast<int>(COLLIDER_TYPE::CT_End)];
 
 CColliderManager::CColliderManager()
 {
@@ -192,5 +194,15 @@ bool CColliderManager::Intersect(CCollider* _pColLeft, CCollider* _pColRight)
 
     }
 
+    if (leftColType == COLLIDER_TYPE::CT_AABB2D && rightColType == COLLIDER_TYPE::CT_AABB2D)
+    {
+        DirectX::BoundingBox left = _pColLeft.Left.AABB;
+    }
+
     return false;
+}
+
+bool CColliderManager::Collision(const class CCollisionParameter& _Collision)
+{
+    return ArrCollFunction[_Collision.GetLeftTypeToInt()][_Collision.GetRightTypeToInt()](_Collision);
 }

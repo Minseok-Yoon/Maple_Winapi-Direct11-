@@ -64,8 +64,16 @@ enum COLLISION_STATE
 
 enum class COLLIDER_TYPE
 {
+	// 3D에서 z값을 0으로 주면 2D값이 출력
 	CT_Rect2D,
 	CT_Circle2D,
+	CT_Line2D,
+	CT_AABB2D,
+	CT_OBB2D,
+	CT_Line3D,
+	CT_Circle3D,
+	CT_AABB3D,
+	CT_OBB3D,
 	CT_Pixel,
 	CT_End
 };
