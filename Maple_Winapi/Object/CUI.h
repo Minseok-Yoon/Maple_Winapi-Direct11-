@@ -1,7 +1,7 @@
 #pragma once
-#include "../Entity/CEntity.h"
+#include "../Object/CGameObject.h"
 
-class CUI : public CEntity
+class CUI : public CGameObject
 {
 public:
     struct tUIEvent
@@ -48,10 +48,14 @@ public:
     void SetSize(Vector2 _vSize) { m_vSize = _vSize; }
     Vector2 GetSize() { return m_vSize; }
 
+    void SetZOrder(int _iZOrder) { m_iZOrder = _iZOrder; }
+    int GetZOrder() const { return m_iZOrder; }
+
 protected:
     Vector2	m_vPosition;
     Vector2	m_vSize;
     bool	m_bMouseOn;
+    int     m_iZOrder = 0;
 
 private:
     UI_TYPE m_eUIType;

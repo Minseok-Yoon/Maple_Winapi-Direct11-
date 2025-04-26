@@ -12,6 +12,7 @@
 #define CBUFFER(name, slot) static const int CB_GETBINDSLOT(name) = slot; struct alignas(16) name 
 
 #define CBSLOT_TRANSFORM		0
+#define CBSLOT_COLOR			1
 
 struct Vertex
 {
@@ -44,6 +45,8 @@ enum class SHADER_STAGE
 enum class CB_TYPE
 {
 	CT_Transform,
+	CT_Color,
+	CT_Count,
 	CT_None,
 	CT_End,
 };
@@ -88,7 +91,9 @@ enum class RASTERIZER_STATE
 
 enum class BLEND_STATE
 {
-	BS_AlphaBlend,
+	BS_Opaque,
+	BS_Cutout,
+	BS_Transparent,
 	BS_OneOne,
 	BS_End,
 };
@@ -97,6 +102,7 @@ enum class DEPTHSTENCIL_STATE
 {
 	DS_DepthNone,
 	DS_LessEqual,
+	DS_Always,
 	DS_End,
 };
 
@@ -106,4 +112,9 @@ CBUFFER(TransformCB, CBSLOT_TRANSFORM)
 	math::Matrix world;
 	math::Matrix view;
 	math::Matrix projection;
+};
+
+CBUFFER(ColorCB, CBSLOT_COLOR)
+{
+	math::float4 color;
 };

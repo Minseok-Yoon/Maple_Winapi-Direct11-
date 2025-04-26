@@ -11,7 +11,7 @@
 #include "../Object/CBtnUI.h"
 #include "../Object/CUI.h"
 
-#include "../Object/CGround.h"
+#include "../Object/CBackGround.h"
 #include "../Component/CCamera.h"
 #include "../Component/CRenderer.h"
 #include "../Object/CGameObject.h"

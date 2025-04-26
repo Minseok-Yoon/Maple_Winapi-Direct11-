@@ -6,7 +6,7 @@
 #include "../Object/CGameObject.h"
 #include "../Object/CObject.h"
 #include "../Component/CTransform.h"
-#include "../Object/CGround.h"
+#include "../Object/CBackGround.h"
 #include "../Core/CCore.h"
 #include "../Component/CCamera.h"
 #include "../Component/CRenderer.h"
@@ -37,7 +37,7 @@ void CRectDrawScene::Enter()
 
     CBackGround* bgbg = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
     CTransform* bgTr = bgbg->GetComponent<CTransform>();
-    bgTr->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+    bgTr->SetLocalPosition(Vector3(0.0f, 0.0f, 0.0f));
 
     CTexture* bgTexture = CResourceManager::Find<CTexture>(L"Main");
     if (bgTexture != nullptr)
@@ -55,8 +55,8 @@ void CRectDrawScene::Enter()
         // 더 큰 비율로 설정하여 텍스처가 화면을 덮도록 조정
         float scale = scaleX > scaleY ? scaleX : scaleY;
         // 배경 크기를 스케일링
-        bgTr->SetScale(Vector3(textureWidth, textureHeight, 1.0f));
-        bgbg->SetBackGroundTexture(bgTexture);
+        bgTr->SetLocalScale(Vector3(textureWidth, textureHeight, 1.0f));
+        //bgbg->SetBackGroundTexture(bgTexture);
     }
 
     // 스프라이트 렌더러 설정
@@ -88,7 +88,7 @@ void CRectDrawScene::Init()
     // 배경 생성
     CBackGround* bg = Instantiate<CBackGround>(LAYER_TYPE::LT_PixelBackGround);
     CTransform* bgTransform = bg->GetComponent<CTransform>();
-    bgTransform->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+    bgTransform->SetLocalPosition(Vector3(0.0f, 0.0f, 0.0f));
 
     // 배경 텍스처 생성
     bg->Init();
@@ -114,23 +114,23 @@ void CRectDrawScene::Init()
         float scale = scaleX > scaleY ? scaleX : scaleY;
 
         // 배경 텍스처를 화면 크기에 맞추기 위한 스케일 설정
-        bgTransform->SetScale(Vector3(textureWidth * scale, textureHeight * scale, 1.0f));
+        bgTransform->SetLocalScale(Vector3(textureWidth * scale, textureHeight * scale, 1.0f));
 
         // 배경 텍스처의 중심을 화면 중앙으로 이동
-        bgTransform->SetPosition(Vector3(resolutionWidth / 2.0f, resolutionHeight / 2.0f, 0.0f));
+        bgTransform->SetLocalPosition(Vector3(resolutionWidth / 2.0f, resolutionHeight / 2.0f, 0.0f));
     }
 
 
     // 플레이어 생성
     CGameObject* pPlayer = Instantiate<CPlayer>(LAYER_TYPE::LT_Player);
     CTransform* plTr = pPlayer->GetComponent<CTransform>();
-    plTr->SetPosition(Vector3(0.0f, 0.0f, -1.0f));
+    plTr->SetLocalPosition(Vector3(0.0f, 0.0f, -1.0f));
     DontDestroyOnLoad(pPlayer);
 
     // 플레이어 텍스처 설정
     CTexture* playerTexture = CResourceManager::Find<CTexture>(L"PLAYER");
     CTransform* playerTransform = pPlayer->GetComponent<CTransform>();
-    playerTransform->SetScale(Vector3(54.0f, 65.0f, 1.0f));
+    playerTransform->SetLocalScale(Vector3(54.0f, 65.0f, 1.0f));
     CSpriteRenderer* sr = pPlayer->AddComponent<CSpriteRenderer>();
     sr->SetTexture(playerTexture);
     CAnimator* animator = pPlayer->AddComponent<CAnimator>();

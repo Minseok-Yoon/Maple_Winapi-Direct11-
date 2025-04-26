@@ -9,7 +9,7 @@
 #include "../Object/CMonster.h"
 #include "../Manager/CCollisionManager.h"
 #include "../Component/CPixelCollider.h"
-#include "../Object/CGround.h"
+#include "../Object/CBackGround.h"
 #include "../Object/CPortal.h"
 
 #include "../Component/CAnimator.h"
@@ -50,8 +50,6 @@ void CScene_Stage01::Init()
 
 	CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
 	renderer::mainCamera = cameraComp;
-
-	
 }
 
 void CScene_Stage01::Update()
@@ -111,15 +109,6 @@ void CScene_Stage01::Render()
 void CScene_Stage01::Enter(const wstring& _strBackGroundName, const wstring& _strAudioName)
 {
 	CScene::Enter(L"Stage01_BG", L"Stage01_BGSound");
-
-	//// 카메라 설정
-	//CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_Particle, Vector3(0.0f, 0.0f, 0.0f));
-	//CCamera* cameraComp = camera->AddComponent<CCamera>();
-	//cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
-	//cameraComp->SetSize(200.0f);
-
-	//CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
-	//renderer::mainCamera = cameraComp;
 
 	//// 플레이어 설정
 	//m_pPlayer = Instantiate<CPlayer>(LAYER_TYPE::Player, Vector2(760.0f, 777.0f));

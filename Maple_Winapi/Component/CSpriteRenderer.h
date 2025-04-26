@@ -1,11 +1,11 @@
 #pragma once
-#include "../Entity/CEntity.h"
 #include "CComponent.h"
 #include "../Resource/CTexture.h"
 #include "../Resource/CMaterial.h"
 #include "../Resource/CMesh.h"
+#include "../Component/CBaseRenderer.h"
 
-class CSpriteRenderer : public CComponent
+class CSpriteRenderer : public CBaseRenderer
 {
 public:
 	CSpriteRenderer();
@@ -14,17 +14,13 @@ public:
 	void Init() override;
 	void Update() override;
 	void LateUpdate() override;
-	void Render() override;
+	void Render(const Matrix& view, const Matrix& projection) override;
 
 	void SetTexture(CTexture* _pTexture) { m_pTexture = _pTexture; }
-	CTexture* GetTexture() { return m_pTexture; }
-
-	void SetMaterial(CMaterial* _pMaterial) { m_pMaterial = _pMaterial; }
-
-	void SetMesh(CMesh* _pMesh) { m_pMesh = _pMesh; }
 
 private:
 	CTexture*	m_pTexture;
-	CMaterial*	m_pMaterial;
-	CMesh*		m_pMesh;
 };
+
+// mesh와 material을 이용해 화면에 출력하는 역할을 하지만
+// 텍스트 렌더링 기능, 부모 렌더러 연결, 셰이더 리소스 관리, 좌표 변환 기능은 없음

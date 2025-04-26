@@ -1,6 +1,7 @@
 #include "CUIManager.h"
 #include "../Object/CUIHUD.h"
 #include "../Object/CBtnUI.h"
+#include "../Object/CMiniMap.h"
 
 unordered_map<UI_TYPE, CUI*> CUIManager::m_mapUI = {};
 stack<CUI*> CUIManager::m_stUI = {};
@@ -17,12 +18,19 @@ CUIManager::~CUIManager()
 
 void CUIManager::Init()
 {
-	if (m_mapUI.find(UI_TYPE::UT_Button) == m_mapUI.end())
-	{
-		// UI 객체 생성해주기
-		CBtnUI* uiBtn = new CBtnUI();
-		m_mapUI.insert(make_pair(UI_TYPE::UT_Button, uiBtn));
-	}
+	//if (m_mapUI.find(UI_TYPE::UT_Button) == m_mapUI.end())
+	//{
+	//	// UI 객체 생성해주기
+	//	CBtnUI* uiBtn = new CBtnUI();
+	//	m_mapUI.insert(make_pair(UI_TYPE::UT_Button, uiBtn));
+	//}
+
+	//if (m_mapUI.find(UI_TYPE::UT_MiniMap) == m_mapUI.end())
+	//{
+	//	// UI 객체 생성해주기
+	//	CMiniMap* uiMiniMap = new CMiniMap();
+	//	m_mapUI.insert(make_pair(UI_TYPE::UT_MiniMap, uiMiniMap));
+	//}
 }
 
 void CUIManager::Update()
@@ -78,7 +86,12 @@ void CUIManager::Render()
 		buff.push_back(ui);
 	}
 
-	reverse(buff.begin(), buff.end());
+	sort(buff.begin(), buff.end(),
+		[](CUI* a, CUI* b) {
+		return a->GetZOrder() < b->GetZOrder(); // 낮은 zOrder 먼저 → 나중에 높은 zOrder 위로 렌더
+	});
+
+	//reverse(buff.begin(), buff.end());
 
 	for (CUI* ui : buff)
 	{
@@ -201,4 +214,10 @@ CUI* CUIManager::GetUI(UI_TYPE _eUIType)
 	}
 
 	return nullptr;
+}
+
+void CUIManager::RegisterUI(UI_TYPE _eUIType, CUI* _pUI)
+{
+	if (m_mapUI.find(_eUIType) == m_mapUI.end())
+		m_mapUI.insert(make_pair(_eUIType, _pUI));
 }

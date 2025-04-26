@@ -1,5 +1,6 @@
 #pragma once
 #define DIRECTINPUT_VERSION 0x0800
+#define NOMINMAX
 
 using namespace std;
 
@@ -28,6 +29,9 @@ using std::make_pair;
 using std::unordered_map;
 #include <utility>
 using std::pair;
+
+#include <set>
+using std::set;
 
 #include <bitset>
 #include <functional>

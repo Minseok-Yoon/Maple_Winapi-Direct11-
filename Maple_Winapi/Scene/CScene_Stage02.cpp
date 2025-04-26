@@ -7,7 +7,7 @@
 #include "../Resource/CTexture.h"
 #include "../Scene/CScene.h"
 #include "../Object/CPlayer.h"
-#include "../Object/CGround.h"
+#include "../Object/CBackGround.h"
 #include "../Object/CPortal.h"
 #include "../Manager/CCollisionManager.h"
 

@@ -1,12 +1,22 @@
-#include "CGravity.h"
+ï»¿#include "CGravity.h"
 #include "../Manager/CTimeManager.h"
 #include "../Object/CGameObject.h"
 #include "../Component/CRigidBody.h"
 #include "../Component/CTransform.h"
+#include "../Resource/CTexture.h"
+#include "../Manager/CSceneManager.h"
+#include "../Object/CBackGround.h"
+#include "../Object/CPlayer.h"
 
 CGravity::CGravity() :
-    m_bGround(false),
-    m_vGravity(Vector2(0.0f, 800.0f))
+    m_bGround(true),
+    m_bIsGravity(false),
+    m_fGravityForce(0.0f),
+    m_fGravitySpeed(15000.0f),
+    m_vecMoveForce(Vector2(0.0f, 0.0f)),
+    m_fMaxGravity(10.0f),
+    m_vGravity(Vector2(0.0f, -800.0f)),
+    m_pTransform(nullptr)
 {
 }
 
@@ -17,36 +27,75 @@ CGravity::~CGravity()
 void CGravity::Init()
 {
     CRigidBody::Init();
+
+    m_pTransform = GetOwner()->GetComponent<CTransform>();
 }
 
 void CGravity::Update()
 {
-    // ±âÁ¸ÀÇ CRigidBody Updat¸¦ È£ÃâÇÏ¿© ±âº» ¹°¸® Ã³¸®¸¦ ¼öÇà
     CRigidBody::Update();
 
-    // ¶¥¿¡ ´ê¾Æ ÀÖ´Â °æ¿ì ¼öÁ÷ ¼Óµµ¸¦ 0À¸·Î ¼³Á¤ÇÏ¿© Áß·Â ¿µÇâÀ» ¹ŞÁö ¾Ê°Ô ÇÑ´Ù.
+    // í˜„ì¬ ì”¬ì—ì„œ ë°°ê²½ ê°€ì ¸ì˜¤ê¸°
+    CScene* pCurScene = CSceneManager::GetCurScene();
+    if (!pCurScene) return;
+
+    CBackGround* pBackGround = pCurScene->GetBackGround();
+    if (!pBackGround) return;
+
+    // í”Œë ˆì´ì–´ì˜ ìœ„ì¹˜ì—ì„œ ì¶©ëŒ ê²€ì‚¬
+    m_bGround = m_pPlayer->CheckGround(m_pTransform->GetWorldPosition());
+
+    Gravity();
+}
+
+void CGravity::LateUpdate()
+{
+    CRigidBody::LateUpdate();
+}
+
+void CGravity::Render(const Matrix& view, const Matrix& projection)
+{
+    CRigidBody::Render(view, projection);
+}
+
+void CGravity::Jump(float _fJumpForce)
+{
+    if (!m_bGround) return; // ë•…ì— ë¶™ì–´ ìˆì§€ ì•Šìœ¼ë©´ ì í”„ ë¶ˆê°€
+
+    m_bGround = false;
+
+    // Owner ê°ì²´ì˜ Transform, RigidBody ì»´í¬ë„ŒíŠ¸ë¥¼ ê°€ì ¸ì˜¨ë‹¤.
+    CTransform* tr = GetOwner()->GetComponent<CTransform>();
+    CRigidBody* rb = GetOwner()->GetComponent<CRigidBody>();
+
+    // RigidBodyê°€ ìˆëŠ” ê²½ìš°ì—ë§Œ ì í”„ ì†ë„ ì„¤ì •
+    if (rb)
+    {
+        rb->SetVelocity(Vector2(rb->GetVelocity().x, -_fJumpForce));
+    }
+}
+
+void CGravity::Gravity()
+{
+    // ë•…ì— ë‹¿ì•„ ìˆëŠ” ê²½ìš° ìˆ˜ì§ ì†ë„ë¥¼ 0ìœ¼ë¡œ ì„¤ì •í•˜ì—¬ ì¤‘ë ¥ ì˜í–¥ì„ ë°›ì§€ ì•Šê²Œ í•œë‹¤.
     if (m_bGround)
     {
-        // ¶¥À§¿¡ ÀÖÀ» ¶§
-        Vector2 gravity = m_vGravity;
-        gravity.Normalize();
-
-        float dot = m_vVelocity.Dot(gravity);
-        m_vVelocity -= gravity * dot;
+        // ë•…ì— ìˆì„ ê²½ìš° ìˆ˜ì§ ì†ë„ë¥¼ 0ìœ¼ë¡œ ì„¤ì •
+        m_vVelocity.y = 0.0f;
     }
     else
     {
-        // °øÁõ¿¡ ÀÖÀ» ¶§
+        // ê³µì¤‘ì— ìˆì„ ê²½ìš° ì¤‘ë ¥ ì ìš©
         m_vVelocity += m_vGravity * CTimeManager::GetfDeltaTime();
     }
 
-    // ÃÖ´ë ¼Óµµ Á¦ÇÑ
+    // ìµœëŒ€ ì†ë„ ì œí•œ
     Vector2 gravity = m_vGravity;
     gravity.Normalize();
     float dot = m_vVelocity.Dot(gravity);
     gravity = gravity * dot;
-
     Vector2 sideVelocity = m_vVelocity - gravity;
+
     if (m_vMaxVelocity.y < gravity.Length())
     {
         gravity.Normalize();
@@ -56,33 +105,119 @@ void CGravity::Update()
     if (m_vMaxVelocity.x < sideVelocity.Length())
     {
         sideVelocity.Normalize();
-        sideVelocity *= m_vMaxVelocity;
+        sideVelocity *= m_vMaxVelocity.x;
     }
+
+    m_vVelocity = sideVelocity + gravity;
 }
+/*if (m_bIsGravity == false) { return; }
 
-void CGravity::LateUpdate()
-{
-    CRigidBody::LateUpdate();
-}
-
-void CGravity::Render()
-{
-    CRigidBody::Render();
-}
-
-void CGravity::Jump(float _fJumpForce)
-{
-    if (!m_bGround) return; // ¶¥¿¡ ºÙ¾î ÀÖÁö ¾ÊÀ¸¸é Á¡ÇÁ ºÒ°¡
-
-    m_bGround = false;
-
-    // Owner °´Ã¼ÀÇ Transform, RigidBody ÄÄÆ÷³ÍÆ®¸¦ °¡Á®¿Â´Ù.
-    CTransform* tr = GetOwner()->GetComponent<CTransform>();
-    CRigidBody* rb = GetOwner()->GetComponent<CRigidBody>();
-
-    // RigidBody°¡ ÀÖ´Â °æ¿ì¿¡¸¸ Á¡ÇÁ ¼Óµµ ¼³Á¤
-    if (rb)
+    m_fGravityForce += m_fGravitySpeed * CTimeManager::GetfDeltaTime();
+    if (m_fGravityForce >= 1400.0f)
     {
-        rb->SetVelocity(Vector2(rb->GetVelocity().x, -_fJumpForce));
+        m_fGravityForce = 1400.0f;
     }
-}
+
+    m_vecMoveForce.y -= m_fGravityForce * CTimeManager::GetfDeltaTime();
+    float MoveVectorForceDelta = m_vecMoveForce.y * CTimeManager::GetfDeltaTime();
+    if (-m_fMaxGravity >= MoveVectorForceDelta)
+    {
+        MoveVectorForceDelta = -m_fMaxGravity;
+    }
+
+    if (m_vecMoveForce.y < 0.0f  && MoveVectorForceDelta  < -1.0f)
+    {
+        float Count = 0.0f;
+        for (; ; Count -= 1.0f)
+        {
+            if (Count <= MoveVectorForceDelta)
+            {
+                Count = MoveVectorForceDelta;
+                break;
+            }
+
+            if (true == CheckGround(Vector3(0.0f, Count, 0.0f)))
+            {
+                break;
+            }
+        }
+        m_pTransform->AddLocalPosition(Vector3(0.0f, Count, 0.0f));
+    }
+    else
+    {
+        m_pTransform->AddLocalPosition(Vector3(0.0f, MoveVectorForceDelta, 0.0f));
+    }*/
+
+    //CScene* pCurrentScene = CSceneManager::GetCurScene();
+        //if (!pCurrentScene)
+        //{
+        //    OutputDebugStringA("ERROR: Current Scene is NULL!\n");
+        //    return;
+        //}
+        //CBackGround* pCurBackGround = pCurrentScene->GetBackGround();
+        //if (!pCurBackGround)
+        //{
+        //    OutputDebugStringA("WARNING: BackGround is not set in current scene!\n");
+        //    return;
+        //}
+
+        //// âœ… AABB + í”½ì…€ ì¶©ëŒ ê²€ì‚¬
+        //m_bGround = CheckGround(pCurBackGround, Vector3(0.0f, -1.0f, 0.0f));
+
+        //// âœ… ì¶©ëŒ ìƒíƒœì— ë”°ë¼ ì¤‘ë ¥ ì²˜ë¦¬
+        //if (m_bGround)
+        //{
+        //    m_vVelocity.y = 0.0f; // ì¶©ëŒ ì‹œ ì¤‘ë ¥ ì œê±°
+        //}
+        //else
+        //{
+        //    m_vVelocity.y -= m_fGravityForce * CTimeManager::GetfDeltaTime(); // ì¤‘ë ¥ ì ìš©
+        //}
+
+        //SetVelocity(Vector2(m_vVelocity.x, m_vVelocity.y));
+
+//bool CGravity::CheckGround(CBackGround* pGround, Vector3 _fPlusCheckPos)
+//{
+//    /*if (!m_pTransform)
+//    {
+//        OutputDebugStringA("ERROR: CGravity::CheckGround() - Transform is NULL!\n");
+//        return false;
+//    }*/
+//
+//    if (this == nullptr) // âœ… `this`ê°€ ìœ íš¨í•œì§€ ë¨¼ì € ì²´í¬
+//    {
+//        OutputDebugStringA("ERROR: CGravity::CheckGround() - this is NULL!\n");
+//        return false;
+//    }
+//
+//    // âœ… ì¶©ëŒ ë°•ìŠ¤ ê°€ì ¸ì˜¤ê¸°
+//    CCollider* collider = m_pOwner->GetComponent<CCollider>();
+//    if (!collider)
+//    {
+//        OutputDebugStringA("WARNING: Collider not found in Player!\n");
+//        return false;
+//    }
+//
+//    // âœ… AABB ì¶©ëŒ ë²”ìœ„ ê°€ì ¸ì˜¤ê¸°
+//    Vector3 bottomLeft = collider->m_vBottomLeft + _fPlusCheckPos;
+//    Vector3 topRight = collider->m_vTopRight + _fPlusCheckPos;
+//
+//    // âœ… AABB ë°•ìŠ¤ ì˜ì—­ ë‚´ í”½ì…€ ì¶©ëŒ ê²€ì‚¬
+//    for (int x = static_cast<int>(bottomLeft.x); x <= static_cast<int>(topRight.x); x++)
+//    {
+//        for (int y = static_cast<int>(topRight.y); y <= static_cast<int>(bottomLeft.y); y++)
+//        {
+//            TextureColor CheckColor = pGround->GetColor(
+//                float4(static_cast<float>(x), static_cast<float>(y), 0.0f, 1.0f),
+//                TextureColor(0.0f, 0.0f, 0.0f, 255.0f));
+//
+//            // âœ… ì¶©ëŒ í”½ì…€ ìƒ‰ìƒ í™•ì¸ (ì˜ˆ: R=255, G=0, B=255ëŠ” ë•…)
+//            if (CheckColor.R == 255 && CheckColor.G == 0 && CheckColor.B == 255)
+//            {
+//                return true; // ë•…ì— ë‹¿ìŒ
+//            }
+//        }
+//    }
+//
+//    return false; // ë•…ì´ ì•„ë‹˜
+//}

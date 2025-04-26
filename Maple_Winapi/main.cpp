@@ -14,6 +14,7 @@
 
 #include "Object/CGameObject.h"
 #include "Component/CTransform.h"
+#include "Component/CCollider.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -27,6 +28,8 @@
 #include "GraphEditor.h"
 
 CCore core;
+CCollider collider;
+CScene scene;
 
 ULONG_PTR   gpToken;
 Gdiplus::GdiplusStartupInput gpsi;
@@ -130,6 +133,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
+    bool show_createObject_window = true;
+    static bool showColliderInspector = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MAPLEWINAPI));
@@ -288,7 +293,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 ImGui::End();
             }
 
+            if (show_createObject_window)
+            {
+                ImGui::Begin("CreateObject", &show_createObject_window);
+
+                // Collider UI 표시 여부 체크박스
+                ImGui::Checkbox("Show Collider Inspector", &showColliderInspector);
+
+                ImGui::End();
+            }
+
             // Rendering
+            if (showColliderInspector)
+            {
+                collider.RenderUI();
+            }
+
             ImGui::Render();
             ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 

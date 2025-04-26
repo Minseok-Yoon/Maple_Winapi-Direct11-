@@ -88,9 +88,9 @@ void CCore::Render()
 
 	// Rendering
 	CDamageManager::GetInst()->Render();
+	CSceneManager::Render();
 	CColliderManager::GetInst()->Render();
 	CUIManager::GetInst()->Render();
-	CSceneManager::Render();
 }
 
 void CCore::Present()

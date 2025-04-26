@@ -15,7 +15,4 @@ public:
     void Update() override;
     void LateUpdate() override;
     void Render() override;
-
-private:
-    //class CPlayer* m_pPlayer;
 };

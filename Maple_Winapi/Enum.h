@@ -86,6 +86,12 @@ enum ITEM_TAG
 	IT_Size
 };
 
+enum class CAM_ORDER
+{
+	CO_Main,
+	CO_Ui
+};
+
 enum class CAM_EFFECT
 {
 	CE_None,
@@ -104,13 +110,14 @@ enum class OBJECT_STATE
 enum class LAYER_TYPE
 {
 	LT_None,
-	LT_BackGround,
 	LT_PixelBackGround,
+	LT_BackGround,
 	LT_Player,
 	LT_Monster,
 	LT_Floor,
 	LT_Tile,
 	LT_Particle,
+	LT_UIBackGround,
 	LT_UI,
 	LT_End,
 };
@@ -160,6 +167,21 @@ enum class ANIMATION_STATE
 enum class UI_TYPE
 {
 	UT_HpBar,
+	UT_MiniMap,
 	UT_Button,
 	UT_End
+};
+
+enum class CAMERA_ORDER
+{
+	CO_None = 0,
+	CO_Main = 1,
+	CO_UI = 10
+};
+
+enum class CLEAR_FLAG
+{
+	CF_Color,      // 기본값 - 배경색으로 Clear
+	CF_DepthOnly,  // Depth만 Clear
+	CF_DontClear   // 아무것도 Clear 안 함
 };

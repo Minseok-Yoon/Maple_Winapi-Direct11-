@@ -12,16 +12,16 @@ public:
 	void Init() override;
 	void Update() override;
 	void LateUpdate() override;
-	void Render() override;
+	void Render(const Matrix& view, const Matrix& projection) override;
 
 	void OnCollisionEnter(class CCollider* _pOther) override;
 	void OnCollisionStay(class CCollider* _pOther) override;
 	void OnCollisionExit(class CCollider* _pOther) override;
 
-	vector<Vector3>GetCollisionPoints(const Vector3& _vPos, int _iPlayerWidthHalf, int _iPlayerHeightHalf);
+	/*vector<Vector3>GetCollisionPoints(const Vector3& _vPos, int _iPlayerWidthHalf, int _iPlayerHeightHalf);
 	bool CheckPixelCollision(int _iPosX, int _iPosY, PIXEL& _pPixel, const string& _colTag);
 	void UpdateCollisionState(bool& _bIsColiding, bool _bCollisionDetected, const string& _strColTag, void (CPlayerScript::* onEnter)(), void (CPlayerScript::* onExit)());
-	void CheckPixelColor();
+	void CheckPixelColor();*/
 
 	void OnStageCollisionEnter();
 	void OnStageCollisionExit();

@@ -2,9 +2,13 @@
 #include "../Entity/CEntity.h"
 #include "../Object/CGameObject.h"
 #include "../Layer/CLayer.h"
-#include "../Object/CGround.h"
+#include "../Object/CBackGround.h"
 #include "../Component/CAudioSource.h"
+#include "../Object/CMiniMap.h"
+#include "../Object/CPlayer.h"
 
+class CMiniMap;
+class CCamera;
 class CScene : public CEntity
 {
 public:
@@ -23,16 +27,38 @@ public:
 
 	void AddGameObject(CGameObject* _pGameObj, const LAYER_TYPE _eLayerType);
 	void EraseGameObject(CGameObject* _pGameObj);
+	void AddCamera(CCamera* _pCamera);
+	void RemoveCamera(CCamera* _pCamera);
+	void CollectRenderables(CCamera* _pCamera, std::vector<CGameObject*>& opaqueList, std::vector<CGameObject*>& cutoutList
+		, std::vector<CGameObject*>& transparentList) const;
+	void SortByDistance(std::vector<CGameObject*>& renderList, 
+		const Vector3& cameraPos, bool bAscending) const;
+	void RenderRenderables(const std::vector<CGameObject*>& renderList
+		, const Matrix& view, const Matrix& projection) const;
 
-	CLayer* GetLayer(const LAYER_TYPE _eLayerType) { return m_vecLayers[static_cast<UINT>(_eLayerType)]; }
+
+	CLayer* GetLayer(const LAYER_TYPE _eLayerType) const { return m_vecLayers[static_cast<UINT>(_eLayerType)]; }
 
 	CBackGround* GetBackGround() const { return m_pBackGround; }
+
+	vector<CGameObject*> GetGameObjects(const LAYER_TYPE _eLayerType)
+	{
+		if (_eLayerType >= LAYER_TYPE::LT_End)
+			return {}; // 肋给等 立辟 规瘤
+
+		return m_vecLayers[static_cast<UINT>(_eLayerType)]->GetGameObjects();
+	}
+
+	CBackGround* GetCurBackGround() { return m_pBackGround; }
+	CPlayer* GetPlayer() { return m_pPlayer; }
 
 private:
 	void createLayers();
 
 public:
 	class CBackGround* m_pBackGround;
+	vector<CCamera*>	m_vecCameras;
+	class CPlayer* m_pPlayer = nullptr;
 
 protected:
 	class CAudioSource* m_pAudioSource;

@@ -15,6 +15,8 @@ static T* Instantiate(LAYER_TYPE _eLayerType)
 	CLayer* layer = activeScene->GetLayer(_eLayerType);
 	layer->AddGameObject(gameObject);
 
+	gameObject->Init();
+
 	return gameObject;
 }
 
@@ -28,7 +30,9 @@ static T* Instantiate(LAYER_TYPE _eLayerType, Vector3 _vPosition)
 	layer->AddGameObject(gameObject);
 
 	CTransform* tr = gameObject->GetComponent<CTransform>();
-	tr->SetPosition(_vPosition);
+	tr->SetLocalPosition(_vPosition);
+
+	gameObject->Init();
 
 	return gameObject;
 }
@@ -44,3 +48,14 @@ static void DontDestroyOnLoad(CGameObject* _pGameObject)
 	CScene* dontDestroyOnLoad = CSceneManager::GetDontDestroyOnLoad();
 	dontDestroyOnLoad->AddGameObject(_pGameObject, _pGameObject->GetLayerType());
 }
+
+class CObject : public CGameObject
+{
+public:
+	CObject();
+	~CObject();
+
+protected:
+	class CScene* GetScene();
+	class CObject* GetObject();
+};

@@ -26,7 +26,7 @@ void CItem::LateUpdate()
 {
 }
 
-void CItem::Render()
+void CItem::Render(const Matrix& view, const Matrix& projection)
 {
     //CGameObject* gameObj = m_pItem->GetOwner();
     //CTransform* tr = gameObj->GetComponent<CTransform>();

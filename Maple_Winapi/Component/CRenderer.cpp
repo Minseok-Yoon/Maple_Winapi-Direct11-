@@ -9,6 +9,9 @@
 namespace renderer
 {
 	CCamera* mainCamera = nullptr;
+	CCamera* uiCamera = nullptr;
+	CCamera* activeCamera = nullptr; // 현재 렌더링할 카메라
+
 	CGameObject* selectedObject = nullptr;
 	CConstantBuffer* constantBuffers[static_cast<UINT>(CB_TYPE::CT_End)] = {};
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[static_cast<UINT>(SAMPLE_TYPE::ST_End)] = {};
@@ -93,35 +96,69 @@ namespace renderer
 #pragma endregion
 #pragma region blend state
 		D3D11_BLEND_DESC bsDesc = {};
-		bsDesc.AlphaToCoverageEnable = false;
-		bsDesc.IndependentBlendEnable = false;
-		bsDesc.RenderTarget[0].BlendEnable = true;
-		bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
-		bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
-		bsDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
-		bsDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
-		bsDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
-		bsDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
-		bsDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
-		GetDevice()->CreateBlendState(&bsDesc, blendStates[static_cast<UINT>(BLEND_STATE::BS_AlphaBlend)].GetAddressOf());
+		bsDesc.RenderTarget[0].BlendEnable = FALSE;
+		bsDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		GetDevice()->CreateBlendState(&bsDesc, blendStates[static_cast<UINT>(BLEND_STATE::BS_Opaque)].GetAddressOf());
 
-		bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND::D3D11_BLEND_ONE;
-		bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND::D3D11_BLEND_ONE;
+		bsDesc = {};
+		bsDesc.RenderTarget[0].BlendEnable = FALSE;
+		bsDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		GetDevice()->CreateBlendState(&bsDesc, blendStates[static_cast<UINT>(BLEND_STATE::BS_Cutout)].GetAddressOf());
+
+		bsDesc = {};
+		bsDesc.RenderTarget[0].BlendEnable = TRUE;
+		bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		bsDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+
+		bsDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		bsDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		bsDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+		bsDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		GetDevice()->CreateBlendState(&bsDesc, blendStates[static_cast<UINT>(BLEND_STATE::BS_Transparent)].GetAddressOf());
+
+		bsDesc = {};
+		bsDesc.RenderTarget[0].BlendEnable = TRUE;
+
+		// 색상 블렌딩
+		bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+		bsDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+
+		// 알파 블렌딩 (보통 무시)
+		bsDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		bsDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		bsDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+		// 출력 마스크: RGBA 다 써도 된다
+		bsDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		GetDevice()->CreateBlendState(&bsDesc, blendStates[static_cast<UINT>(BLEND_STATE::BS_OneOne)].GetAddressOf());
 #pragma endregion
 #pragma region depthstencil state
 		D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 		dsDesc.DepthEnable = true;
-		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
-		dsDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 		dsDesc.StencilEnable = false;
-		GetDevice()->CreateDepthStencilState(&dsDesc, depthStencilStates[static_cast<UINT>(DEPTHSTENCIL_STATE::DS_LessEqual)].GetAddressOf());
+		GetDevice()->CreateDepthStencilState(
+			&dsDesc, depthStencilStates[static_cast<UINT>(DEPTHSTENCIL_STATE::DS_LessEqual)].GetAddressOf());
 
+		dsDesc = {};
 		dsDesc.DepthEnable = false;
-		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ZERO;
-		dsDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		dsDesc.DepthFunc = D3D11_COMPARISON_NEVER;
 		dsDesc.StencilEnable = false;
-		GetDevice()->CreateDepthStencilState(&dsDesc, depthStencilStates[static_cast<UINT>(DEPTHSTENCIL_STATE::DS_DepthNone)].GetAddressOf());
+		GetDevice()->CreateDepthStencilState(
+			&dsDesc, depthStencilStates[static_cast<UINT>(DEPTHSTENCIL_STATE::DS_DepthNone)].GetAddressOf());
+
+		dsDesc = {};
+		dsDesc.DepthEnable = true;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		dsDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+		dsDesc.StencilEnable = false;
+		GetDevice()->CreateDepthStencilState(
+			&dsDesc, depthStencilStates[static_cast<UINT>(DEPTHSTENCIL_STATE::DS_Always)].GetAddressOf());
 #pragma endregion
 	}
 
@@ -273,6 +310,9 @@ namespace renderer
 	{
 		constantBuffers[CBSLOT_TRANSFORM] = new CConstantBuffer(CB_TYPE::CT_Transform);
 		constantBuffers[CBSLOT_TRANSFORM]->Create(sizeof(TransformCB));
+
+		constantBuffers[CBSLOT_COLOR] = new CConstantBuffer(CB_TYPE::CT_Color);
+		constantBuffers[CBSLOT_COLOR]->Create(sizeof(ColorCB));
 	}
 
 	void Init()

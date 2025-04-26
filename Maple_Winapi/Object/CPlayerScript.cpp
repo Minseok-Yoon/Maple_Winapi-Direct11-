@@ -1,4 +1,4 @@
-#include "CPlayerScript.h"
+ï»¿#include "CPlayerScript.h"
 #include "../Manager/CKeyManager.h"
 #include "../Manager/CTimeManager.h"
 #include "../Manager/CResourceManager.h"
@@ -29,8 +29,7 @@ void CPlayerScript::Init()
 
 void CPlayerScript::Update()
 {
-	CheckPixelColor();
-
+	// í”Œë ˆì´ì–´ ê°ì²´ ê°€ì ¸ì˜¤ê¸°
 	CGameObject* pPlayer = renderer::selectedObject;
 	if (pPlayer != nullptr)
 	{
@@ -40,10 +39,10 @@ void CPlayerScript::Update()
 	switch (m_ePlayerState)
 	{
 	case PLAYER_STATE::PS_Idle:
-		idle();  // Idle ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ¼³Á¤
+		idle();
 		break;
 	case PLAYER_STATE::PS_Walk:
-		move();  // °È±â ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ¼³Á¤
+		move();
 		break;
 	case PLAYER_STATE::PS_Attack:
 		attack();
@@ -54,7 +53,6 @@ void CPlayerScript::Update()
 	case PLAYER_STATE::PS_Jump:
 		jump();
 		break;
-		// ÇÊ¿ä¿¡ µû¶ó ´Ù¸¥ »óÅÂ Ãß°¡
 	}
 }
 
@@ -62,7 +60,7 @@ void CPlayerScript::LateUpdate()
 {
 }
 
-void CPlayerScript::Render()
+void CPlayerScript::Render(const Matrix& view, const Matrix& projection)
 {
 }
 
@@ -78,238 +76,6 @@ void CPlayerScript::OnCollisionExit(CCollider* _pOther)
 {
 }
 
-vector<Vector3> CPlayerScript::GetCollisionPoints(const Vector3& _vPos, int _iPlayerWidthHalf, int _iPlayerHeightHalf)
-{
-	vector<Vector3> collisionPoints;       // Ãæµ¹ ÁÂÇ¥¸¦ ÀúÀå
-	int offsetY = _iPlayerHeightHalf;
-
-	// ÇöÀç À§Ä¡ÀÇ Á¤¼ö ÁÂÇ¥·Î °è»ê
-	int x = static_cast<int>(_vPos.x);
-	int y = static_cast<int>(_vPos.y);
-
-	// ÁÂ¿ì Ãæµ¹ °Ë»ç ÁÂÇ¥¸¦ °è»ê
-	int xLeft = x - _iPlayerWidthHalf;
-	int xRight = x + _iPlayerWidthHalf;
-
-	// »óÇÏ Ãæµ¹ °Ë»ç ÁÂÇ¥¸¦ °è»ê
-	int yTop = y - 10.f;
-	int yBottom = y + _iPlayerHeightHalf;
-
-	// Ãæµ¹ÁÂÇ¥¿¡ º¤ÅÍ¸¦ Ãß°¡
-	collisionPoints.emplace_back(Vector3(x, y, 0.0f));
-	collisionPoints.emplace_back(Vector3(xLeft, y, 0.0f));
-	collisionPoints.emplace_back(Vector3(xRight, y, 0.0f));
-	collisionPoints.emplace_back(Vector3(x, yTop, 0.0f));
-
-	return collisionPoints;
-}
-
-bool CPlayerScript::CheckPixelCollision(int _iPosX, int _iPosY, PIXEL& _pPixel, const string& _colTag)
-{
-	//// ÁÂÇ¥°¡ ÇÈ¼¿ Ãæµ¹ °´Ã¼ÀÇ ¹üÀ§ ³»¿¡ ÀÖ´ÂÁö È®ÀÎ
-	//if (_iPosX >= 0 && _iPosX < m_pPixelCollider->GetWidth() && _iPosY >= 0 && _iPosY < m_pPixelCollider->GetHeight()) {
-	//	_pPixel = m_pPixelCollider->GetPixelColor(_iPosX, _iPosY);
-
-	//	// Ãæµ¹ ÅÂ±×¿¡ µû¶ó Ãæµ¹ ¿©ºÎ¸¦ ÆÇÁ¤
-	//	if (_colTag == "StageColl") {
-	//		return (_pPixel.r == 255 && _pPixel.g == 0 && _pPixel.b == 255);
-	//	}
-	//	else if (_colTag == "StageColl") {
-	//		return (_pPixel.r == 255 && _pPixel.g == 255 && _pPixel.b == 255);
-	//	}
-	//	/*
-	//	else if (_colTag == "Wall") {
-	//		return (_pPixel.r == 0 && _pPixel.g == 255 && _pPixel.b == 255);
-	//	}
-	//	else if (_colTag == "Rope") {
-	//		return (_pPixel.r == 0 && _pPixel.g == 128 && _pPixel.b == 0);
-	//	}*/
-	//}
-	//else {
-	//	OutputDebugStringA("Player position out of bounds.\n");
-	//}
-	//return false;
-	// Áß½É ±âÁØÀ¸·Î ÁÂÇ¥ º¯È¯
-
-	if (!m_pPixelCollider) {
-		OutputDebugStringA("Pixel collider not set.\n");
-		return false;
-	}
-
-	if (_iPosX >= 0 && _iPosX < m_pPixelCollider->GetWidth() &&
-		_iPosY >= 0 && _iPosY < m_pPixelCollider->GetHeight()) {
-
-		// ÇÈ¼¿ µ¥ÀÌÅÍ °¡Á®¿À±â
-		_pPixel = m_pPixelCollider->GetPixelColor(_iPosX, _iPosY);
-
-		// µğ¹ö±× Ãâ·Â
-		char debugMsg[200];
-		sprintf_s(debugMsg, "Pixel Collision Debug - Pos(%d, %d), Color(R=%d, G=%d, B=%d)\n",
-			_iPosX, _iPosY, _pPixel.r, _pPixel.g, _pPixel.b);
-		OutputDebugStringA(debugMsg);
-
-		if (_colTag == "StageColl") {
-			return (_pPixel.r == 255 && _pPixel.g == 0 && _pPixel.b == 255);
-		}
-	}
-	OutputDebugStringA("Pixel position out of bounds or no collision.\n");
-	return false;
-
-	//// Áß½É ±âÁØÀ¸·Î ÁÂÇ¥ º¯È¯
-	//int centerX = m_pPixelCollider->GetWidth() / 2;
-	//int centerY = m_pPixelCollider->GetHeight() / 2;
-
-	//int localX = _iPosX + centerX;  // Á¤Áß¾ÓÀ» ±âÁØÀ¸·Î º¯È¯
-	//int localY = centerY - _iPosY;  // YÃà ¹æÇâ ¹İÀü ¹× Á¤Áß¾Ó ±âÁØ º¯È¯
-
-	//if (localX >= 0 && localX < m_pPixelCollider->GetWidth() &&
-	//	localY >= 0 && localY < m_pPixelCollider->GetHeight()) {
-
-	//	// ÇÈ¼¿ µ¥ÀÌÅÍ °¡Á®¿À±â
-	//	_pPixel = m_pPixelCollider->GetPixelColor(localX, localY);
-
-	//	// µğ¹ö±× Ãâ·Â
-	//	char debugMsg[200];
-	//	sprintf_s(debugMsg, "Pixel Collision Debug - LocalPos(%d, %d), Color(R=%d, G=%d, B=%d)\n",
-	//		localX, localY, _pPixel.r, _pPixel.g, _pPixel.b);
-	//	OutputDebugStringA(debugMsg);
-
-	//	if (_colTag == "StageColl") {
-	//		return (_pPixel.r == 255 && _pPixel.g == 0 && _pPixel.b == 255);
-	//	}
-	//}
-
-	//OutputDebugStringA("Pixel position out of bounds or no collision.\n");
-	//return false;
-}
-
-void CPlayerScript::UpdateCollisionState(bool& _bIsColiding, bool _bCollisionDetected, const string& _strColTag, void(CPlayerScript::* onEnter)(), void(CPlayerScript::* onExit)())
-{
-	if (_bCollisionDetected) {
-		if (!_bIsColiding) {
-			_bIsColiding = true;
-			(this->*onEnter)();
-		}
-	}
-	else {
-		if (_bIsColiding) {
-			_bIsColiding = false;
-			(this->*onExit)();
-		}
-	}
-}
-
-void CPlayerScript::CheckPixelColor()
-{
-	// ½ºÅ×ÀÌÁö Ãæµ¹ ¹× º®, ·ÎÇÁ Ãæµ¹ »óÅÂ¸¦ ³ªÅ¸³»´Â Á¤Àû º¯¼ö
-	static bool isCollidingWithStage = false;
-	static bool isCollidingWithWall = false;
-	static bool isCollidingWithRope = false;
-
-	// ÇÈ¼¿ Ãæµ¹ °´Ã¼°¡ Á¸ÀçÇÑ´Ù¸é
-	if (m_pPixelCollider) {
-		CTransform* tr = GetOwner()->GetComponent<CTransform>();
-		Vector3 vPos = tr->GetPosition();
-
-		int playerWidthHalf = 17;
-		int playerHeightHalf = 32;
-
-		auto collisionPoints = GetCollisionPoints(vPos, playerWidthHalf, playerHeightHalf);
-		m_vecCollisionPoint.clear(); // Ãæµ¹ À§Ä¡ º¤ÅÍ ÃÊ±âÈ­
-
-		// Ãæµ¹ °¨Áö ÇÃ·¡±× ÃÊ±âÈ­
-		bool stageCollisionDetected = false;
-		bool wallCollisionDetected = false;
-		bool ropeCollisionDetected = false;
-
-		PIXEL pixel;
-
-		// ½ºÅ×ÀÌÁö Ãæµ¹ °Ë»ç
-		const auto& stagePoint = collisionPoints[0];
-		if (CheckPixelCollision(stagePoint.x, stagePoint.y, pixel, "StageColl")) {
-			m_vecCollisionPoint.emplace_back(stagePoint);
-			stageCollisionDetected = true;
-
-			// ÇÈ¼¿ »ö»ó µğ¹ö±ë
-			char debugMsg[100];
-			sprintf_s(debugMsg, "Pixel Collider Color - R: %d, G: %d, B: %d\n", pixel.r, pixel.g, pixel.b);
-			OutputDebugStringA(debugMsg);
-
-			CCollider* collider = GetOwner()->GetComponent<CCollider>();
-			if (collider) {
-				collider->SetCollisionDetected(true);
-			}
-		}
-		else {
-			CCollider* collider = GetOwner()->GetComponent<CCollider>();
-			if (collider) {
-				collider->SetCollisionDetected(false);
-			}
-		}
-
-		//// º® Ãæµ¹ °Ë»ç
-		//for (size_t i = 1; i <= 2; ++i) {
-		//	const auto& point = collisionPoints[i];
-		//	if (CheckPixelCollision(point.x, point.y, pixel, "Wall")) {
-		//		m_CollisionPoint.emplace_back(point);
-		//		wallCollisionDetected = true;
-		//	}
-		//}
-
-		//// ·ÎÇÁ Ãæµ¹ °Ë»ç
-		//const auto& ropePoint = collisionPoints.back();
-		//int ropeCollisionRadius = 10; // ·ÎÇÁ Ãæµ¹ ¹üÀ§ ¹İ°æ
-
-		//for (int dx = -ropeCollisionRadius; dx <= ropeCollisionRadius; dx += 1) { // XÃà ¹æÇâÀ¸·Î ÁÂÇ¥ °Ë»ç
-		//	if (CheckPixelCollision(ropePoint.x + dx, ropePoint.y, pixel, "Rope")) {
-		//		m_CollisionPoint.emplace_back(Vec2(ropePoint.x + dx, ropePoint.y));
-		//		ropeCollisionDetected = true;
-		//		m_vRopePos = Vec2(ropePoint.x + dx, ropePoint.y); // ·ÎÇÁ À§Ä¡ ¾÷µ¥ÀÌÆ®
-		//	}
-		//}
-
-		UpdateCollisionState(isCollidingWithStage, stageCollisionDetected, "StageColl", &CPlayerScript::OnStageCollisionEnter, &CPlayerScript::OnStageCollisionExit);
-		//UpdateCollisionState(isCollidingWithWall, wallCollisionDetected, "Wall", &CPlayer::OnWallCollisionEnter, &CPlayer::OnWallCollisionExit);
-		//UpdateCollisionState(isCollidingWithRope, ropeCollisionDetected, "Rope", &CPlayer::OnRopeCollisionEnter, &CPlayer::OnRopeCollisionExit);
-	}
-	else {
-		OutputDebugStringA("Pixel collider not set.\n");
-	}
-}
-
-void CPlayerScript::OnStageCollisionEnter() {
-	CCollider tempCollider;
-	tempCollider.SetColTag("StageColl");
-	OnStageCollisionEnter(&tempCollider);
-}
-
-void CPlayerScript::OnStageCollisionExit() {
-	CCollider tempCollider;
-	tempCollider.SetColTag("StageColl");
-	OnStageCollisionExit(&tempCollider);
-}
-
-void CPlayerScript::OnStageCollisionEnter(CCollider* _pOther)
-{
-	if (_pOther->GetColTag() == "StageColl")
-	{
-	}
-}
-
-void CPlayerScript::OnStageCollision(CCollider* _pOther)
-{
-	if (_pOther->GetColTag() == "StageColl")
-	{
-	}
-}
-
-void CPlayerScript::OnStageCollisionExit(CCollider* _pOther)
-{
-	if (_pOther->GetColTag() == "StageColl")
-	{
-	}
-}
-
 void CPlayerScript::idle()
 {
 	CAnimator* animator = GetOwner()->GetComponent<CAnimator>();
@@ -318,35 +84,35 @@ void CPlayerScript::idle()
 		animator = GetOwner()->AddComponent<CAnimator>();
 	}
 
-	// SpriteRenderer °¡Á®¿À±â
+	// SpriteRenderer ê°€ì ¸ì˜¤ê¸°
 	CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
 	if (sr == nullptr)
 	{
 		sr = GetOwner()->AddComponent<CSpriteRenderer>();
 	}
 
-	// Idle ¾Ö´Ï¸ŞÀÌ¼Ç »ı¼º
+	// Idle ì• ë‹ˆë©”ì´ì…˜ ìƒì„±
 	wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
 	wstring animationName = L"Idle";
-	wstring filePathPattern = L"../Resources/Texture/Player/Idle/" + direction + L"/%d.bmp";  // %d·Î ÇÁ·¹ÀÓ ¹øÈ£ º¯°æ
-	int frameCount = 3;  // ¾Ö´Ï¸ŞÀÌ¼Ç ÇÁ·¹ÀÓ ¼ö (¿¹: 1.bmp, 2.bmp, 3.bmp)
-	float frameDuration = 0.5f;  // ÇÁ·¹ÀÓ °£ Áö¼Ó ½Ã°£ (0.5ÃÊ·Î ¼³Á¤)
+	wstring filePathPattern = L"../Resources/Texture/Player/Idle/" + direction + L"/%d.bmp";  // %dë¡œ í”„ë ˆì„ ë²ˆí˜¸ ë³€ê²½
+	int frameCount = 3;  // ì• ë‹ˆë©”ì´ì…˜ í”„ë ˆì„ ìˆ˜ (ì˜ˆ: 1.bmp, 2.bmp, 3.bmp)
+	float frameDuration = 0.5f;  // í”„ë ˆì„ ê°„ ì§€ì† ì‹œê°„ (0.5ì´ˆë¡œ ì„¤ì •)
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç Ãß°¡
+	// ì• ë‹ˆë©”ì´ì…˜ ì¶”ê°€
 	animator->AddFrameAnimation(
 		animationName,
 		filePathPattern.c_str(),
 		frameCount,
-		Vector2(0.0f, 0.0f),  // ¿ŞÂÊ »ó´Ü ÁÂÇ¥
-		54.0f,                 // °¢ ÇÁ·¹ÀÓÀÇ ³Êºñ
-		65.0f,                 // °¢ ÇÁ·¹ÀÓÀÇ ³ôÀÌ
-		0.0f,                  // ÇÁ·¹ÀÓ °£ x ¿ÀÇÁ¼Â
-		0.0f,                  // ÇÁ·¹ÀÓ °£ y ¿ÀÇÁ¼Â
-		frameDuration         // ÇÁ·¹ÀÓ Áö¼Ó ½Ã°£
+		Vector2(0.0f, 0.0f),  // ì™¼ìª½ ìƒë‹¨ ì¢Œí‘œ
+		54.0f,                 // ê° í”„ë ˆì„ì˜ ë„ˆë¹„
+		65.0f,                 // ê° í”„ë ˆì„ì˜ ë†’ì´
+		0.0f,                  // í”„ë ˆì„ ê°„ x ì˜¤í”„ì…‹
+		0.0f,                  // í”„ë ˆì„ ê°„ y ì˜¤í”„ì…‹
+		frameDuration         // í”„ë ˆì„ ì§€ì† ì‹œê°„
 	);
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà (Ã¹ ¹øÂ° ÇÁ·¹ÀÓ °­Á¦ ¼³Á¤ÇÏÁö ¾ÊÀ½)
-	animator->Play(animationName, true);  // ¹İº¹ Àç»ı
+	// ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰ (ì²« ë²ˆì§¸ í”„ë ˆì„ ê°•ì œ ì„¤ì •í•˜ì§€ ì•ŠìŒ)
+	animator->Play(animationName, true);  // ë°˜ë³µ ì¬ìƒ
 
 	if (KEY_HOLD(KEY_CODE::LEFT) || KEY_TAP(KEY_CODE::LEFT) ||
 		KEY_HOLD(KEY_CODE::RIGHT) || KEY_TAP(KEY_CODE::RIGHT))
@@ -406,34 +172,34 @@ void CPlayerScript::move()
 		animator = GetOwner()->AddComponent<CAnimator>();
 	}
 
-	// SpriteRenderer °¡Á®¿À±â
+	// SpriteRenderer ê°€ì ¸ì˜¤ê¸°
 	CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
 	if (sr == nullptr)
 	{
 		sr = GetOwner()->AddComponent<CSpriteRenderer>();
 	}
 
-	// Idle ¾Ö´Ï¸ŞÀÌ¼Ç »ı¼º
+	// Idle ì• ë‹ˆë©”ì´ì…˜ ìƒì„±
 	wstring animationName = L"Walk";
-	wstring filePathPattern = L"../Resources/Texture/Player/Walk/Right/%d.bmp";  // %d·Î ÇÁ·¹ÀÓ ¹øÈ£ º¯°æ
-	int frameCount = 4;  // ¾Ö´Ï¸ŞÀÌ¼Ç ÇÁ·¹ÀÓ ¼ö (¿¹: 1.bmp, 2.bmp, 3.bmp)
-	float frameDuration = 0.5f;  // ÇÁ·¹ÀÓ °£ Áö¼Ó ½Ã°£ (0.5ÃÊ·Î ¼³Á¤)
+	wstring filePathPattern = L"../Resources/Texture/Player/Walk/Right/%d.bmp";  // %dë¡œ í”„ë ˆì„ ë²ˆí˜¸ ë³€ê²½
+	int frameCount = 4;  // ì• ë‹ˆë©”ì´ì…˜ í”„ë ˆì„ ìˆ˜ (ì˜ˆ: 1.bmp, 2.bmp, 3.bmp)
+	float frameDuration = 0.5f;  // í”„ë ˆì„ ê°„ ì§€ì† ì‹œê°„ (0.5ì´ˆë¡œ ì„¤ì •)
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç Ãß°¡
+	// ì• ë‹ˆë©”ì´ì…˜ ì¶”ê°€
 	animator->AddFrameAnimation(
 		animationName,
 		filePathPattern.c_str(),
 		frameCount,
-		Vector2(0.0f, 0.0f),  // ¿ŞÂÊ »ó´Ü ÁÂÇ¥
-		54.0f,                 // °¢ ÇÁ·¹ÀÓÀÇ ³Êºñ
-		65.0f,                 // °¢ ÇÁ·¹ÀÓÀÇ ³ôÀÌ
-		0.0f,                  // ÇÁ·¹ÀÓ °£ x ¿ÀÇÁ¼Â
-		0.0f,                  // ÇÁ·¹ÀÓ °£ y ¿ÀÇÁ¼Â
-		frameDuration         // ÇÁ·¹ÀÓ Áö¼Ó ½Ã°£
+		Vector2(0.0f, 0.0f),  // ì™¼ìª½ ìƒë‹¨ ì¢Œí‘œ
+		54.0f,                 // ê° í”„ë ˆì„ì˜ ë„ˆë¹„
+		65.0f,                 // ê° í”„ë ˆì„ì˜ ë†’ì´
+		0.0f,                  // í”„ë ˆì„ ê°„ x ì˜¤í”„ì…‹
+		0.0f,                  // í”„ë ˆì„ ê°„ y ì˜¤í”„ì…‹
+		frameDuration         // í”„ë ˆì„ ì§€ì† ì‹œê°„
 	);
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà (Ã¹ ¹øÂ° ÇÁ·¹ÀÓ °­Á¦ ¼³Á¤ÇÏÁö ¾ÊÀ½)
-	animator->Play(animationName, true);  // ¹İº¹ Àç»ı
+	// ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰ (ì²« ë²ˆì§¸ í”„ë ˆì„ ê°•ì œ ì„¤ì •í•˜ì§€ ì•ŠìŒ)
+	animator->Play(animationName, true);  // ë°˜ë³µ ì¬ìƒ
 }
 
 void CPlayerScript::prone()
@@ -444,35 +210,35 @@ void CPlayerScript::prone()
 		animator = GetOwner()->AddComponent<CAnimator>();
 	}
 
-	// SpriteRenderer °¡Á®¿À±â
+	// SpriteRenderer ê°€ì ¸ì˜¤ê¸°
 	CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
 	if (sr == nullptr)
 	{
 		sr = GetOwner()->AddComponent<CSpriteRenderer>();
 	}
 
-	// Idle ¾Ö´Ï¸ŞÀÌ¼Ç »ı¼º
+	// Idle ì• ë‹ˆë©”ì´ì…˜ ìƒì„±
 	wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
 	wstring animationName = L"Prone";
-	wstring filePathPattern = L"../Resources/Texture/Player/Prone/" + direction + L"/%d.bmp";  // %d·Î ÇÁ·¹ÀÓ ¹øÈ£ º¯°æ
-	int frameCount = 1;  // ¾Ö´Ï¸ŞÀÌ¼Ç ÇÁ·¹ÀÓ ¼ö (¿¹: 1.bmp, 2.bmp, 3.bmp)
-	float frameDuration = 0.5f;  // ÇÁ·¹ÀÓ °£ Áö¼Ó ½Ã°£ (0.5ÃÊ·Î ¼³Á¤)
+	wstring filePathPattern = L"../Resources/Texture/Player/Prone/" + direction + L"/%d.bmp";  // %dë¡œ í”„ë ˆì„ ë²ˆí˜¸ ë³€ê²½
+	int frameCount = 1;  // ì• ë‹ˆë©”ì´ì…˜ í”„ë ˆì„ ìˆ˜ (ì˜ˆ: 1.bmp, 2.bmp, 3.bmp)
+	float frameDuration = 0.5f;  // í”„ë ˆì„ ê°„ ì§€ì† ì‹œê°„ (0.5ì´ˆë¡œ ì„¤ì •)
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç Ãß°¡
+	// ì• ë‹ˆë©”ì´ì…˜ ì¶”ê°€
 	animator->AddFrameAnimation(
 		animationName,
 		filePathPattern.c_str(),
 		frameCount,
-		Vector2(0.0f, 0.0f),  // ¿ŞÂÊ »ó´Ü ÁÂÇ¥
-		80.0f,                 // °¢ ÇÁ·¹ÀÓÀÇ ³Êºñ
-		37.0f,                 // °¢ ÇÁ·¹ÀÓÀÇ ³ôÀÌ
-		0.0f,                  // ÇÁ·¹ÀÓ °£ x ¿ÀÇÁ¼Â
-		0.0f,                  // ÇÁ·¹ÀÓ °£ y ¿ÀÇÁ¼Â
-		frameDuration         // ÇÁ·¹ÀÓ Áö¼Ó ½Ã°£
+		Vector2(0.0f, 0.0f),  // ì™¼ìª½ ìƒë‹¨ ì¢Œí‘œ
+		80.0f,                 // ê° í”„ë ˆì„ì˜ ë„ˆë¹„
+		37.0f,                 // ê° í”„ë ˆì„ì˜ ë†’ì´
+		0.0f,                  // í”„ë ˆì„ ê°„ x ì˜¤í”„ì…‹
+		0.0f,                  // í”„ë ˆì„ ê°„ y ì˜¤í”„ì…‹
+		frameDuration         // í”„ë ˆì„ ì§€ì† ì‹œê°„
 	);
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà (Ã¹ ¹øÂ° ÇÁ·¹ÀÓ °­Á¦ ¼³Á¤ÇÏÁö ¾ÊÀ½)
-	animator->Play(animationName, true);  // ¹İº¹ Àç»ı
+	// ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰ (ì²« ë²ˆì§¸ í”„ë ˆì„ ê°•ì œ ì„¤ì •í•˜ì§€ ì•ŠìŒ)
+	animator->Play(animationName, true);  // ë°˜ë³µ ì¬ìƒ
 
 	if(KEY_AWAY(KEY_CODE::DOWN))
 	{
@@ -488,35 +254,35 @@ void CPlayerScript::jump()
 		animator = GetOwner()->AddComponent<CAnimator>();
 	}
 
-	// SpriteRenderer °¡Á®¿À±â
+	// SpriteRenderer ê°€ì ¸ì˜¤ê¸°
 	CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
 	if (sr == nullptr)
 	{
 		sr = GetOwner()->AddComponent<CSpriteRenderer>();
 	}
 
-	// Idle ¾Ö´Ï¸ŞÀÌ¼Ç »ı¼º
+	// Idle ì• ë‹ˆë©”ì´ì…˜ ìƒì„±
 	wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
 	wstring animationName = L"Jump";
-	wstring filePathPattern = L"../Resources/Texture/Player/Jump/" + direction + L"/%d.bmp";  // %d·Î ÇÁ·¹ÀÓ ¹øÈ£ º¯°æ
-	int frameCount = 1;  // ¾Ö´Ï¸ŞÀÌ¼Ç ÇÁ·¹ÀÓ ¼ö (¿¹: 1.bmp, 2.bmp, 3.bmp)
-	float frameDuration = 0.5f;  // ÇÁ·¹ÀÓ °£ Áö¼Ó ½Ã°£ (0.5ÃÊ·Î ¼³Á¤)
+	wstring filePathPattern = L"../Resources/Texture/Player/Jump/" + direction + L"/%d.bmp";  // %dë¡œ í”„ë ˆì„ ë²ˆí˜¸ ë³€ê²½
+	int frameCount = 1;  // ì• ë‹ˆë©”ì´ì…˜ í”„ë ˆì„ ìˆ˜ (ì˜ˆ: 1.bmp, 2.bmp, 3.bmp)
+	float frameDuration = 0.5f;  // í”„ë ˆì„ ê°„ ì§€ì† ì‹œê°„ (0.5ì´ˆë¡œ ì„¤ì •)
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç Ãß°¡
+	// ì• ë‹ˆë©”ì´ì…˜ ì¶”ê°€
 	animator->AddFrameAnimation(
 		animationName,
 		filePathPattern.c_str(),
 		frameCount,
-		Vector2(0.0f, 0.0f),  // ¿ŞÂÊ »ó´Ü ÁÂÇ¥
-		54.0f,                 // °¢ ÇÁ·¹ÀÓÀÇ ³Êºñ
-		65.0f,                 // °¢ ÇÁ·¹ÀÓÀÇ ³ôÀÌ
-		0.0f,                  // ÇÁ·¹ÀÓ °£ x ¿ÀÇÁ¼Â
-		0.0f,                  // ÇÁ·¹ÀÓ °£ y ¿ÀÇÁ¼Â
-		frameDuration         // ÇÁ·¹ÀÓ Áö¼Ó ½Ã°£
+		Vector2(0.0f, 0.0f),  // ì™¼ìª½ ìƒë‹¨ ì¢Œí‘œ
+		54.0f,                 // ê° í”„ë ˆì„ì˜ ë„ˆë¹„
+		65.0f,                 // ê° í”„ë ˆì„ì˜ ë†’ì´
+		0.0f,                  // í”„ë ˆì„ ê°„ x ì˜¤í”„ì…‹
+		0.0f,                  // í”„ë ˆì„ ê°„ y ì˜¤í”„ì…‹
+		frameDuration         // í”„ë ˆì„ ì§€ì† ì‹œê°„
 	);
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà (Ã¹ ¹øÂ° ÇÁ·¹ÀÓ °­Á¦ ¼³Á¤ÇÏÁö ¾ÊÀ½)
-	animator->Play(animationName, true);  // ¹İº¹ Àç»ı
+	// ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰ (ì²« ë²ˆì§¸ í”„ë ˆì„ ê°•ì œ ì„¤ì •í•˜ì§€ ì•ŠìŒ)
+	animator->Play(animationName, true);  // ë°˜ë³µ ì¬ìƒ
 
 	if (KEY_AWAY(KEY_CODE::UP))
 	{
@@ -532,38 +298,38 @@ void CPlayerScript::attack()
 		animator = GetOwner()->AddComponent<CAnimator>();
 	}
 
-	// SpriteRenderer °¡Á®¿À±â
+	// SpriteRenderer ê°€ì ¸ì˜¤ê¸°
 	CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
 	if (sr == nullptr)
 	{
 		sr = GetOwner()->AddComponent<CSpriteRenderer>();
 	}
 
-	// Attack ¾Ö´Ï¸ŞÀÌ¼Ç »ı¼º
+	// Attack ì• ë‹ˆë©”ì´ì…˜ ìƒì„±
 	wstring animationName = L"Attack";
-	wstring filePathPattern = L"../Resources/Texture/Player/Attack/Right/%d.bmp";  // %d·Î ÇÁ·¹ÀÓ ¹øÈ£ º¯°æ
-	int frameCount = 3;  // ¾Ö´Ï¸ŞÀÌ¼Ç ÇÁ·¹ÀÓ ¼ö (¿¹: 1.bmp, 2.bmp, 3.bmp)
-	float frameDuration = 0.5f;  // ÇÁ·¹ÀÓ °£ Áö¼Ó ½Ã°£ (0.5ÃÊ·Î ¼³Á¤)
+	wstring filePathPattern = L"../Resources/Texture/Player/Attack/Right/%d.bmp";  // %dë¡œ í”„ë ˆì„ ë²ˆí˜¸ ë³€ê²½
+	int frameCount = 3;  // ì• ë‹ˆë©”ì´ì…˜ í”„ë ˆì„ ìˆ˜ (ì˜ˆ: 1.bmp, 2.bmp, 3.bmp)
+	float frameDuration = 0.5f;  // í”„ë ˆì„ ê°„ ì§€ì† ì‹œê°„ (0.5ì´ˆë¡œ ì„¤ì •)
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç Ãß°¡
+	// ì• ë‹ˆë©”ì´ì…˜ ì¶”ê°€
 	animator->AddFrameAnimation(
 		animationName,
 		filePathPattern.c_str(),
 		frameCount,
-		Vector2(0.0f, 0.0f),  // ¿ŞÂÊ »ó´Ü ÁÂÇ¥
-		55.0f,                 // °¢ ÇÁ·¹ÀÓÀÇ ³Êºñ
-		65.0f,                 // °¢ ÇÁ·¹ÀÓÀÇ ³ôÀÌ
-		0.0f,                  // ÇÁ·¹ÀÓ °£ x ¿ÀÇÁ¼Â
-		0.0f,                  // ÇÁ·¹ÀÓ °£ y ¿ÀÇÁ¼Â
-		frameDuration         // ÇÁ·¹ÀÓ Áö¼Ó ½Ã°£
+		Vector2(0.0f, 0.0f),  // ì™¼ìª½ ìƒë‹¨ ì¢Œí‘œ
+		55.0f,                 // ê° í”„ë ˆì„ì˜ ë„ˆë¹„
+		65.0f,                 // ê° í”„ë ˆì„ì˜ ë†’ì´
+		0.0f,                  // í”„ë ˆì„ ê°„ x ì˜¤í”„ì…‹
+		0.0f,                  // í”„ë ˆì„ ê°„ y ì˜¤í”„ì…‹
+		frameDuration         // í”„ë ˆì„ ì§€ì† ì‹œê°„
 	);
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà (Ã¹ ¹øÂ° ÇÁ·¹ÀÓ °­Á¦ ¼³Á¤ÇÏÁö ¾ÊÀ½)
-	animator->Play(animationName, false);  // ¹İº¹µÇÁö ¾Êµµ·Ï false ¼³Á¤
+	// ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰ (ì²« ë²ˆì§¸ í”„ë ˆì„ ê°•ì œ ì„¤ì •í•˜ì§€ ì•ŠìŒ)
+	animator->Play(animationName, false);  // ë°˜ë³µë˜ì§€ ì•Šë„ë¡ false ì„¤ì •
 
-	// ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ³¡³µ´ÂÁö Ã¼Å©ÇÏ°í, ³¡³µÀ¸¸é Idle »óÅÂ·Î º¯°æ
-	if (animator->End())  // ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ³¡³µ´Ù¸é
+	// ì• ë‹ˆë©”ì´ì…˜ì´ ëë‚¬ëŠ”ì§€ ì²´í¬í•˜ê³ , ëë‚¬ìœ¼ë©´ Idle ìƒíƒœë¡œ ë³€ê²½
+	if (animator->End())  // ì• ë‹ˆë©”ì´ì…˜ì´ ëë‚¬ë‹¤ë©´
 	{
-		m_ePlayerState = PLAYER_STATE::PS_Idle;  // Idle »óÅÂ·Î º¯°æ
+		m_ePlayerState = PLAYER_STATE::PS_Idle;  // Idle ìƒíƒœë¡œ ë³€ê²½
 	}
 }

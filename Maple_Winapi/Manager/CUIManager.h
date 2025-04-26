@@ -21,6 +21,8 @@ public:
 
 	static CUI* GetUI(UI_TYPE _eUIType);
 
+	static void RegisterUI(UI_TYPE _eUIType, CUI* _pUI);
+
 private:
 	static unordered_map<UI_TYPE, CUI*>	m_mapUI;
 	static stack<CUI*>					m_stUI;

@@ -1,32 +1,44 @@
-#include "CCamera.h"
+ï»¿#include "CCamera.h"
 #include "../Object/CGameObject.h"
 #include "../Component/CTransform.h"
 #include "../Core/CCore.h"
 #include "../Manager/CSceneManager.h"
 #include "../Scene/CScene.h"
+#include <imgui.h>
+#include "CRenderer.h"
 
 extern CCore core;
-Matrix CCamera::ViewMatrix = Matrix::Identity;			// ºä ¸ÅÆ®¸¯½º
-Matrix CCamera::ProjectionMatrix =Matrix::Identity;		// Åõ¿µ ¸ÅÆ®¸¯½º
+
+wstring CCamera::FormatVector3(const Vector3& vec)
+{
+	wstringstream ss;
+	ss << L"(" << vec.x << L", " << vec.y << L", " << vec.z << L")";
+	return ss.str();
+}
 
 CCamera::CCamera() :
 	CComponent(COMPONENT_TYPE::CT_Camera),
-	m_eProjectionType(PROJECTION_TYPE::PT_Perspective),	// Åõ¿µ Å¸ÀÔ
+	m_eProjectionType(PROJECTION_TYPE::PT_Perspective),	// íˆ¬ì˜ íƒ€ì…
 	m_vDistance(Vector3(0.0f, 0.0f, 0.0f)),
 	m_ViewMatrix(Matrix::Identity),
 	m_ProjectionMatrix(Matrix::Identity),
 	m_fAspectRatio(0.0f),
 	m_fNear(1.0f),
 	m_fFar(1000.0f),
-	m_fSize(1.0f), // Size°¡ ¿Ã¶ó°¥¼ö·Ï È®´ëµÇ¾î º¸¿©Áø´Ù.
+	m_fSize(1.0f), // Sizeê°€ ì˜¬ë¼ê°ˆìˆ˜ë¡ í™•ëŒ€ë˜ì–´ ë³´ì—¬ì§„ë‹¤.
 	m_pVeilTex(nullptr),
-	m_pTargetObject(nullptr),
 	m_listCamEffect{}
 {
+	m_pTransform = new CTransform();
 }
 
 CCamera::~CCamera()
 {
+	if (m_pTransform)
+	{
+		delete m_pTransform;
+		m_pTransform = nullptr;
+	}
 }
 
 void CCamera::Init()
@@ -34,108 +46,123 @@ void CCamera::Init()
 	CComponent::Init();
 
 	CScene* curscene = CSceneManager::GetCurScene();
-
-	if (curscene == nullptr)
-	{
-		OutputDebugStringA("ÇöÀç ¾ÀÀÌ ¾ø½À´Ï´Ù.");
-		return;
-	}
+	curscene->AddCamera(this);
 }
 
 void CCamera::Update()
 {
-#pragma region
-	//CScene* pCurScene = CSceneManager::GetInst()->GetCurScene();
-	//Vector2 vMapSize = pCurScene->GetMapSize();
-
-	//Vector2 vResolution = CCore::GetInst()->GetResolution();
-
-	//if (m_pTargetObj)
-	//{
-	//	CTransform* tr = m_pTargetObj->GetComponent<CTransform>();
-	//	m_vLookPosition = tr->GetPosition();
-
-	//	// Ä«¸Ş¶óÀÇ À§Ä¡¸¦ ¸Ê °æ°è ³»·Î Á¦ÇÑ
-	//	m_vLookPosition.x = std::clamp(m_vLookPosition.x, vResolution.x / 2.0f, vMapSize.x - vResolution.x / 2.0f);
-	//	m_vLookPosition.y = std::clamp(m_vLookPosition.y, vResolution.y / 2.0f, vMapSize.y - vResolution.y / 2.0f);
-
-	//	// Ä«¸Ş¶ó À§Ä¡ Á¶Á¤ (È­¸é Áß½É¿¡¼­ Å¸°Ù À§Ä¡·Î)
-	//	m_vDistance = m_vLookPosition - (vResolution / 2.0f);
-
-	//	// Ä«¸Ş¶óÀÇ TransformÀ» ¾÷µ¥ÀÌÆ®ÇÏ¿© Å¸°ÙÀ» ÂÑµµ·Ï ÇÕ´Ï´Ù.
-	//	CTransform* cameraTransform = GetOwner()->GetComponent<CTransform>();
-	//	cameraTransform->SetPosition(m_vLookPosition - m_vDistance);
-	//}
-	//else if (m_pGameObjectOwner)
-	//{
-	//	CTransform* cameraTr = m_pGameObjectOwner->GetComponent<CTransform>();
-	//	if (cameraTr)
-	//	{
-	//		m_vLookPosition = cameraTr->GetPosition();
-	//	}
-	//}
-
-	//if (m_vLookPosition.x < 0)
-	//	m_vLookPosition.x = 0;
-	//else if (m_vLookPosition.x > vMapSize.x - vResolution.x)
-	//	m_vLookPosition.x = vMapSize.x - vResolution.x;
-
-	//if (m_vLookPosition.y < 0)
-	//	m_vLookPosition.y = 0;
-	//else if (m_vLookPosition.y > vMapSize.y - vResolution.y)
-	//	m_vLookPosition.y = (vMapSize.y - vResolution.y) - 10.f;
-#pragma endregion
-	//// Å¬¶óÀÌ¾ğÆ® Å©±â¸¦ °¡Á®¿Í ³Êºñ¿Í ³ôÀÌ ÀúÀå
-	//float width = core.GetWidth();
-	//float height = core.GetHeight();
-
-	//// Å¸°Ù °´Ã¼°¡ ÀÖ´Â °æ¿ì
-	//if (m_pTargetObject)
-	//{
-	//	if (m_pTargetObject->IsDead())
-	//	{
-	//		m_pTargetObject = nullptr;
-	//	}
-	//	else
-	//	{
-	//		CTransform* tr = GetOwner()->GetComponent<CTransform>();
-	//		math::Vector3 targetPos = tr->GetPosition();
-
-	//		// Ä«¸Ş¶ó À§Ä¡ °è»ê (Å¸°Ù À§Ä¡¿¡¼­ ÀÏÁ¤ °Å¸®¸¸Å­ ¶³¾îÁ® ÀÖ°Ô ¼³Á¤)
-	//		math::Vector3 cameraPos = targetPos + Vector3(0.0f, 0.0f, -10.0f);  // ¿¹½Ã·Î zÃàÀ¸·Î 10¸¸Å­ µÚ¿¡ ¹èÄ¡
-
-	//		// Ä«¸Ş¶óÀÇ À§Ä¡¿Í È¸Àü ¾÷µ¥ÀÌÆ®
-	//		CTransform* cameraTransform = GetOwner()->GetComponent<CTransform>();
-	//		cameraTransform->SetPosition(cameraPos);
-
-	//		// Ä«¸Ş¶ó°¡ Å¸°ÙÀ» ÇâÇÏµµ·Ï ¼³Á¤ (Å¸°ÙÀÌ ¹Ù¶óº¸´Â ¹æÇâÀ¸·Î Ä«¸Ş¶ó È¸Àü)
-	//		math::Vector3 forward = (targetPos - cameraPos);  // Å¸°Ù ¹æÇâÀ¸·Î Á¤±ÔÈ­µÈ º¤ÅÍ
-	//		forward.Normalize();
-	//		cameraTransform->LookAt(targetPos);
-	//	}
-	//}
 }
 
 void CCamera::LateUpdate()
 {
 	CreateViewMatrix();
 	CreateProjectionMatrix(m_eProjectionType);
-
-	ViewMatrix = m_ViewMatrix;
-	ProjectionMatrix = m_ProjectionMatrix;
 }
 
-void CCamera::Render()
+void CCamera::Render(const Matrix& view, const Matrix& projection)
 {
-#pragma region Ä«¸Ş¶ó ·£´õ
+}
+
+void CCamera::FadeIn(float _fDuration)
+{
+	tCamEffect ef = {};
+	ef.eEffect = CAM_EFFECT::CE_Fade_In;
+	ef.fDuration = _fDuration;
+	ef.fCurTime = 0.f;
+
+	m_listCamEffect.push_back(ef);
+
+	if (0.f == _fDuration)
+		assert(nullptr);
+}
+
+void CCamera::FadeOut(float _fDuration)
+{
+	tCamEffect ef = {};
+	ef.eEffect = CAM_EFFECT::CE_Fade_Out;
+	ef.fDuration = _fDuration;
+	ef.fCurTime = 0.f;
+
+	m_listCamEffect.push_back(ef);
+
+	if (0.f == _fDuration)
+		assert(nullptr);
+}
+
+void CCamera::CreateViewMatrix()
+{
+	CTransform* tr = GetOwner()->GetComponent<CTransform>();
+
+	const Vector3 pos = tr->GetWorldPosition();
+	const Vector3 up = tr->Up();
+	const Vector3 forward = tr->Forward();
+
+	m_ViewMatrix = Matrix::CreateLookToLH(pos, forward, up);
+
+	// ë””ë²„ê¹…: ViewMatrix í™•ì¸
+	assert(m_ViewMatrix != Matrix::Identity);
+}
+
+void CCamera::CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType)
+{
+	RECT winRect = {};
+	GetClientRect(core.GetMainHWnd(), &winRect);
+	const float width = static_cast<float>(winRect.right - winRect.left);
+	const float height = static_cast<float>(winRect.bottom - winRect.top);
+	m_fAspectRatio = width / height;
+
+	switch (_eProjectionType)
+	{
+	case PROJECTION_TYPE::PT_Perspective:
+		m_ProjectionMatrix = Matrix::CreatePerspectiveFieldOfViewLH(XM_2PI / 6.0f, m_fAspectRatio, m_fNear, m_fFar);
+		break;
+
+	case PROJECTION_TYPE::PT_Orthographic:
+		m_ProjectionMatrix = Matrix::CreateOrthographicLH(width / m_fSize, height / m_fSize, m_fNear, m_fFar);
+		break;
+	}
+
+	// í”„ë¡œì ì…˜ ë§¤íŠ¸ë¦­ìŠ¤ ìƒì„± ë¡œì§
+	assert(m_ProjectionMatrix != Matrix::Identity);
+}
+
+// 2025-04-17
+//if (m_pTargetObject != nullptr)
+	//{
+	//	Vector3 targetPos = m_pTargetObject->m_pTransform->GetWorldPosition();
+	//	Vector3 camPos = targetPos + m_vDistance;
+
+	//	m_pTransform->SetLocalPosition(camPos);
+
+	//	Vector3 local = m_pTargetObject->GetTransform()->GetLocalPosition();
+	//	Vector3 world = m_pTargetObject->GetTransform()->GetWorldPosition();
+
+	//	std::wstring debugMsg = L"[Camera] íƒ€ê²Ÿ LocalPosition: " + FormatVector3(local) + L"\n";
+	//	OutputDebugStringW(debugMsg.c_str());
+
+	//	debugMsg = L"[Camera] íƒ€ê²Ÿ WorldPosition: " + FormatVector3(world) + L"\n";
+	//	OutputDebugStringW(debugMsg.c_str());
+
+	//	// ë””ë²„ê¹… ë¡œê·¸
+	//	std::wstring targetStr = FormatVector3(targetPos);
+	//	std::wstring camStr = FormatVector3(camPos);
+
+	//	std::wstring debugMsgs = L"[Camera] íƒ€ê²Ÿ ìœ„ì¹˜: " + targetStr + L"\n";
+	//	OutputDebugStringW(debugMsgs.c_str());
+
+	//	debugMsg = L"[Camera] ì‹¤ì œ ì¹´ë©”ë¼ ìœ„ì¹˜ë¡œ ì´ë™: " + camStr + L"\n";
+	//	OutputDebugStringW(debugMsg.c_str());
+	//}
+
+#pragma region ì¹´ë©”ë¼ ëœë”
 	//if (m_listCamEffect.empty())
 	//	return;
 
-	//// ½Ã°£ ´©Àû°ªÀ» Ã¼Å©ÇØ¼­
+	//// ì‹œê°„ ëˆ„ì ê°’ì„ ì²´í¬í•´ì„œ
 	//tCamEffect& effect = m_listCamEffect.front();
 	//effect.fCurTime += fDeltaTime;
 
-	//float fRatio = 0.f; // ÀÌÆåÆ® ÁøÇà ºñÀ²
+	//float fRatio = 0.f; // ì´í™íŠ¸ ì§„í–‰ ë¹„ìœ¨
 	//fRatio = effect.fCurTime / effect.fDuration;
 
 	//if (fRatio < 0.f)
@@ -170,74 +197,36 @@ void CCamera::Render()
 	//	(int)m_pVeilTex->GetWidth(),
 	//	(int)m_pVeilTex->GetHeight(), bf);
 
-	//// ÁøÇà ½Ã°£ÀÌ ÀÌÆåÆ® ÃÖ´ë ÁöÁ¤ ½Ã°£À» ³Ñ¾î¼± °æ¿ì
+	//// ì§„í–‰ ì‹œê°„ì´ ì´í™íŠ¸ ìµœëŒ€ ì§€ì • ì‹œê°„ì„ ë„˜ì–´ì„  ê²½ìš°
 	//if (effect.fDuration <= effect.fCurTime)
 	//{
-	//	// È¿°ú Á¾·á
+	//	// íš¨ê³¼ ì¢…ë£Œ
 	//	m_listCamEffect.pop_front();
 	//}
 #pragma endregion
-}
 
-void CCamera::FadeIn(float _fDuration)
-{
-	tCamEffect ef = {};
-	ef.eEffect = CAM_EFFECT::CE_Fade_In;
-	ef.fDuration = _fDuration;
-	ef.fCurTime = 0.f;
+//Matrix CCamera::ViewMatrix = Matrix::Identity;			// ë·° ë§¤íŠ¸ë¦­ìŠ¤
+//Matrix CCamera::ProjectionMatrix =Matrix::Identity;		// íˆ¬ì˜ ë§¤íŠ¸ë¦­ìŠ¤
 
-	m_listCamEffect.push_back(ef);
-
-	if (0.f == _fDuration)
-		assert(nullptr);
-}
-
-void CCamera::FadeOut(float _fDuration)
-{
-	tCamEffect ef = {};
-	ef.eEffect = CAM_EFFECT::CE_Fade_Out;
-	ef.fDuration = _fDuration;
-	ef.fCurTime = 0.f;
-
-	m_listCamEffect.push_back(ef);
-
-	if (0.f == _fDuration)
-		assert(nullptr);
-}
-
-void CCamera::CreateViewMatrix()
-{
-	CTransform* tr = GetOwner()->GetComponent<CTransform>();
-
-	const Vector3 pos = tr->GetPosition();
-	const Vector3 up = tr->Up();
-	const Vector3 forward = tr->Forward();
-
-	m_ViewMatrix = Matrix::CreateLookToLH(pos, forward, up);
-
-	// µğ¹ö±ë: ViewMatrix È®ÀÎ
-	assert(m_ViewMatrix != Matrix::Identity);
-}
-
-void CCamera::CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType)
-{
-	RECT winRect = {};
-	GetClientRect(core.GetMainHWnd(), &winRect);
-	const float width = static_cast<float>(winRect.right - winRect.left);
-	const float height = static_cast<float>(winRect.bottom - winRect.top);
-	m_fAspectRatio = width / height;
-
-	switch (_eProjectionType)
-	{
-	case PROJECTION_TYPE::PT_Perspective:
-		m_ProjectionMatrix = Matrix::CreatePerspectiveFieldOfViewLH(XM_2PI / 6.0f, m_fAspectRatio, m_fNear, m_fFar);
-		break;
-
-	case PROJECTION_TYPE::PT_Orthographic:
-		m_ProjectionMatrix = Matrix::CreateOrthographicLH(width / m_fSize, height / m_fSize, m_fNear, m_fFar);
-		break;
-	}
-
-	// ÇÁ·ÎÁ§¼Ç ¸ÅÆ®¸¯½º »ı¼º ·ÎÁ÷
-	assert(m_ProjectionMatrix != Matrix::Identity);
-}
+//void CCamera::LateUpdate()
+//{
+//	//CreateViewMatrix();
+//	//CreateProjectionMatrix(m_eProjectionType);
+//
+//	//renderer::activeCamera = this; //  ì—¬ê¸°ì„œ ë°”ê¿”ì¤Œ
+//
+//	//SetGpuViewMatrix(m_ViewMatrix);
+//	//SetGpuProjectionMatrix(m_ProjectionMatrix);
+//
+//	////OutputDebugString((L"[Camera] ViewMatrix: " + FormatMatrix(ViewMatrix) + L"\n").c_str());
+//	////OutputDebugString((L"[Camera] ProjectionMatrix: " + FormatMatrix(ProjectionMatrix) + L"\n").c_str());
+//
+//	CreateViewMatrix();
+//	CreateProjectionMatrix(m_eProjectionType);
+//	//renderer::activeCamera = this; //  ì—¬ê¸°ì„œ ë°”ê¿”ì¤Œ
+//	//SetGpuViewMatrix(m_ViewMatrix);
+//	//SetGpuProjectionMatrix(m_ProjectionMatrix);
+//
+//	//// GPUì— ì„¤ì •ëœ í–‰ë ¬ í™•ì¸
+//	//OutputDebugStringW(L"View & Projection Matrix ì—…ë°ì´íŠ¸ ì™„ë£Œ\n");
+//}

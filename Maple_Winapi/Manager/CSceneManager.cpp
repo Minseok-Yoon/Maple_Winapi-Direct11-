@@ -1,5 +1,6 @@
 #include "CSceneManager.h"
 #include "../Scene/CDontDestroyOnLoad.h"
+#include "CKeyManager.h"
 
 CScene* CSceneManager::m_pCurScene = nullptr;
 CScene* CSceneManager::m_pDontDestroyOnLoad = nullptr;

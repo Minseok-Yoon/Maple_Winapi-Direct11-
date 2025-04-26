@@ -29,6 +29,6 @@ void CAudioListener::LateUpdate()
 	CFmod::Set3DListenerAttributes(vPos);
 }
 
-void CAudioListener::Render()
+void CAudioListener::Render(const Matrix& view, const Matrix& projection)
 {
 }

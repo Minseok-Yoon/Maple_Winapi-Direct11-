@@ -24,12 +24,12 @@ void CAudioSource::Update()
 void CAudioSource::LateUpdate()
 {
 	CTransform* tr = GetOwner()->GetComponent<CTransform>();
-	Vector3 vPos = tr->GetPosition();
+	Vector3 vPos = tr->GetLocalPosition();
 
 	//m_pAudioClip->Set3DAttributes(vPos);
 }
 
-void CAudioSource::Render()
+void CAudioSource::Render(const Matrix& view, const Matrix& projection)
 {
 }
 

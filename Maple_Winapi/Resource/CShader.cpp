@@ -7,7 +7,7 @@ bool CShader::bWireframe = false;
 CShader::CShader() :
 	CResource(RESOURCE_TYPE::RT_Shader),
 	m_RasterizerState(RASTERIZER_STATE::RS_SolidBack),
-	m_BlendState(BLEND_STATE::BS_AlphaBlend),
+	m_BlendState(BLEND_STATE::BS_Opaque),
 	m_DepthStencilState(DEPTHSTENCIL_STATE::DS_LessEqual)
 {
 }

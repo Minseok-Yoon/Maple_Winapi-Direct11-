@@ -168,18 +168,20 @@
   <ItemGroup>
     <ClInclude Include="CLoadScene.h" />
     <ClInclude Include="CMath.h" />
-    <ClInclude Include="CMath4.h" />
     <ClInclude Include="Component\CAnimation.h" />
     <ClInclude Include="Component\CAnimator.h" />
     <ClInclude Include="Component\CAudioListener.h" />
     <ClInclude Include="Component\CAudioSource.h" />
+    <ClInclude Include="Component\CBaseRenderer.h" />
     <ClInclude Include="Component\CBoxCollider2D.h" />
     <ClInclude Include="Component\CCamera.h" />
     <ClInclude Include="Component\CCameraScript.h" />
     <ClInclude Include="Component\CCircleCollider2D.h" />
     <ClInclude Include="Component\CCollider.h" />
     <ClInclude Include="Component\CComponent.h" />
+    <ClInclude Include="Component\CDebugRenderer.h" />
     <ClInclude Include="Component\CGravity.h" />
+    <ClInclude Include="Component\CLineCollider.h" />
     <ClInclude Include="Component\CLineRenderer.h" />
     <ClInclude Include="Component\CPixelCollider.h" />
     <ClInclude Include="Component\CRenderer.h" />
@@ -200,8 +202,14 @@
     <ClInclude Include="Graphics\CInputLayout.h" />
     <ClInclude Include="Graphics\CVertexBuffer.h" />
     <ClInclude Include="Layer\CLayer.h" />
+    <ClInclude Include="Manager\CCameraManager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Manager\CCollisionManager.h" />
     <ClInclude Include="Manager\CDamageManager.h" />
+    <ClInclude Include="Manager\CDebugManager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Manager\CKeyManager.h" />
     <ClInclude Include="Manager\CPathManager.h" />
     <ClInclude Include="Manager\CResourceManager.h" />
@@ -213,9 +221,11 @@
     <ClInclude Include="Object\CBtnUI.h" />
     <ClInclude Include="Object\CDamage.h" />
     <ClInclude Include="Object\CGameObject.h" />
-    <ClInclude Include="Object\CGround.h" />
+    <ClInclude Include="Object\CBackGround.h" />
     <ClInclude Include="Object\CItem.h" />
+    <ClInclude Include="Object\CLineBackGround.h" />
     <ClInclude Include="Object\CMeso.h" />
+    <ClInclude Include="Object\CMiniMap.h" />
     <ClInclude Include="Object\CMonster.h" />
     <ClInclude Include="Object\CMonsterScript.h" />
     <ClInclude Include="Object\CObject.h" />
@@ -244,22 +254,26 @@
     <ClInclude Include="Scene\CTestScene.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Test\CDrawCollisionBox.h" />
+    <ClInclude Include="Test\CDrawCollisionBox.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CMath.cpp" />
-    <ClCompile Include="CMath4.cpp" />
     <ClCompile Include="Component\CAnimation.cpp" />
     <ClCompile Include="Component\CAnimator.cpp" />
     <ClCompile Include="Component\CAudioListener.cpp" />
     <ClCompile Include="Component\CAudioSource.cpp" />
+    <ClCompile Include="Component\CBaseRenderer.cpp" />
     <ClCompile Include="Component\CBoxCollider2D.cpp" />
     <ClCompile Include="Component\CCamera.cpp" />
     <ClCompile Include="Component\CCameraScript.cpp" />
     <ClCompile Include="Component\CCircleCollider2D.cpp" />
     <ClCompile Include="Component\CCollider.cpp" />
     <ClCompile Include="Component\CComponent.cpp" />
+    <ClCompile Include="Component\CDebugRenderer.cpp" />
     <ClCompile Include="Component\CGravity.cpp" />
+    <ClCompile Include="Component\CLineCollider.cpp" />
     <ClCompile Include="Component\CLineRenderer.cpp" />
     <ClCompile Include="Component\CPixelCollider.cpp" />
     <ClCompile Include="Component\CRenderer.cpp" />
@@ -276,8 +290,14 @@
     <ClCompile Include="Graphics\CInputLayout.cpp" />
     <ClCompile Include="Graphics\CVertexBuffer.cpp" />
     <ClCompile Include="Layer\CLayer.cpp" />
+    <ClCompile Include="Manager\CCameraManager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Manager\CCollisionManager.cpp" />
     <ClCompile Include="Manager\CDamageManager.cpp" />
+    <ClCompile Include="Manager\CDebugManager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Manager\CKeyManager.cpp" />
     <ClCompile Include="Manager\CPathManager.cpp" />
     <ClCompile Include="Manager\CResourceManager.cpp" />
@@ -289,9 +309,11 @@
     <ClCompile Include="Object\CBtnUI.cpp" />
     <ClCompile Include="Object\CDamage.cpp" />
     <ClCompile Include="Object\CGameObject.cpp" />
-    <ClCompile Include="Object\CGround.cpp" />
+    <ClCompile Include="Object\CBackGround.cpp" />
     <ClCompile Include="Object\CItem.cpp" />
+    <ClCompile Include="Object\CLineBackGround.cpp" />
     <ClCompile Include="Object\CMeso.cpp" />
+    <ClCompile Include="Object\CMiniMap.cpp" />
     <ClCompile Include="Object\CMonster.cpp" />
     <ClCompile Include="Object\CMonsterScript.cpp" />
     <ClCompile Include="Object\CObject.cpp" />
@@ -315,7 +337,9 @@
     <ClCompile Include="Scene\CScene_Stage02.cpp" />
     <ClCompile Include="Scene\CScene_Start.cpp" />
     <ClCompile Include="Scene\CTestScene.cpp" />
-    <ClCompile Include="Test\CDrawCollisionBox.cpp" />
+    <ClCompile Include="Test\CDrawCollisionBox.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Maple_Winapi.rc" />

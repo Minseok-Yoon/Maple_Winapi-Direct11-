@@ -16,4 +16,11 @@ public:
     void Update() override;
     void LateUpdate() override;
     void Render() override;
+
+    void CreateBackgroundLines();
+    void CreateTestRect(float zValue);
+
+private:
+    CGameObject* m_pPlayer = nullptr;
+    CGameObject* m_pLine = nullptr;
 };

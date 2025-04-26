@@ -1,9 +1,12 @@
-#include "../pch.h"
+ï»¿#include "../pch.h"
 #include "CTestScene.h"
+#include "../Manager/CKeyManager.h"
+#include "../Manager/CUIManager.h"
 #include "../Manager/CResourceManager.h"
 #include "../Resource/CTexture.h"
 #include "../Object/CObject.h"
 #include "../Object/CPlayer.h"
+#include "../Object/CMonster.h"
 #include "../Object/CPlayerScript.h"
 #include "../Component/CCamera.h"
 #include "../Component/CCameraScript.h"
@@ -13,13 +16,17 @@
 #include "../Component/CAnimator.h"
 #include "../Core/CCore.h"
 #include "../Component/CCollider.h"
+#include "../Component/CAudioListener.h"
+#include "../Object/CMiniMap.h"
 
 extern CCore core;
 
 CTestScene::CTestScene()
 {
-	CResourceManager::Load<CTexture>(L"Stage02_BG", L"../Resources/Texture/Main.bmp");
-	CTexture* player = CResourceManager::Load<CTexture>(L"PLAYER", L"../Resources/Texture/Player/Player.bmp");
+	CResourceManager::Load<CTexture>(L"Lake of Oblivion_MiniMap", L"../Resources/Texture/MiniMap/Lake of Oblivion_MiniMap.png");
+	CResourceManager::Load<CTexture>(L"Lake of Oblivion_1", L"../Resources/Texture/Lake of Oblivion_1.png");
+	CResourceManager::Load<CTexture>(L"Lake of Oblivion_2", L"../Resources/Texture/Lake of Oblivion_2.png");
+	CAudioClip* ac = CResourceManager::Load<CAudioClip>(L"Lake of Oblivion", L"../Resources/Sound/Lake Of Oblivion.mp3");
 }
 
 CTestScene::~CTestScene()
@@ -30,38 +37,31 @@ void CTestScene::Enter()
 {
 	CScene::Enter();
 
-	// ¹è°æ °´Ã¼ »ı¼º
-	CBackGround* bg = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
-	CTransform* bgTr = bg->GetComponent<CTransform>();
-	bgTr->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-
-	// ¹è°æ ÅØ½ºÃ³ ·Îµå
-	CTexture* bgTexture = CResourceManager::Find<CTexture>(L"Stage02_BG");
-	if (bgTexture != nullptr)
+	if (m_pBackGround == nullptr)
 	{
-		CTexture::TextureSize textureSize = bgTexture->GetTextureSize();
-		float textureWidth = static_cast<float>(textureSize.width);
-		float textureHeight = static_cast<float>(textureSize.height);
-
-		// È­¸é ÇØ»óµµ¸¦ °¡Á®¿À±â
-		float resolutionWidth = core.GetWidth();
-		float resolutionHeight = core.GetHeight();
-
-		// ÅØ½ºÃ³°¡ È­¸éÀ» ¿ÏÀüÈ÷ µ¤µµ·Ï ºñÀ² °è»ê
-		float scaleX = resolutionWidth / textureWidth;
-		float scaleY = resolutionHeight / textureHeight;
-
-		// ´õ Å« ºñÀ²·Î ¼³Á¤ÇÏ¿© ÅØ½ºÃ³°¡ È­¸éÀ» µ¤µµ·Ï Á¶Á¤
-		float scale = scaleX > scaleY ? scaleX : scaleY;
-
-		// ¹è°æ Å©±â¸¦ ½ºÄÉÀÏ¸µ
-		bgTr->SetScale(Vector3(textureWidth, textureHeight, 1.0f));
-		bg->SetBackGroundTexture(bgTexture);
+		m_pBackGround = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
+		m_pBackGround->CreateMap(L"Lake of Oblivion_2");
 	}
 
-	// ¹è°æ ·»´õ·¯ ¼³Á¤
-	CSpriteRenderer* bgSr = bg->AddComponent<CSpriteRenderer>();
-	bgSr->SetTexture(bgTexture);
+	if (m_pAudioSource == nullptr)
+	{
+		m_pBackGround->AddComponent< CAudioListener>();
+		m_pAudioSource = m_pBackGround->AddComponent<CAudioSource>();
+
+		// ë°°ê²½ ìŒì•… ë¡œë“œ ë° ì¬ìƒ
+		CAudioClip* ac = CResourceManager::Find<CAudioClip>(L"Lake of Oblivion");
+		m_pAudioSource->SetClip(ac);
+		m_pAudioSource->Play();
+	}
+
+	// âœ… ì—¬ê¸°ì„œ MiniMap ë™ì  ë“±ë¡
+	if (CUIManager::GetUI(UI_TYPE::UT_MiniMap) == nullptr)
+	{
+		CMiniMap* uiMiniMap = Instantiate<CMiniMap>(LAYER_TYPE::LT_UI);
+		CUIManager::RegisterUI(UI_TYPE::UT_MiniMap, uiMiniMap);
+	}
+
+	CUIManager::Push(UI_TYPE::UT_MiniMap);
 }
 
 void CTestScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioName)
@@ -70,6 +70,8 @@ void CTestScene::Enter(const wstring& _strBackGroundName, const wstring& _strAud
 
 void CTestScene::Exit()
 {
+	CUIManager::Pop(UI_TYPE::UT_MiniMap);
+
 	CScene::Exit();
 }
 
@@ -77,57 +79,32 @@ void CTestScene::Init()
 {
     CScene::Init();
 
-    // Ä«¸Ş¶ó ¼³Á¤
-    CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
-    CCamera* cameraComp = camera->AddComponent<CCamera>();
-    cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+	// í”Œë ˆì´ì–´ ìƒì„±
+	// Instantiateì˜ vectorë¡œ ìºë¦­í„°ì˜ ìœ„ì¹˜ê°€ ë³€ê²½ì´ ë˜ì§€ ì•ŠìŒ... ì™œ?
+	m_pPlayer = Instantiate<CPlayer>(LAYER_TYPE::LT_Player);
 
-    CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
-    renderer::mainCamera = cameraComp;
+	// ì¹´ë©”ë¼ ì„¤ì •
+	CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
+	camera->SetName(L"MainCamera");
+	CCamera* cameraComp = camera->AddComponent<CCamera>();
+	cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
 
-    // ÇÃ·¹ÀÌ¾î »ı¼º
-    CGameObject* pPlayer = Instantiate<CPlayer>(LAYER_TYPE::LT_Player);
-    DontDestroyOnLoad(pPlayer);
-    //cameraComp->SetTarget(pPlayer);
+	CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
+	cameraScript->SetTarget(m_pPlayer); // ì¶”ì  ì¹´ë©”ë¼ ê±°ë¦¬
 
-    // ÇÃ·¹ÀÌ¾î ÅØ½ºÃ³ ·Îµå
-    CTexture* playerTexture = CResourceManager::Find<CTexture>(L"PLAYER");
+	renderer::mainCamera = cameraComp;
+	renderer::activeCamera = renderer::mainCamera;
+	cameraComp->SetCameraMask(~(1 << static_cast<UINT>(LAYER_TYPE::LT_UI)));
+	m_vecCameras.push_back(cameraComp);
 
-    // ÅØ½ºÃ³ Å©±â °¡Á®¿À±â
-    CTexture::TextureSize playerTextureSize = playerTexture->GetTextureSize();
-    float textureWidth = static_cast<float>(playerTextureSize.width);
-    float textureHeight = static_cast<float>(playerTextureSize.height);
+	// UI ì¹´ë©”ë¼
+	CGameObject* uiCamObj = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.f, 0.f, -5.0f));
+	uiCamObj->SetName(L"UICamera");
 
-    // È­¸é ÇØ»óµµ °¡Á®¿À±â
-    float resolutionWidth = core.GetWidth();
-    float resolutionHeight = core.GetHeight();
-
-    // ÅØ½ºÃ³°¡ È­¸éÀ» ¿ÏÀüÈ÷ µ¤µµ·Ï ºñÀ² °è»ê
-    float scaleX = resolutionWidth / textureWidth;
-    float scaleY = resolutionHeight / textureHeight;
-
-    // ´õ Å« ºñÀ²·Î ¼³Á¤ÇÏ¿© ÅØ½ºÃ³°¡ È­¸éÀ» µ¤µµ·Ï Á¶Á¤
-    float scale = scaleX > scaleY ? scaleX : scaleY;
-
-    // ÇÃ·¹ÀÌ¾îÀÇ Å©±â¸¦ ¿øº» Å©±âÀÎ 54x65·Î ¼³Á¤
-    CTransform* playerTransform = pPlayer->GetComponent<CTransform>();
-    playerTransform->SetScale(Vector3(54.0f, 65.0f, 1.0f));
-
-    // SpriteRenderer¿Í ¾Ö´Ï¸ŞÀÌÅÍ ÄÄÆ÷³ÍÆ® Ãß°¡
-    CSpriteRenderer* sr = pPlayer->AddComponent<CSpriteRenderer>();
-    sr->SetTexture(playerTexture);
-    CAnimator* animator = pPlayer->AddComponent<CAnimator>();
-    animator->SetSpriteRenderer(sr);
-
-    // ÇÃ·¹ÀÌ¾î¿¡ CPlayerScript ÄÄÆ÷³ÍÆ® Ãß°¡
-    CPlayerScript* playerScript = pPlayer->AddComponent<CPlayerScript>();
-
-    pPlayer->AddComponent<CRigidBody>();
-
-    CCollider* playerCol = pPlayer->AddComponent<CCollider>();
-    playerCol->SetScale(Vector2(54.0f, 65.0f));
-
-    renderer::selectedObject = pPlayer;
+	CCamera* uiCamera = uiCamObj->AddComponent<CCamera>();
+	uiCamera->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+	uiCamera->SetCameraMask(1 << static_cast<UINT>(LAYER_TYPE::LT_UI));
+	m_vecCameras.push_back(uiCamera);
 }
 
 void CTestScene::Update()
@@ -144,3 +121,188 @@ void CTestScene::Render()
 {
 	CScene::Render();
 }
+
+/*// ì¹´ë©”ë¼ ì„¤ì •
+CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
+CCamera* cameraComp = camera->AddComponent<CCamera>();
+cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+
+CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
+renderer::mainCamera = cameraComp;
+
+// í”Œë ˆì´ì–´ ìƒì„±
+CGameObject* pPlayer = Instantiate<CPlayer>(LAYER_TYPE::LT_Player);
+DontDestroyOnLoad(pPlayer);
+//cameraComp->SetTarget(pPlayer);
+
+// í”Œë ˆì´ì–´ í…ìŠ¤ì²˜ ë¡œë“œ
+CTexture* playerTexture = CResourceManager::Find<CTexture>(L"PLAYER");
+
+// í…ìŠ¤ì²˜ í¬ê¸° ê°€ì ¸ì˜¤ê¸°
+CTexture::TextureSize playerTextureSize = playerTexture->GetTextureSize();
+float textureWidth = static_cast<float>(playerTextureSize.width);
+float textureHeight = static_cast<float>(playerTextureSize.height);
+
+// í™”ë©´ í•´ìƒë„ ê°€ì ¸ì˜¤ê¸°
+float resolutionWidth = core.GetWidth();
+float resolutionHeight = core.GetHeight();
+
+// í…ìŠ¤ì²˜ê°€ í™”ë©´ì„ ì™„ì „íˆ ë®ë„ë¡ ë¹„ìœ¨ ê³„ì‚°
+float scaleX = resolutionWidth / textureWidth;
+float scaleY = resolutionHeight / textureHeight;
+
+// ë” í° ë¹„ìœ¨ë¡œ ì„¤ì •í•˜ì—¬ í…ìŠ¤ì²˜ê°€ í™”ë©´ì„ ë®ë„ë¡ ì¡°ì •
+float scale = scaleX > scaleY ? scaleX : scaleY;
+
+// í”Œë ˆì´ì–´ì˜ í¬ê¸°ë¥¼ ì›ë³¸ í¬ê¸°ì¸ 54x65ë¡œ ì„¤ì •
+CTransform* playerTransform = pPlayer->GetComponent<CTransform>();
+playerTransform->SetScale(Vector3(54.0f, 65.0f, 1.0f));
+
+// SpriteRendererì™€ ì• ë‹ˆë©”ì´í„° ì»´í¬ë„ŒíŠ¸ ì¶”ê°€
+CSpriteRenderer* sr = pPlayer->AddComponent<CSpriteRenderer>();
+sr->SetTexture(playerTexture);
+CAnimator* animator = pPlayer->AddComponent<CAnimator>();
+animator->SetSpriteRenderer(sr);
+
+// í”Œë ˆì´ì–´ì— CPlayerScript ì»´í¬ë„ŒíŠ¸ ì¶”ê°€
+CPlayerScript* playerScript = pPlayer->AddComponent<CPlayerScript>();
+
+pPlayer->AddComponent<CRigidBody>();
+
+CCollider* playerCol = pPlayer->AddComponent<CCollider>();
+playerCol->SetScale(Vector2(54.0f, 65.0f));
+
+renderer::selectedObject = pPlayer;*/
+
+//CResourceManager::Load<CTexture>(L"Stage02_BG", L"../Resources/Texture/Main.bmp");
+//CTexture* player = CResourceManager::Load<CTexture>(L"PLAYER", L"../Resources/Texture/Player/Player.bmp");
+
+//2025-03-20
+/*CMonster* pMonster = Instantiate<CMonster>(LAYER_TYPE::LT_Monster);
+	CTransform* MonTr = pMonster->GetComponent<CTransform>();
+	MonTr->SetParent(m_pPlayer->GetTransform());
+	MonTr->SetLocalPosition(Vector3(20.0f, 0.0f, 0.0f));
+
+	// í”Œë ˆì´ì–´ì™€ ëª¬ìŠ¤í„°ì˜ ë¡œì»¬ ë° ì›”ë“œ ì¢Œí‘œ ê°€ì ¸ì˜¤ê¸°
+	Vector3 playerLocalPos = m_pPlayer->GetTransform()->GetLocalPosition();
+	Vector3 playerWorldPos = m_pPlayer->GetTransform()->GetWorldPosition();
+	Vector3 playerLocalScale = m_pPlayer->GetTransform()->GetLocalScale();
+	Vector3 playerWorldScale = m_pPlayer->GetTransform()->GetWorldScale();
+
+	// í”Œë ˆì´ì–´ì™€ ëª¬ìŠ¤í„°ì˜ ë¡œì»¬ ë° ì›”ë“œ ì¢Œí‘œ ê°€ì ¸ì˜¤ê¸°
+	Vector3 MonsterrLocalPos = MonTr->GetLocalPosition();
+	Vector3 MonsterrWorldPos = MonTr->GetWorldPosition();
+	Vector3 MonsterrLocalScale = MonTr->GetLocalScale();
+	Vector3 MonsterrWorldScale = MonTr->GetWorldScale();
+
+	// ë””ë²„ê·¸ ì¶œë ¥ (í”Œë ˆì´ì–´)
+	char debugMsg[256];
+	sprintf_s(debugMsg, "Player Local Pos: (%f, %f, %f)\n", playerLocalPos.x, playerLocalPos.y, playerLocalPos.z);
+	OutputDebugStringA(debugMsg);
+
+	sprintf_s(debugMsg, "Player World Pos: (%f, %f, %f)\n", playerWorldPos.x, playerWorldPos.y, playerWorldPos.z);
+	OutputDebugStringA(debugMsg);
+
+	sprintf_s(debugMsg, "Player Local Scale: (%f, %f, %f)\n", playerLocalScale.x, playerLocalScale.y, playerLocalScale.z);
+	OutputDebugStringA(debugMsg);
+
+	sprintf_s(debugMsg, "Player World Scale: (%f, %f, %f)\n", playerWorldScale.x, playerWorldScale.y, playerWorldScale.z);
+	OutputDebugStringA(debugMsg);
+
+	// ë””ë²„ê·¸ ì¶œë ¥ (ëª¬ìŠ¤í„°)
+	sprintf_s(debugMsg, "Monster Local Pos: (%f, %f, %f)\n", MonsterrLocalPos.x, MonsterrLocalPos.y, MonsterrLocalPos.z);
+	OutputDebugStringA(debugMsg);
+
+	sprintf_s(debugMsg, "Monster World Pos: (%f, %f, %f)\n", MonsterrWorldPos.x, MonsterrWorldPos.y, MonsterrWorldPos.z);
+	OutputDebugStringA(debugMsg);
+
+	sprintf_s(debugMsg, "Monster Local Scale: (%f, %f, %f)\n", MonsterrLocalScale.x, MonsterrLocalScale.y, MonsterrLocalScale.z);
+	OutputDebugStringA(debugMsg);
+
+	sprintf_s(debugMsg, "Monster World Scale: (%f, %f, %f)\n", MonsterrWorldScale.x, MonsterrWorldScale.y, MonsterrWorldScale.z);
+	OutputDebugStringA(debugMsg);*/ 
+
+	//m_pBackGround = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
+		//CTransform* bgTransform = m_pBackGround->GetComponent<CTransform>();
+		//bgTransform->SetLocalPosition(Vector3(0.0f, 300.0f, 2.0f));
+
+		//// ë°°ê²½ í…ìŠ¤ì²˜ ë¡œë“œ
+		//CTexture* bgTexture = CResourceManager::Find<CTexture>(L"Lake of Oblivion_1");
+		//if (bgTexture != nullptr)
+		//{
+		//	// í…ìŠ¤ì²˜ ì„¤ì •
+		//	m_pBackGround->SetBackGroundTexture(bgTexture);
+
+		//	// í…ìŠ¤ì²˜ í¬ê¸° ì„¤ì •í•˜ê¸°
+		//	CTexture::TextureSize textureSize = bgTexture->GetTextureSize();
+		//	if (textureSize.width <= iWidth || textureSize.height <= iHeight)
+		//	{
+		//		bgTransform->SetLocalScale(Vector3(iWidth, iHeight, 0.0f));
+		//	}
+		//	else
+		//	{
+		//		bgTransform->SetLocalScale(Vector3(textureSize.width, textureSize.height, 0.0f));
+		//	}
+		//}
+
+// 2025-04-16
+// âœ… UI ì „ìš© ì¹´ë©”ë¼ ìƒì„±
+	//if (renderer::uiCamera == nullptr)
+	//{
+	//	CGameObject* uiCameraObj = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.f, 0.f, -10.f));
+	//	uiCameraObj->SetName(L"UICamera");
+	//	CCamera* uiCamera = uiCameraObj->AddComponent<CCamera>();
+	//	uiCamera->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+	//	uiCamera->SetLayerMask(1 << static_cast<UINT>(LAYER_TYPE::LT_UI)); // âœ… UI ì „ìš© ë Œë”ë§
+	//	//uiCamera->SetCameraOrder(1);
+
+	//	renderer::uiCamera = uiCamera;
+	//}
+
+//ì¹´ë©”ë¼ëŠ” staticë³€ìˆ˜ì—ì„œ ì¼ë°˜ ë³€ìˆ˜ë¡œ ë³€ê²½
+//ë‹¤ë§Œ ì‚¬ì´ì¦ˆê°€ ì‘ì•„ì§„ ì´ìœ ì™€ ì—¬ì „íˆ ì¹´ë©”ë¼ê°€ ì ìš©ì´ ì•ˆë˜ëŠ” ì´ìœ ë„ í¬í•¨í•  ê²ƒ.
+
+//void CTestScene::Init()
+//{
+//	CScene::Init();
+//
+//	// í”Œë ˆì´ì–´ ìƒì„±
+//	// Instantiateì˜ vectorë¡œ ìºë¦­í„°ì˜ ìœ„ì¹˜ê°€ ë³€ê²½ì´ ë˜ì§€ ì•ŠìŒ... ì™œ?
+//	m_pPlayer = Instantiate<CPlayer>(LAYER_TYPE::LT_Player);
+//
+//	// ì¹´ë©”ë¼ ì„¤ì •
+//	CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
+//	camera->SetName(L"MainCamera");
+//	CCamera* cameraComp = camera->AddComponent<CCamera>();
+//	cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+//	//cameraComp->SetCameraOrder(0); // ì˜¤ë” 0
+//
+//	// LT_UI ë ˆì´ì–´ ì œì™¸í•˜ê³  ë Œë”ë§
+//	/*UINT mask = 0xFFFFFFFF;
+//	mask &= ~(1 << static_cast<UINT>(LAYER_TYPE::LT_UI));
+//	cameraComp->SetLayerMask(mask);*/
+//
+//	CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
+//	renderer::mainCamera = cameraComp;
+//	//renderer::activeCamera = renderer::mainCamera;
+//
+//	cameraScript->SetTarget(m_pPlayer); // ì¶”ì  ì¹´ë©”ë¼ ê±°ë¦¬
+//
+//	/*CGameObject* uiCameraObj = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -5.0f));
+//	uiCameraObj->SetName(L"UICamera");
+//
+//	CCamera* uiCamera = uiCameraObj->AddComponent<CCamera>();
+//	uiCamera->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);*/
+//	//uiCamera->SetCameraOrder(1); // ë©”ì¸ ì¹´ë©”ë¼ë³´ë‹¤ ë†’ì€ ì˜¤ë”ë¡œ ì„¤ì • (ë’¤ì— ë Œë”ë§)
+//
+//	//UINT uiMask = 0; // ëª¨ë“  ë¹„íŠ¸ë¥¼ ëˆ ìƒíƒœì—ì„œ
+//	//uiMask |= (1 << static_cast<UINT>(LAYER_TYPE::LT_UI)); // UI ë ˆì´ì–´ë§Œ ë Œë”ë§í•˜ë„ë¡ ë§ˆìŠ¤í¬ ì„¤ì •
+//	//uiCamera->SetLayerMask(uiMask);
+//}
+
+//// UI ì¹´ë©”ë¼ ìƒì„±
+	//CGameObject* uiCamObj = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -15.0f));
+	//uiCamObj->SetName(L"UICamera");
+	//CCamera* uiCam = uiCamObj->AddComponent<CCamera>();
+	//uiCam->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+	//m_vecCameras.push_back(uiCam);

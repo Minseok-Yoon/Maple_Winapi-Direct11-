@@ -16,15 +16,19 @@ public:
 	virtual void Init();
 	virtual void Update();
 	virtual void LateUpdate();
-	virtual void Render();
+	virtual void Render(const Matrix& view, const Matrix& projection);
+
+	void SetZOrder(int z) { m_iZOrder = z; }
+	int GetZOrder() const { return m_iZOrder; }
 
 	template <typename T>
 	T* AddComponent()
 	{
 		T* comp = new T();
-		comp->Init();
 		comp->SetOwner(this);
 		m_vecComponents[static_cast<UINT>(comp->GetComponentType())] = comp;
+
+		comp->Init();
 
 		return comp;
 	}
@@ -61,8 +65,14 @@ public:
 	bool IsActive() const { return m_eObjectState == OBJECT_STATE::OS_Active; }
 	bool IsDead() const { return m_eObjectState == OBJECT_STATE::OS_Dead; }
 
+	CTransform* GetTransform() { return m_pTransform; }
+
+public:
+	class CTransform* m_pTransform;
+
 private:
 	vector<CComponent*>		m_vecComponents;
 	LAYER_TYPE				m_eLayerType;
 	OBJECT_STATE			m_eObjectState;
+	int						m_iZOrder = 0;
 };

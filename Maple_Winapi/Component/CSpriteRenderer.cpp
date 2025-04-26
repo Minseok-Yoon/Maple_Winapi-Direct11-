@@ -6,10 +6,8 @@
 #include "../Object/CGameObject.h"
 
 CSpriteRenderer::CSpriteRenderer() :
-	CComponent(COMPONENT_TYPE::CT_SpriteRenderer),
-	m_pTexture(nullptr),
-	m_pMaterial(nullptr),
-	m_pMesh(nullptr)
+	CBaseRenderer(COMPONENT_TYPE::CT_SpriteRenderer),
+	m_pTexture(nullptr)
 {
 }
 
@@ -19,33 +17,31 @@ CSpriteRenderer::~CSpriteRenderer()
 
 void CSpriteRenderer::Init()
 {
-	m_pMesh = CResourceManager::Find<CMesh>(L"RectMesh");
-	m_pMaterial = CResourceManager::Find<CMaterial>(L"Sprite-Default-Material");
+	CBaseRenderer::Init();
+
+	CMesh* m_pMesh = CResourceManager::Find<CMesh>(L"RectMesh");
+	CMaterial* m_pMaterial = CResourceManager::Find<CMaterial>(L"Sprite-Default-Material");
+
+	SetMesh(m_pMesh);
+	SetMaterial(m_pMaterial);
 }
 
 void CSpriteRenderer::Update()
 {
+	CBaseRenderer::Update();
 }
 
 void CSpriteRenderer::LateUpdate()
 {
+	CBaseRenderer::LateUpdate();
 }
 
-void CSpriteRenderer::Render()
+void CSpriteRenderer::Render(const Matrix& view, const Matrix& projection)
 {
-	CTransform* tr = GetOwner()->GetComponent<CTransform>();
-	if (tr)
-		tr->Bind();
-
-	if (m_pMesh)
-		m_pMesh->Bind();
-
-	if (m_pMaterial)
-		m_pMaterial->BindShader();
+	CBaseRenderer::Render(view, projection);
 
 	if (m_pTexture)
 		m_pTexture->Bind(SHADER_STAGE::SS_PS, (UINT)TEXTURE_TYPE::TT_Sprite);
 
-	if (m_pMesh)
-		GetDevice()->DrawIndexed(m_pMesh->GetIndexCount(), 0, 0);
+	CBaseRenderer::Draw();
 }

@@ -6,6 +6,9 @@
 namespace renderer
 {
 	extern CCamera* mainCamera;
+	extern CCamera* uiCamera;
+	extern CCamera* activeCamera;
+
 	extern CGameObject* selectedObject;
 	extern CConstantBuffer* constantBuffers[(UINT)CB_TYPE::CT_End];
 

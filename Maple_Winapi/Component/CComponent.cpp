@@ -22,6 +22,6 @@ void CComponent::LateUpdate()
 {
 }
 
-void CComponent::Render()
+void CComponent::Render(const Matrix& view, const Matrix& projection)
 {
 }

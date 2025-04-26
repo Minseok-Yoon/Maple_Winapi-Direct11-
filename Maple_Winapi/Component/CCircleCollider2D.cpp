@@ -26,8 +26,8 @@ void CCircleCollider2D::LateUpdate()
 {
 }
 
-void CCircleCollider2D::Render()
+void CCircleCollider2D::Render(const Matrix& view, const Matrix& projection)
 {
 	CTransform* tr = GetOwner()->GetComponent<CTransform>();
-	Vector3 vPos = tr->GetPosition();
+	Vector3 vPos = tr->GetLocalPosition();
 }

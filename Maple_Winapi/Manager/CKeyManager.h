@@ -29,6 +29,7 @@ enum class KEY_CODE
 	F1,
 	F2,
 	F3,
+	F4,
 
 	LAST,
 };
@@ -51,6 +52,8 @@ public:
 public:
 	static KEY_STATE GetKeyState(KEY_CODE _eCodeKey) { return m_vecKey[(UINT)_eCodeKey].eKeyState; }
 	static math::Vector2 GetMousePos() { return m_vCurMousePos; }
+
+	static bool IsMouseClicked(KEY_CODE _eMouseBtn);
 
 private:
 	static void updateKey(tKeyInfo& _key);

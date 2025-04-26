@@ -5,10 +5,10 @@
 #include "../Component/CTransform.h"
 #include "../Object/CGameObject.h"
 #include "../Test/CDrawCollisionBox.h"
+#include "../Component/CLineCollider.h"
 
 bitset<(UINT)LAYER_TYPE::LT_End> CColliderManager::m_CollisionLayerMatrix[(UINT)LAYER_TYPE::LT_End] = {};
 unordered_map<UINT64, bool> CColliderManager::m_CollisionMap = {};
-function<bool(const class CCollisionParameter& _Collision)> ArrCollFunction[static_cast<int>(COLLIDER_TYPE::CT_End)][static_cast<int>(COLLIDER_TYPE::CT_End)];
 
 CColliderManager::CColliderManager()
 {
@@ -155,54 +155,52 @@ bool CColliderManager::Intersect(CCollider* _pColLeft, CCollider* _pColRight)
     CTransform* leftTr = _pColLeft->GetOwner()->GetComponent<CTransform>();
     CTransform* rightTr = _pColRight->GetOwner()->GetComponent<CTransform>();
 
-    Vector2 leftPos = leftTr->GetPosition() + _pColLeft->GetOffsetPos();
-    Vector2 rightPos = rightTr->GetPosition() + _pColRight->GetOffsetPos();
+    Vector2 leftPos = leftTr->GetLocalPosition() + _pColLeft->GetOffsetPos();
+    Vector2 rightPos = rightTr->GetLocalPosition() + _pColRight->GetOffsetPos();
 
     // size 1, 1 일때 기본크기가 100px
-    Vector2 leftSize = _pColLeft->GetScale() * 100.0f;
-    Vector2 rightSize = _pColRight->GetScale() * 100.0f;
+    // 충돌체의 크기 계산 (스케일 고려)
+    Vector2 leftSize = Vector2(
+        _pColLeft->GetScale().x * _pColLeft->GetOwner()->GetComponent<CTransform>()->GetLocalScale().x,
+        _pColLeft->GetScale().y * _pColLeft->GetOwner()->GetComponent<CTransform>()->GetLocalScale().y
+    );
 
-    // AABB 충돌
+    Vector2 rightSize = Vector2(
+        _pColRight->GetScale().x * _pColRight->GetOwner()->GetComponent<CTransform>()->GetLocalScale().y,
+        _pColRight->GetScale().y * _pColRight->GetOwner()->GetComponent<CTransform>()->GetLocalScale().x
+    );
+
+    // 충돌체 타입 확인
     COLLIDER_TYPE leftColType = _pColLeft->GetColliderType();
     COLLIDER_TYPE rightColType = _pColRight->GetColliderType();
 
-    if (leftColType == COLLIDER_TYPE::CT_Rect2D &&
-        rightColType == COLLIDER_TYPE::CT_Rect2D)
+    if (leftColType == COLLIDER_TYPE::CT_Rect2D && rightColType == COLLIDER_TYPE::CT_Rect2D)
     {
-        if (fabs(leftPos.x - rightPos.x) < fabs(leftSize.x / 2.0f + rightSize.x / 2.0f)
-            && fabs(leftPos.y - rightPos.y) < fabs(leftSize.y / 2.0f + rightSize.y / 2.0f))
-        {
-            return true;
-        }
+        // 각 충돌체의 중심점 계산
+        Vector3 leftCenter = leftTr->GetWorldPosition();
+        Vector3 rightCenter = rightTr->GetWorldPosition();
+
+        // 충돌 검사 (크기를 기반으로)
+        bool xOverlap = std::abs(leftCenter.x - rightCenter.x) <= (leftSize.x + rightSize.x) / 2.0f;
+        bool yOverlap = std::abs(leftCenter.y - rightCenter.y) <= (leftSize.y + rightSize.y) / 2.0f;
+
+        // 충돌 판정 (Z축은 무시)
+        return xOverlap && yOverlap;
     }
 
-    if (leftColType == COLLIDER_TYPE::CT_Circle2D &&
-        rightColType == COLLIDER_TYPE::CT_Circle2D)
+    // 라인 충돌체와 박스 충돌체 간의 충돌 검사 (2D 충돌 검사 적용)
+    else if (leftColType == COLLIDER_TYPE::CT_Line2D && rightColType == COLLIDER_TYPE::CT_Rect2D)
     {
-        Vector2 leftCirclePos = leftPos + (leftSize / 2.0f);
-        Vector2 rightCirclePos = rightPos + (rightSize / 2.0f);
-        float distance = (leftCirclePos - rightCirclePos).Length();
-        if (distance <= (leftSize.x / 2.0f + rightSize.x / 2.0f))
-        {
-            return true;
-        }
+        CLineCollider* lineCollider = static_cast<CLineCollider*>(_pColLeft);
+        return lineCollider->LineToBoxCollision(Vector2(rightPos.x - rightSize.x / 2.0f, rightPos.y - rightSize.y / 2.0f),
+            Vector2(rightPos.x + rightSize.x / 2.0f, rightPos.y + rightSize.y / 2.0f));
     }
-
-    if ((leftColType == COLLIDER_TYPE::CT_Circle2D && rightColType == COLLIDER_TYPE::CT_Rect2D) ||
-        (leftColType == COLLIDER_TYPE::CT_Rect2D && rightColType == COLLIDER_TYPE::CT_Circle2D))
+    else if (leftColType == COLLIDER_TYPE::CT_Rect2D && rightColType == COLLIDER_TYPE::CT_Line2D)
     {
-
-    }
-
-    if (leftColType == COLLIDER_TYPE::CT_AABB2D && rightColType == COLLIDER_TYPE::CT_AABB2D)
-    {
-        DirectX::BoundingBox left = _pColLeft.Left.AABB;
+        CLineCollider* lineCollider = static_cast<CLineCollider*>(_pColRight);
+        return lineCollider->LineToBoxCollision(Vector2(leftPos.x - leftSize.x / 2.0f, leftPos.y - leftSize.y / 2.0f),
+            Vector2(leftPos.x + leftSize.x / 2.0f, leftPos.y + leftSize.y / 2.0f));
     }
 
     return false;
-}
-
-bool CColliderManager::Collision(const class CCollisionParameter& _Collision)
-{
-    return ArrCollFunction[_Collision.GetLeftTypeToInt()][_Collision.GetRightTypeToInt()](_Collision);
 }

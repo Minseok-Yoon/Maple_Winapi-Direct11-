@@ -68,16 +68,16 @@ void CRigidBody::LateUpdate()
 {
 }
 
-void CRigidBody::Render()
+void CRigidBody::Render(const Matrix& view, const Matrix& projection)
 {
 }
 
 void CRigidBody::Move()
 {
 	CTransform* tr = GetOwner()->GetComponent<CTransform>();
-	Vector3 vPos = tr->GetPosition();
+	Vector3 vPos = tr->GetLocalPosition();
 	vPos = vPos + m_vVelocity * CTimeManager::GetfDeltaTime();
-	tr->SetPosition(vPos);
+	tr->SetLocalPosition(vPos);
 
 	m_vForce = Vector2::One;
 }

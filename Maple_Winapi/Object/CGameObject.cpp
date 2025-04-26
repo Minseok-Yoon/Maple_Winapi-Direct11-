@@ -1,7 +1,9 @@
 #include "CGameObject.h"
 #include "../Manager/CKeyManager.h"
 #include "../Manager/CTimeManager.h"
+#include "../Manager/CSceneManager.h"
 #include "../Component/CTransform.h"
+#include "..\Scene\CScene.h"
 
 
 void Destroy(CGameObject* _pGameObject)
@@ -63,18 +65,25 @@ void CGameObject::LateUpdate()
 	}
 }
 
-void CGameObject::Render()
+void CGameObject::Render(const Matrix& view, const Matrix& projection)
 {
 	for (CComponent* comp : m_vecComponents)
 	{
 		if (comp == nullptr)
 			continue;
 
-		comp->Render();
+		comp->Render(view, projection);
 	}
 }
 
 void CGameObject::initializeTransform()
 {
-	AddComponent<CTransform>();
+	// CTransform을 생성하여 m_pTransform에 할당
+	m_pTransform = this->AddComponent<CTransform>();
+
+	// 만약 CTransform이 제대로 추가되지 않았으면 오류 로그를 출력
+	if (!m_pTransform)
+	{
+		OutputDebugStringA("Error: Failed to initialize CTransform!\n");
+	}
 }

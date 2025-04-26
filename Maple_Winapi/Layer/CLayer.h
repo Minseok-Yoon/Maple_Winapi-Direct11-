@@ -2,7 +2,9 @@
 #include "../pch.h"
 #include "../Entity/CEntity.h"
 #include "../Object/CGameObject.h"
+#include "../Manager/CCollisionManager.h"
 
+class CCollisionManager;
 class CLayer : public CEntity
 {
 public:
@@ -18,7 +20,7 @@ public:
 	void AddGameObject(CGameObject* _pAddGameObject);
 	void EraseGameObject(CGameObject* _pEraseGameObject);
 
-	vector<CGameObject*> GetGameObjects() { return m_vecGameObjects; }
+	vector<CGameObject*>& GetGameObjects() { return m_vecGameObjects; }
 
 private:
 	void findDeadGameObjects(OUT vector<CGameObject*>& _vecGameObjects);

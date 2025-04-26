@@ -220,6 +220,27 @@
     <Filter Include="Engine\14. Test">
       <UniqueIdentifier>{8d3605d9-6232-4131-bfc8-571d6c5c1598}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\09. Component\Collider\LineCollider">
+      <UniqueIdentifier>{394b6b82-1090-4ee1-8ed4-03b42feaf966}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\04. Manager\DebugManager">
+      <UniqueIdentifier>{cf0d2f43-cd94-4dae-af77-d9c7ab613682}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\09. Component\Camera\Renderer\DebugRenderer">
+      <UniqueIdentifier>{e032121a-fae8-4504-acce-97a84b1a6e71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Ground\CLineGround">
+      <UniqueIdentifier>{fa8dce3a-1049-4bfb-afa0-a0986a03a461}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\UI\MiniMap">
+      <UniqueIdentifier>{ccb9dcb5-c952-49d5-930e-5ebcebefa22a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\04. Manager\CameraManager">
+      <UniqueIdentifier>{674a9d9b-77ab-4fbd-8ded-2ca9aa4c2e26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\09. Component\Camera\Renderer\BaseRenderer">
+      <UniqueIdentifier>{c6d7dd0e-fc97-40da-abae-05d1f63f3951}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -279,7 +300,7 @@
     <ClInclude Include="Object\CGameObject.h">
       <Filter>Engine\05. Object\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="Object\CGround.h">
+    <ClInclude Include="Object\CBackGround.h">
       <Filter>Engine\05. Object\Ground</Filter>
     </ClInclude>
     <ClInclude Include="Object\CMeso.h">
@@ -456,8 +477,26 @@
     <ClInclude Include="Test\CDrawCollisionBox.h">
       <Filter>Engine\14. Test</Filter>
     </ClInclude>
-    <ClInclude Include="CMath4.h">
+    <ClInclude Include="Component\CLineCollider.h">
+      <Filter>Engine\09. Component\Collider\LineCollider</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\CDebugManager.h">
+      <Filter>Engine\04. Manager\DebugManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\CDebugRenderer.h">
       <Filter>Engine\14. Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CLineBackGround.h">
+      <Filter>Engine\05. Object\Ground\CLineGround</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CMiniMap.h">
+      <Filter>Engine\05. Object\UI\MiniMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\CCameraManager.h">
+      <Filter>Engine\04. Manager\CameraManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\CBaseRenderer.h">
+      <Filter>Engine\09. Component\Camera\Renderer\BaseRenderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -503,7 +542,7 @@
     <ClCompile Include="Object\CGameObject.cpp">
       <Filter>Engine\05. Object\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="Object\CGround.cpp">
+    <ClCompile Include="Object\CBackGround.cpp">
       <Filter>Engine\05. Object\Ground</Filter>
     </ClCompile>
     <ClCompile Include="Object\CMeso.cpp">
@@ -665,8 +704,26 @@
     <ClCompile Include="Test\CDrawCollisionBox.cpp">
       <Filter>Engine\14. Test</Filter>
     </ClCompile>
-    <ClCompile Include="CMath4.cpp">
+    <ClCompile Include="Component\CLineCollider.cpp">
+      <Filter>Engine\09. Component\Collider\LineCollider</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\CDebugManager.cpp">
+      <Filter>Engine\04. Manager\DebugManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\CDebugRenderer.cpp">
       <Filter>Engine\14. Test</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CLineBackGround.cpp">
+      <Filter>Engine\05. Object\Ground\CLineGround</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CMiniMap.cpp">
+      <Filter>Engine\05. Object\UI\MiniMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\CCameraManager.cpp">
+      <Filter>Engine\04. Manager\CameraManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\CBaseRenderer.cpp">
+      <Filter>Engine\09. Component\Camera\Renderer\BaseRenderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

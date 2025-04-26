@@ -43,6 +43,7 @@ int g_arrVK[static_cast<UINT>(KEY_CODE::LAST)] =
 	VK_F1,
 	VK_F2,
 	VK_F3,
+	VK_F4,
 };
 
 CKeyManager::CKeyManager()
@@ -73,6 +74,14 @@ void CKeyManager::Update()
 	{
 		updateKey(key);
 	});
+}
+
+bool CKeyManager::IsMouseClicked(KEY_CODE _eMouseBtn)
+{
+	if (_eMouseBtn != KEY_CODE::LBTN && _eMouseBtn != KEY_CODE::RBTN)
+		return false;
+
+	return GetKeyState(_eMouseBtn) == KEY_STATE::TAP;
 }
 
 void CKeyManager::updateKey(tKeyInfo& _key)

@@ -65,9 +65,9 @@ void CLoadingScene::resourcesLoad(std::mutex& _pMutex)
             renderer::Init();
 
             CSceneManager::CreateScene<CScene_Start>(L"StartScene");
-            /*CSceneManager::CreateScene<CScene_Stage01>(L"Stage01");
+            CSceneManager::CreateScene<CScene_Stage01>(L"Stage01");
             CSceneManager::CreateScene<CTestScene>(L"TestScene");
-            CSceneManager::CreateScene<CRectDrawScene>(L"DrawRectScene");*/
+            /*CSceneManager::CreateScene<CRectDrawScene>(L"DrawRectScene");*/
             CSceneManager::CreateScene<CPixScene>(L"PixScene");
         }
         _pMutex.unlock();

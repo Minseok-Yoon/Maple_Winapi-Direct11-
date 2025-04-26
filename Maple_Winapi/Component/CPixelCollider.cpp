@@ -181,7 +181,7 @@ void CPixelCollider::LateUpdate()
 {
 }
 
-void CPixelCollider::Render()
+void CPixelCollider::Render(const Matrix& view, const Matrix& projection)
 {
 }
 

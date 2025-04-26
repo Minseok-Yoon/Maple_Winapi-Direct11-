@@ -12,7 +12,7 @@ public:
     virtual void Init() override;
     virtual void Update() override;
     virtual void LateUpdate() override;
-    virtual void Render() override;
+    virtual void Render(const Matrix& view, const Matrix& projection) override;
 
     void SetItemInfo(const Vector2& _vPos) { m_vPos = _vPos; };
     Vector2 GetItemInfo() const { return m_vPos; }

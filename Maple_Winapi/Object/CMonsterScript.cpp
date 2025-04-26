@@ -1,4 +1,6 @@
 #include "CMonsterScript.h"
+#include "../Component/CRigidBody.h"
+#include "../Manager/CKeyManager.h"
 
 CMonsterScript::CMonsterScript()
 {
@@ -21,7 +23,7 @@ void CMonsterScript::LateUpdate()
 {
 }
 
-void CMonsterScript::Render()
+void CMonsterScript::Render(const Matrix& view, const Matrix& projection)
 {
 }
 

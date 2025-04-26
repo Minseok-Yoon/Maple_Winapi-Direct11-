@@ -22,7 +22,7 @@ void CScript::LateUpdate()
 {
 }
 
-void CScript::Render()
+void CScript::Render(const Matrix& view, const Matrix& projection)
 {
 }
 

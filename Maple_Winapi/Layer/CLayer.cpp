@@ -1,4 +1,5 @@
 #include "CLayer.h"
+#include "../Manager/CCollisionManager.h"
 
 CLayer::CLayer() :
 	m_vecGameObjects{}
@@ -58,16 +59,6 @@ void CLayer::LateUpdate()
 
 void CLayer::Render()
 {
-	for (CGameObject* gameObj : m_vecGameObjects)
-	{
-		if (gameObj == nullptr)
-			continue;
-
-		if (gameObj->IsActive() == false)
-			continue;
-
-		gameObj->Render();
-	}
 }
 
 void CLayer::Destroy()
@@ -146,3 +137,14 @@ void CLayer::eraseDeadGameObjects()
 	m_vecGameObjects.erase(iter, m_vecGameObjects.end());*/
 #pragma endregion
 }
+
+/*for (CGameObject* gameObj : m_vecGameObjects)
+	{
+		if (gameObj == nullptr)
+			continue;
+
+		if (gameObj->IsActive() == false)
+			continue;
+
+		gameObj->Render();
+	}*/

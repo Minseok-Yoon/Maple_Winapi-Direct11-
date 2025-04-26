@@ -1,4 +1,4 @@
-#include "CScene.h"
+ï»¿#include "CScene.h"
 
 #include "../Core/CCore.h"
 #include "../Object/CObject.h"
@@ -12,6 +12,9 @@
 #include "../Manager/CResourceManager.h"
 #include "../Resource/CAudioClip.h"
 #include "../Resource/CTexture.h"
+#include <imgui.h>
+#include "../Component/CBaseRenderer.h"
+#include "..\Component\CRenderer.h"
 
 extern CCore core;
 
@@ -23,7 +26,7 @@ CScene::CScene() :
 
 CScene::~CScene()
 {
-	// ¸ğµç LayerµéÀ» ¸Ş¸ğ¸®¿¡¼­ »èÁ¦
+	// ëª¨ë“  Layerë“¤ì„ ë©”ëª¨ë¦¬ì—ì„œ ì‚­ì œ
 	for (CLayer* layer : m_vecLayers)
 	{
 		delete layer;
@@ -61,12 +64,54 @@ void CScene::LateUpdate()
 
 void CScene::Render()
 {
-	for (CLayer* layer : m_vecLayers)
+	for (CCamera* camera : m_vecCameras)
 	{
-		if (layer == nullptr)
-			continue;
+		if (camera == nullptr) continue;
 
-		layer->Render();
+		renderer::activeCamera = camera;
+
+		Matrix viewMatrix = camera->GetViewMatrix();
+		Matrix projectionMatrix = camera->GetProjectionMatrix();
+		Vector3 cameraPos = camera->GetOwner()->GetComponent<CTransform>()->GetWorldPosition();
+
+		vector<CGameObject*> opaqueList = {};
+		vector<CGameObject*> cutoutList = {};
+		vector<CGameObject*> transparentList = {};
+		vector<CGameObject*> uiList = {};
+
+		// ê¸°ì¡´ ë°©ì‹ëŒ€ë¡œ ìˆ˜ì§‘
+		CollectRenderables(camera, opaqueList, cutoutList, transparentList);
+
+		// UI ì˜¤ë¸Œì íŠ¸ ë”°ë¡œ ìˆ˜ì§‘
+		for (CGameObject* obj : m_vecLayers[static_cast<UINT>(LAYER_TYPE::LT_UI)]->GetGameObjects())
+		{
+			if (obj == nullptr) continue;
+			if (obj->GetComponent<CBaseRenderer>() == nullptr) continue;
+
+			// ì¹´ë©”ë¼ ë§ˆìŠ¤í¬ ì²´í¬
+			UINT camMask = camera->GetCameraMask();
+			UINT objMask = (1 << static_cast<UINT>(obj->GetLayerType()));
+			if ((camMask & objMask) == 0)
+				continue;
+
+			uiList.push_back(obj);
+		}
+
+		// ğŸ’¡ UIëŠ” ZOrderë¡œ ì •ë ¬
+		std::ranges::sort(uiList, [](CGameObject* a, CGameObject* b) {
+			return a->GetZOrder() < b->GetZOrder();
+		});
+
+		RenderRenderables(uiList, viewMatrix, projectionMatrix);
+
+		// ê¸°ì¡´ ë Œë”ë§
+		SortByDistance(opaqueList, cameraPos, true);
+		SortByDistance(cutoutList, cameraPos, true);
+		SortByDistance(transparentList, cameraPos, false);
+
+		RenderRenderables(opaqueList, viewMatrix, projectionMatrix);
+		RenderRenderables(cutoutList, viewMatrix, projectionMatrix);
+		RenderRenderables(transparentList, viewMatrix, projectionMatrix);
 	}
 }
 
@@ -90,39 +135,39 @@ void CScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioNa
 	UINT iWidth = core.GetWidth();
 	UINT iHeight = core.GetHeight();
 
-	// ¹è°æ °´Ã¼ »ı¼º
+	// ë°°ê²½ ê°ì²´ ìƒì„±
 	m_pBackGround = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
 	CTransform* backGroundTr = m_pBackGround->GetComponent<CTransform>();
-	backGroundTr->SetPosition(Vector3(0.0f, 0.0f, 0.0f));  // ¹è°æ À§Ä¡ ¼³Á¤
+	backGroundTr->SetLocalPosition(Vector3(0.0f, 0.0f, 0.0f));  // ë°°ê²½ ìœ„ì¹˜ ì„¤ì •
 
-	// ¹è°æ ÅØ½ºÃ³ ·Îµå
+	// ë°°ê²½ í…ìŠ¤ì²˜ ë¡œë“œ
 	CTexture* bgTexture = CResourceManager::Find<CTexture>(_strBackGroundName);
 	if (bgTexture != nullptr)
 	{
-		// ÅØ½ºÃ³ ¼³Á¤
-		m_pBackGround->SetBackGroundTexture(bgTexture);
+		// í…ìŠ¤ì²˜ ì„¤ì •
+		//m_pBackGround->SetBackGroundTexture(bgTexture);
 
-		// ÅØ½ºÃ³ Å©±â ¼³Á¤ÇÏ±â
+		// í…ìŠ¤ì²˜ í¬ê¸° ì„¤ì •í•˜ê¸°
 		CTexture::TextureSize textureSize = bgTexture->GetTextureSize();
 		if (textureSize.width <= iWidth || textureSize.height <= iHeight)
 		{
-			backGroundTr->SetScale(Vector3(iWidth, iHeight, 0.0f));
+			backGroundTr->SetLocalScale(Vector3(iWidth, iHeight, 0.0f));
 		}
 		else
 		{
-			backGroundTr->SetScale(Vector3(textureSize.width, textureSize.height, 0.0f));
+			backGroundTr->SetLocalScale(Vector3(textureSize.width, textureSize.height, 0.0f));
 		}
 	}
 
-	// ½ºÇÁ¶óÀÌÆ® ·»´õ·¯ ¼³Á¤
+	// ìŠ¤í”„ë¼ì´íŠ¸ ë Œë”ëŸ¬ ì„¤ì •
 	CSpriteRenderer* sr = m_pBackGround->AddComponent<CSpriteRenderer>();
 	sr->SetTexture(bgTexture);
 
-	// ¿Àµğ¿À ¸®½º³Ê ¹× ¼Ò½º Ãß°¡
+	// ì˜¤ë””ì˜¤ ë¦¬ìŠ¤ë„ˆ ë° ì†ŒìŠ¤ ì¶”ê°€
 	m_pBackGround->AddComponent<CAudioListener>();
 	m_pAudioSource = m_pBackGround->AddComponent<CAudioSource>();
 
-	// ¹è°æ À½¾Ç ·Îµå ¹× Àç»ı
+	// ë°°ê²½ ìŒì•… ë¡œë“œ ë° ì¬ìƒ
 	CAudioClip* ac = CResourceManager::Find<CAudioClip>(_strAudioName);
 	m_pAudioSource->SetClip(ac);
 	m_pAudioSource->Play();
@@ -130,11 +175,11 @@ void CScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioNa
 
 void CScene::Exit()
 {
-	// ¹è°æ À½¾Ç ÁßÁö
+	// ë°°ê²½ ìŒì•… ì¤‘ì§€
 	if (m_pAudioSource)
 	{
-		m_pAudioSource->Stop(); // À½¾Ç Á¤Áö
-		m_pAudioSource = nullptr; // Æ÷ÀÎÅÍ ÃÊ±âÈ­
+		m_pAudioSource->Stop(); // ìŒì•… ì •ì§€
+		m_pAudioSource = nullptr; // í¬ì¸í„° ì´ˆê¸°í™”
 	}
 
 	m_pBackGround = nullptr;
@@ -153,6 +198,105 @@ void CScene::EraseGameObject(CGameObject* _pGameObj)
 	m_vecLayers[static_cast<UINT>(layerType)]->EraseGameObject(_pGameObj);
 }
 
+void CScene::AddCamera(CCamera* _pCamera)
+{
+	if (_pCamera == nullptr) return;
+
+	m_vecCameras.push_back(_pCamera);
+}
+
+void CScene::RemoveCamera(CCamera* _pCamera)
+{
+	if (_pCamera == nullptr) return;
+
+	auto iter
+		= find(m_vecCameras.begin(), m_vecCameras.end(), _pCamera);
+
+	if (iter != m_vecCameras.end())
+		m_vecCameras.erase(iter);
+}
+
+void CScene::CollectRenderables(CCamera* _pCamera, vector<CGameObject*>& opaqueList,
+	vector<CGameObject*>& cutoutList, vector<CGameObject*>& transparentList) const
+{
+	UINT camMask = _pCamera->GetCameraMask();
+
+	for (CLayer* layer : m_vecLayers)
+	{
+		if (layer == nullptr)
+			continue;
+
+		vector<CGameObject*>& gameObjects = layer->GetGameObjects();
+
+		for (CGameObject* gameObj : gameObjects)
+		{
+			if (gameObj == nullptr)
+				continue;
+
+			UINT objLayerMask = (1 << static_cast<UINT>(gameObj->GetLayerType()));
+
+			// ì¹´ë©”ë¼ ë§ˆìŠ¤í¬ì— í¬í•¨ ì•ˆë˜ë©´ ì œì™¸
+			if ((camMask & objLayerMask) == 0)
+				continue;
+
+			CBaseRenderer* renderer = gameObj->GetComponent<CBaseRenderer>();
+			if (renderer == nullptr)
+				continue;
+
+			switch (renderer->GetMaterial()->GetRenderingMode())
+			{
+			case RENDERING_MODE::RM_Opaque:
+				opaqueList.push_back(gameObj);
+				break;
+			case RENDERING_MODE::RM_CutOut:
+				cutoutList.push_back(gameObj);
+				break;
+			case RENDERING_MODE::RM_Transparent:
+				transparentList.push_back(gameObj);
+				break;
+			}
+		}
+	}
+
+	// ZOrder ê¸°ì¤€ìœ¼ë¡œ ê° ë Œë”ë§ ë¦¬ìŠ¤íŠ¸ ì •ë ¬
+	std::ranges::sort(opaqueList, [](CGameObject* a, CGameObject* b) {
+		return a->GetZOrder() < b->GetZOrder();
+	});
+
+	std::ranges::sort(cutoutList, [](CGameObject* a, CGameObject* b) {
+		return a->GetZOrder() < b->GetZOrder();
+	});
+
+	std::ranges::sort(transparentList, [](CGameObject* a, CGameObject* b) {
+		return a->GetZOrder() < b->GetZOrder();
+	});
+}
+
+void CScene::SortByDistance(std::vector<CGameObject*>& renderList, 
+	const Vector3& cameraPos, bool bAscending) const
+{
+	auto comparator = [cameraPos, bAscending](CGameObject* a, CGameObject* b)
+	{
+		float distA = Vector3::Distance(a->GetComponent<CTransform>()->GetWorldPosition(), cameraPos);
+		float distB = Vector3::Distance(b->GetComponent<CTransform>()->GetWorldPosition(), cameraPos);
+		return bAscending ? (distA < distB) : (distA > distB);
+	};
+
+	std::ranges::sort(renderList, comparator);
+}
+
+void CScene::RenderRenderables(const vector<CGameObject*>& renderList, 
+	const Matrix& view, const Matrix& projection) const
+{
+	for (auto* obj : renderList)
+	{
+		if (obj == nullptr)
+			continue;
+
+		obj->Render(view, projection);
+	}
+}
+
 void CScene::createLayers()
 {
 	m_vecLayers.resize(static_cast<UINT>(LAYER_TYPE::LT_End));
@@ -162,3 +306,36 @@ void CScene::createLayers()
 		m_vecLayers[i] = new CLayer();
 	}
 }
+
+/*for (CLayer* layer : m_vecLayers)
+	{
+		if (layer == nullptr)
+			continue;
+
+		vector<CGameObject*>& gameObjects = layer->GetGameObjects();
+
+		for (CGameObject* gameObj : gameObjects)
+		{
+			if (gameObj == nullptr)
+				continue;
+
+			CBaseRenderer* renderer = gameObj->GetComponent<CBaseRenderer>();
+			if (renderer == nullptr)
+				continue;
+
+			switch (renderer->GetMaterial()->GetRenderingMode())
+			{
+			case RENDERING_MODE::RM_Opaque:
+				opaqueList.push_back(gameObj);
+				break;
+
+			case RENDERING_MODE::RM_CutOut:
+				cutoutList.push_back(gameObj);
+				break;
+
+			case RENDERING_MODE::RM_Transparent:
+				transparentList.push_back(gameObj);
+				break;
+			}
+		}
+	}*/

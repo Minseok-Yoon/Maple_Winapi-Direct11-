@@ -69,7 +69,7 @@ void CAnimator::LateUpdate()
 {
 }
 
-void CAnimator::Render()
+void CAnimator::Render(const Matrix& view, const Matrix& projection)
 {
 	// 현재 애니메이션이 존재하는 경우
 	if (m_pCurAnimation)

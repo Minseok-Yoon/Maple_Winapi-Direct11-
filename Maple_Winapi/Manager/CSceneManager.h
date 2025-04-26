@@ -1,7 +1,9 @@
 #pragma once
 #include "../Scene/CScene.h"
+#include "../Object/CGameObject.h"
 
 class CScene;
+class CGameObject;
 class CSceneManager
 {
 public:
@@ -36,8 +38,12 @@ public:
 	static vector<CGameObject*> GetGameObjects(LAYER_TYPE _eLayerType);
 	static CScene* GetDontDestroyOnLoad() { return m_pDontDestroyOnLoad; }
 
+	void SelectObject(CGameObject* _pGameObject) { m_pSelectedObject = _pGameObject; }
+	CGameObject* GetSelectObject() { return m_pSelectedObject; }
+
 private:
 	static map<wstring, CScene*>	m_mapScene;	// 모든 씬 목록
 	static CScene* m_pCurScene;							// 현재 씬
 	static CScene* m_pDontDestroyOnLoad;
+	CGameObject* m_pSelectedObject = nullptr;	// 선택된 오브젝트
 };

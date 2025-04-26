@@ -31,8 +31,16 @@
 #define CAST_UINT(value) static_cast<UINT>(value);
 #define CAST_FLOAT(value) static_cast<float>(value);
 
+#define GROUND_COLOR TextureColor(255, 0, 255, 255)
+#define ROPE_COLOR TextureColor(255, 0, 0, 255)
+#define FOOTHOLD_COLOR TextureColor(0, 114, 255, 255)
+
 // 오류 메세지 박스 생성
 #define AssertMsgBox(Text)\
 std::string Value = Text;\
 MessageBoxA(nullptr, Value.c_str(), "Error", MB_OK);\
 assert(false);
+
+#define CLEAR_NONE      0
+#define CLEAR_COLOR     1
+#define CLEAR_DEPTH     2

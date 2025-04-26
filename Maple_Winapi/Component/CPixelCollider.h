@@ -57,7 +57,7 @@ public:
 	void Init() override;
 	void Update() override;
 	void LateUpdate() override;
-	void Render() override;
+	void Render(const Matrix& view, const Matrix& projection) override;
 
 	// 충돌 시점 함수
 	virtual void OnCollisionEnter(class CCollider* _pOther) final;	// 충돌 진입 시
