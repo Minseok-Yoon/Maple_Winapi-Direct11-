@@ -7,7 +7,7 @@ bool CShader::bWireframe = false;
 CShader::CShader() :
 	CResource(RESOURCE_TYPE::RT_Shader),
 	m_RasterizerState(RASTERIZER_STATE::RS_SolidBack),
-	m_BlendState(BLEND_STATE::BS_Opaque),
+	m_BlendState(BLEND_STATE::BS_Transparent),
 	m_DepthStencilState(DEPTHSTENCIL_STATE::DS_LessEqual)
 {
 }
@@ -62,11 +62,17 @@ void CShader::Bind()
 	{
 		// Wireframe 렌더링 상태 설정
 		CShader* wireframeShader = CResourceManager::Find<CShader>(L"WireframeShader");
-		GetDevice()->BindVS(wireframeShader->GetVS().Get());
-		GetDevice()->BindPS(wireframeShader->GetPS().Get());
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> wireframeShaderVS = wireframeShader->GetVS();
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> wireframeShaderPS = wireframeShader->GetPS();
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> wireframeRasterizerState
+			= renderer::rasterizerStates[static_cast<UINT>(RASTERIZER_STATE::RS_WireFrame)];
 
 		// Wireframe 전용 Rasterizer 설정
+		GetDevice()->BindVS(wireframeShader->GetVS().Get());
+		GetDevice()->BindPS(wireframeShader->GetPS().Get());
 		GetDevice()->BindRasterizerState(renderer::rasterizerStates[static_cast<UINT>(RASTERIZER_STATE::RS_WireFrame)].Get());
+		GetDevice()->BindBlendState(renderer::blendStates[static_cast<UINT>(m_BlendState)].Get(), nullptr, 0xffffff);
+		GetDevice()->BindDepthStencilState(renderer::depthStencilStates[static_cast<UINT>(m_DepthStencilState)].Get(), 0);
 
 		return;
 	}
@@ -76,4 +82,6 @@ void CShader::Bind()
 	if (m_PS) GetDevice()->BindPS(m_PS.Get());
 
 	GetDevice()->BindRasterizerState(renderer::rasterizerStates[static_cast<UINT>(m_RasterizerState)].Get());
+	GetDevice()->BindBlendState(renderer::blendStates[static_cast<UINT>(m_BlendState)].Get(), nullptr, 0xffffff);
+	GetDevice()->BindDepthStencilState(renderer::depthStencilStates[static_cast<UINT>(m_DepthStencilState)].Get(), 0);
 }

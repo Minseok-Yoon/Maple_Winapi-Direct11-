@@ -69,8 +69,8 @@ void CMiniMap::CreateMiniMap(const std::wstring& mapTextureName)
     float miniMapHeight = textureSize.height;
 
     Vector3 localPos(
-        -static_cast<float>(screenWidth) / 2.0f + miniMapWidth / 2.0f,
-        static_cast<float>(screenHeight) / 2.0f - miniMapHeight,
+        (-static_cast<float>(screenWidth) / 2.0f + miniMapWidth / 2.0f) + 20.0f,
+        (static_cast<float>(screenHeight) / 2.0f - miniMapHeight) - 20.0f,
         0.0f
     );
 
@@ -136,8 +136,8 @@ void CMiniMap::UpdateMiniMapPlayer()
     Vector3 miniMapPos = m_tElements.Background->GetComponent<CTransform>()->GetWorldPosition(); // 미니맵 위치
 
     // --- 1. 플레이어 위치를 정규화 ---
-    float normX = std::clamp(playerWorldPos.x / realMapSize.x, 0.0f, 1.0f);
-    float normY = std::clamp(playerWorldPos.y / realMapSize.y, 0.0f, 1.0f);
+    float normX = std::clamp(playerWorldPos.x / realMapSize.x, -1.0f, 1.0f);
+    float normY = std::clamp(playerWorldPos.y / realMapSize.y, -1.0f, 1.0f);
 
     // --- 2. 정규화된 위치를 미니맵 내부 좌표로 환산 ---
     float iconX = miniMapPos.x + normX * miniMapSize.x;
@@ -145,15 +145,6 @@ void CMiniMap::UpdateMiniMapPlayer()
 
     // --- 3. 아이콘 위치 갱신 ---
     m_tElements.PlayerIcon->GetComponent<CTransform>()->SetLocalPosition(Vector3(iconX, iconY, -1.0f));
-
-    wstringstream ss;
-    ss << L"PlayerIcon WorldPosition: (" << m_tElements.PlayerIcon->GetComponent<CTransform>()->GetWorldPosition().x
-        << L", " << m_tElements.PlayerIcon->GetComponent<CTransform>()->GetWorldPosition().y << L")\n";
-    //ss << L"PlayerIcon LocalPosition: (" << m_tElements.PlayerIcon->GetComponent<CTransform>()->GetWorldPosition().x
-    //    << L", " << m_tElements.PlayerIcon->GetComponent<CTransform>()->GetWorldPosition().y << L")\n";
-    ////ss << L"Player WorldPosition: (" << playerWorldPos.x << L", " << playerWorldPos.y << L")\n";
-    //ss << L"normY: " << normY << L", iconY: " << iconY << "\n";
-    OutputDebugStringW(ss.str().c_str());
 }
 
 /*wstringstream ss;

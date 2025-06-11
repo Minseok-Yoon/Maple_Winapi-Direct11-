@@ -51,6 +51,11 @@ public:
     void SetZOrder(int _iZOrder) { m_iZOrder = _iZOrder; }
     int GetZOrder() const { return m_iZOrder; }
 
+    // 2025-06-10
+    bool IsEnable() const { return m_bEnable; }
+
+    void SetEnable(bool _bEnable) { m_bEnable = _bEnable; }
+
 protected:
     Vector2	m_vPosition;
     Vector2	m_vSize;
@@ -61,7 +66,7 @@ private:
     UI_TYPE m_eUIType;
     bool	m_bFullScreen;
     bool	m_bEnable;
-    CUI* m_pParent;
+    CUI*    m_pParent;
 };
 
 // UI클래스 내부에는 이런 저런 UI들이 있기 때문에.. 이것을 '추상 클래스'로 만들어서 '객체화'할 수 없게 만들 것이다.

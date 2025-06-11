@@ -74,8 +74,14 @@ void CAnimator::Render(const Matrix& view, const Matrix& projection)
 	// 현재 애니메이션이 존재하는 경우
 	if (m_pCurAnimation)
 	{
-		m_pCurAnimation->Render();  // 애니메이션 렌더링 호출
-		//OutputDebugStringW(L"Rendering current animation\n");
+		m_pCurAnimation->Render(view, projection);  // 애니메이션 렌더링 호출
+		// 애니메이션 진행 중 텍스처 출력
+		CTexture* currentTexture = m_pCurAnimation->GetCurrentFrameTexture();
+		/*if (currentTexture)
+		{
+			wstring debugMessage = L"현재 출력 중인 텍스처: " + currentTexture->GetFilePath() + L"\n";
+			OutputDebugString(debugMessage.c_str());
+		}*/
 	}
 	else
 	{
@@ -120,6 +126,11 @@ void CAnimator::CreateFrameAnimation(const wstring& _strName, const vector<wstri
 	{
 		// wstring 경로를 사용하여 텍스처를 로드
 		CTexture* texture = CResourceManager::Load<CTexture>(fileName, fileName);
+
+		if (texture == nullptr)
+		{
+			OutputDebugString((L"[에러] 텍스처 로딩 실패: " + fileName + L"\n").c_str());
+		}
 		vecTextures.push_back(texture);
 	}
 
@@ -168,10 +179,19 @@ CAnimation* CAnimator::FindAnimation(const wstring& _strName)
 	return iter->second;
 }
 
+bool CAnimator::HasAnimation(const wstring& _strAnimName) const
+{
+	return m_mapAnimations.find(_strAnimName) != m_mapAnimations.end();
+}
+
 void CAnimator::Play(const wstring& _strName, bool _bRepeat)
 {
 	CAnimation* animation = FindAnimation(_strName);
 	if (animation == nullptr)
+		return;
+
+	// 같은 애니메이션일 경우에는 아무것도 하지 않음
+	if (m_pCurAnimation == animation)
 		return;
 
 	// 애니메이션 프레임 갱신을 위한 코드
@@ -192,14 +212,14 @@ void CAnimator::Play(const wstring& _strName, bool _bRepeat)
 		m_pCurAnimation->ResetAnimation(); // 애니메이션을 초기화
 		m_bRepeat = _bRepeat;
 	}
-
-	// 애니메이션 진행 중 텍스처 출력
-	/*CTexture* currentTexture = m_pCurAnimation->GetCurrentFrameTexture();
-	if (currentTexture)
-	{
-		wstring debugMessage = L"현재 출력 중인 텍스처: " + currentTexture->GetFilePath() + L"\n";
-		OutputDebugString(debugMessage.c_str());
-	}*/
+	
+	//// 애니메이션 진행 중 텍스처 출력
+	//CTexture* currentTexture = m_pCurAnimation->GetCurrentFrameTexture();
+	//if (currentTexture)
+	//{
+	//	wstring debugMessage = L"현재 출력 중인 텍스처: " + currentTexture->GetFilePath() + L"\n";
+	//	OutputDebugString(debugMessage.c_str());
+	//}
 }
 
 bool CAnimator::End() const

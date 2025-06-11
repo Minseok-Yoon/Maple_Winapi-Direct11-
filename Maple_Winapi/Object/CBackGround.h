@@ -17,6 +17,7 @@ public:
 
     bool CheckGround(Vector3 _vPlusCheckPos);
 
+    TextureColor GetPixelColor(const Vector3& _vWorldPos);
     TextureColor GetColor(Vector3 _Pos, TextureColor _DefaultColor);
 
     void CreateMap(wstring _MapName);
@@ -42,6 +43,7 @@ public:
 private:
     wstring  m_strMapName;
     CTexture* m_pMapCollision;
+    CTexture* m_pMap;
 
 
     CTexture*       m_pBackGroundTexture;

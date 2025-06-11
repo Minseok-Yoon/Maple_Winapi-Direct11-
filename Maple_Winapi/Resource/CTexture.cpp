@@ -100,10 +100,6 @@ void CTexture::Bind(SHADER_STAGE _eShaderStage, UINT startSlot)
 	GetDevice()->SetShaderResource(_eShaderStage, startSlot, m_SRV.GetAddressOf());
 }
 
-void CTexture::CreateTexture(wstring _strName)
-{
-}
-
 bool CTexture::GetDesc(D3D11_TEXTURE2D_DESC& desc) const
 {
 	if (!m_Texture) {

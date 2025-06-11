@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -137,6 +137,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>-D_HAS_STD_BYTE=0 %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,6 +185,7 @@
     <ClInclude Include="Component\CLineCollider.h" />
     <ClInclude Include="Component\CLineRenderer.h" />
     <ClInclude Include="Component\CPixelCollider.h" />
+    <ClInclude Include="Component\CPortalScript.h" />
     <ClInclude Include="Component\CRenderer.h" />
     <ClInclude Include="Component\CRigidBody.h" />
     <ClInclude Include="Component\CScript.h" />
@@ -205,7 +207,7 @@
     <ClInclude Include="Manager\CCameraManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Manager\CCollisionManager.h" />
+    <ClInclude Include="Manager\CColliderManager.h" />
     <ClInclude Include="Manager\CDamageManager.h" />
     <ClInclude Include="Manager\CDebugManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -220,20 +222,32 @@
     <ClInclude Include="Module\SelectGDI.h" />
     <ClInclude Include="Object\CBtnUI.h" />
     <ClInclude Include="Object\CDamage.h" />
+    <ClInclude Include="Object\CEtcItem.h" />
     <ClInclude Include="Object\CGameObject.h" />
     <ClInclude Include="Object\CBackGround.h" />
+    <ClInclude Include="Object\CInventory.h" />
+    <ClInclude Include="Object\CInventoryUI.h" />
     <ClInclude Include="Object\CItem.h" />
+    <ClInclude Include="Object\CItemScript.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Object\CLineBackGround.h" />
     <ClInclude Include="Object\CMeso.h" />
     <ClInclude Include="Object\CMiniMap.h" />
     <ClInclude Include="Object\CMonster.h" />
     <ClInclude Include="Object\CMonsterScript.h" />
+    <ClInclude Include="Object\CNpc.h" />
     <ClInclude Include="Object\CObject.h" />
+    <ClInclude Include="Object\CObjectPool.h" />
     <ClInclude Include="Object\CPlayer.h" />
+    <ClInclude Include="Object\CPlayerBehavious.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Object\CPlayerScript.h" />
     <ClInclude Include="Object\CPortal.h" />
     <ClInclude Include="Object\CUI.h" />
     <ClInclude Include="Object\CUIHUD.h" />
+    <ClInclude Include="Object\Erdas_of_Gladness.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Resource\CAudioClip.h" />
@@ -252,11 +266,14 @@
     <ClInclude Include="Scene\CScene_Stage02.h" />
     <ClInclude Include="Scene\CScene_Start.h" />
     <ClInclude Include="Scene\CTestScene.h" />
+    <ClInclude Include="Scene\The_Lake_of_Oblivion.h" />
+    <ClInclude Include="Scene\The_Land_of_Weathered_gladness.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Test\CDrawCollisionBox.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Test\CRandom.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CMath.cpp" />
@@ -276,6 +293,7 @@
     <ClCompile Include="Component\CLineCollider.cpp" />
     <ClCompile Include="Component\CLineRenderer.cpp" />
     <ClCompile Include="Component\CPixelCollider.cpp" />
+    <ClCompile Include="Component\CPortalScript.cpp" />
     <ClCompile Include="Component\CRenderer.cpp" />
     <ClCompile Include="Component\CRigidBody.cpp" />
     <ClCompile Include="Component\CScript.cpp" />
@@ -293,7 +311,7 @@
     <ClCompile Include="Manager\CCameraManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Manager\CCollisionManager.cpp" />
+    <ClCompile Include="Manager\CColliderManager.cpp" />
     <ClCompile Include="Manager\CDamageManager.cpp" />
     <ClCompile Include="Manager\CDebugManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -308,20 +326,32 @@
     <ClCompile Include="Module\SelectGDI.cpp" />
     <ClCompile Include="Object\CBtnUI.cpp" />
     <ClCompile Include="Object\CDamage.cpp" />
+    <ClCompile Include="Object\CEtcItem.cpp" />
     <ClCompile Include="Object\CGameObject.cpp" />
     <ClCompile Include="Object\CBackGround.cpp" />
+    <ClCompile Include="Object\CInventory.cpp" />
+    <ClCompile Include="Object\CInventoryUI.cpp" />
     <ClCompile Include="Object\CItem.cpp" />
+    <ClCompile Include="Object\CItemScript.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Object\CLineBackGround.cpp" />
     <ClCompile Include="Object\CMeso.cpp" />
     <ClCompile Include="Object\CMiniMap.cpp" />
     <ClCompile Include="Object\CMonster.cpp" />
     <ClCompile Include="Object\CMonsterScript.cpp" />
+    <ClCompile Include="Object\CNpc.cpp" />
     <ClCompile Include="Object\CObject.cpp" />
+    <ClCompile Include="Object\CObjectPool.cpp" />
     <ClCompile Include="Object\CPlayer.cpp" />
+    <ClCompile Include="Object\CPlayerBehavious.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Object\CPlayerScript.cpp" />
     <ClCompile Include="Object\CPortal.cpp" />
     <ClCompile Include="Object\CUI.cpp" />
     <ClCompile Include="Object\CUIHUD.cpp" />
+    <ClCompile Include="Object\Erdas_of_Gladness.cpp" />
     <ClCompile Include="Resource\CAudioClip.cpp" />
     <ClCompile Include="Resource\CMaterial.cpp" />
     <ClCompile Include="Resource\CMesh.cpp" />
@@ -337,9 +367,12 @@
     <ClCompile Include="Scene\CScene_Stage02.cpp" />
     <ClCompile Include="Scene\CScene_Start.cpp" />
     <ClCompile Include="Scene\CTestScene.cpp" />
+    <ClCompile Include="Scene\The_Lake_of_Oblivion.cpp" />
+    <ClCompile Include="Scene\The_Land_of_Weathered_gladness.cpp" />
     <ClCompile Include="Test\CDrawCollisionBox.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Test\CRandom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Maple_Winapi.rc" />
@@ -350,8 +383,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\imgui-master\examples\example_win32_directx9\imgui.ini" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets" Condition="Exists('..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets'))" />
+  </Target>
 </Project>

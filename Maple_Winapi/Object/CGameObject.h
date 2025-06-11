@@ -2,12 +2,14 @@
 #include "../pch.h"
 #include "../Component/CComponent.h"
 #include "../Component/CCollider.h"
+#include "../Component/CScript.h"
 
 void Destroy(CGameObject* _pGameObject);
 
 class CGameObject : public CEntity
 {
 public:
+	friend class CMonsterScript;
 	friend void Destroy(CGameObject* _pObj);
 
 	CGameObject();
@@ -17,6 +19,8 @@ public:
 	virtual void Update();
 	virtual void LateUpdate();
 	virtual void Render(const Matrix& view, const Matrix& projection);
+
+	void Reset();
 
 	void SetZOrder(int z) { m_iZOrder = z; }
 	int GetZOrder() const { return m_iZOrder; }
@@ -29,7 +33,6 @@ public:
 		m_vecComponents[static_cast<UINT>(comp->GetComponentType())] = comp;
 
 		comp->Init();
-
 		return comp;
 	}
 
@@ -43,17 +46,20 @@ public:
 			if (component)
 				break;
 		}
+
 		return component;
 	}
 
+	void death() { m_eObjectState = OBJECT_STATE::OS_Dead; }
+
 private:
 	void initializeTransform();
-	void death() { m_eObjectState = OBJECT_STATE::OS_Dead; }
 
 public:
 	void SetLayerType(const LAYER_TYPE _eLayerType) { m_eLayerType = _eLayerType; }
 	LAYER_TYPE GetLayerType() const { return m_eLayerType; }
 
+	void SetObjectState(const OBJECT_STATE _eObjectType) { m_eObjectState = _eObjectType; }
 	OBJECT_STATE GetObjectState() { return m_eObjectState; }
 
 	void SetActive(bool _bPower)
@@ -66,9 +72,29 @@ public:
 	bool IsDead() const { return m_eObjectState == OBJECT_STATE::OS_Dead; }
 
 	CTransform* GetTransform() { return m_pTransform; }
+	
+	bool IsUpdate()
+	{
+		return m_pParent == nullptr ? IsUpdateValue == true && IsDeathValue == false : m_pParent->IsUpdate() && IsUpdateValue == true && IsDeath() == false;
+	}
+
+	bool IsDeath()
+	{
+		return m_pParent == nullptr ? IsDeathValue : m_pParent->IsDeath() || IsDeathValue;
+	}
+
+	// 2025-05-29
+	void SetDead() { IsDeathValue = true; SetActive(false); }
+	void SetIsDead(bool b) { IsDeathValue = b; }
+	void SetIsUpdate(bool b) { IsUpdateValue = b; }
 
 public:
 	class CTransform* m_pTransform;
+
+protected:
+	CGameObject* m_pParent = nullptr;
+	bool IsUpdateValue = true;
+	bool IsDeathValue = false;
 
 private:
 	vector<CComponent*>		m_vecComponents;
@@ -76,3 +102,40 @@ private:
 	OBJECT_STATE			m_eObjectState;
 	int						m_iZOrder = 0;
 };
+
+// 2025-06-04 수정 전
+//template <typename T>
+//T* AddComponent()
+//{
+//	T* comp = new T();
+//	comp->SetOwner(this);
+//
+//	UINT index = static_cast<UINT>(comp->GetComponentType());
+//	if (index >= m_vecComponents.size()) {
+//		OutputDebugStringA("ComponentType index out of range!\n");
+//		delete comp; // or use SAFE_DELETE(comp)
+//		return nullptr;
+//	}
+//
+//	// 2025-06-04 Script로부터 파생되었는지 확인
+//	if constexpr (is_base_of<CScript, T>::value) {
+//		m_vecScripts.push_back(comp);
+//	}
+//
+//	comp->Init();
+//
+//	return comp;
+//}
+//
+//template <typename T>
+//T* GetComponent()
+//{
+//	T* component = nullptr;
+//	for (CComponent* comp : m_vecComponents)
+//	{
+//		component = dynamic_cast<T*>(comp);
+//		if (component)
+//			break;
+//	}
+//	return component;
+//}

@@ -18,6 +18,7 @@ public:
 
 	static void Push(UI_TYPE _eUIType);
 	static void Pop(UI_TYPE _eUIType);
+	static bool IsActive(UI_TYPE _eUIType);
 
 	static CUI* GetUI(UI_TYPE _eUIType);
 

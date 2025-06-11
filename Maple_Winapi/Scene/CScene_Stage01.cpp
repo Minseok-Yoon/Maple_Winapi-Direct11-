@@ -7,7 +7,7 @@
 #include "../Scene/CScene.h"
 #include "../Object/CPlayer.h"
 #include "../Object/CMonster.h"
-#include "../Manager/CCollisionManager.h"
+#include "../Manager/CColliderManager.h"
 #include "../Component/CPixelCollider.h"
 #include "../Object/CBackGround.h"
 #include "../Object/CPortal.h"

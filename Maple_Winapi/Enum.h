@@ -37,6 +37,7 @@ enum class OBJECT_TYPE
 enum class MON_STATE
 {
 	MS_Idle,		// 대기 상태
+	MS_Move,
 	MS_Patrol,		// 순찰 상태
 	MS_Trace,		// 추적 상태
 	MS_Attack,		// 공격
@@ -101,6 +102,7 @@ enum class CAM_EFFECT
 
 enum class OBJECT_STATE
 {
+	OS_None,
 	OS_Active,
 	OS_Paused,
 	OS_Dead,
@@ -112,9 +114,11 @@ enum class LAYER_TYPE
 	LT_None,
 	LT_PixelBackGround,
 	LT_BackGround,
+	LT_Item,
 	LT_Player,
 	LT_Monster,
 	LT_Floor,
+	LT_Portal,
 	LT_Tile,
 	LT_Particle,
 	LT_UIBackGround,
@@ -136,6 +140,17 @@ enum class COMPONENT_TYPE
 	CT_AudioListener,
 	CT_AudioSource,
 	CT_End
+};
+
+enum class SCRIPT_TYPE
+{
+	ST_CameraScript,
+	ST_PlayerScript,
+	ST_PlayerBehavious,
+	ST_MonsterScript,
+	ST_ItemScript,
+	ST_PortalScript,
+	ST_End
 };
 
 enum class RESOURCE_TYPE
@@ -167,6 +182,7 @@ enum class ANIMATION_STATE
 enum class UI_TYPE
 {
 	UT_HpBar,
+	UI_Inventory,
 	UT_MiniMap,
 	UT_Button,
 	UT_End
@@ -184,4 +200,17 @@ enum class CLEAR_FLAG
 	CF_Color,      // 기본값 - 배경색으로 Clear
 	CF_DepthOnly,  // Depth만 Clear
 	CF_DontClear   // 아무것도 Clear 안 함
+};
+
+enum class PIVOT_TYPE
+{
+	PT_Center,
+	PT_Top,
+	PT_RightUp,
+	PT_Right,
+	PT_RightBottom,
+	PT_Bottom,
+	PT_LeftBottom,
+	PT_Left,
+	PT_LeftTop,
 };

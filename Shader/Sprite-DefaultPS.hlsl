@@ -20,11 +20,6 @@ struct VSOutput
 
 float4 main(VSOutput input) : SV_Target
 {
-    /*float4 color = sprite.Sample(anisotropicSampler, input.uv);
-
-    return color;*/
-    //float4 texColor = sprite.Sample(anisotropicSampler, input.uv);
-    //return texColor * input.color; // 텍스처 색상과 Vertex 색상을 곱함
     if (input.isLine == 1.0)
     {
         return input.color;
@@ -35,3 +30,9 @@ float4 main(VSOutput input) : SV_Target
         return color; // 텍스처 색상 반환
     }
 }
+
+/*float4 color = sprite.Sample(anisotropicSampler, input.uv);
+
+    return color;*/
+    //float4 texColor = sprite.Sample(anisotropicSampler, input.uv);
+    //return texColor * input.color; // 텍스처 색상과 Vertex 색상을 곱함

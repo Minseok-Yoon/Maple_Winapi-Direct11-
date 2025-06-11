@@ -8,6 +8,7 @@
 #include "../Component/CGravity.h"
 #include "../Resource/CTexture.h"
 #include "../Object/CPlayerScript.h"
+#include "../Object/CPlayerBehavious.h"
 #include "../Manager/CResourceManager.h"
 #include "../Manager/CSceneManager.h"
 #include "../Component/CSpriteRenderer.h"
@@ -18,7 +19,7 @@ CPlayer::CPlayer() :
 	m_fElapsedTime(0.0f),
 	m_bAttackCycle(false)
 {
-	CTexture* player = CResourceManager::Load<CTexture>(L"Player", L"../Resources/Texture/Player/Player.bmp");
+	//CTexture* player = CResourceManager::Load<CTexture>(L"Player", L"../Resources/Texture/Player/Player.bmp");
     SetName(L"Player");
 }
 
@@ -31,7 +32,7 @@ void CPlayer::Init()
     CGameObject::Init();
 
     m_pTransform = this->AddComponent<CTransform>();
-    m_pTransform->SetLocalPosition(Vector3(-400.0f, 400.0f, -1.0f));
+    m_pTransform->SetLocalPosition(Vector3(0.0f, 0.0f, -1.0f));
     m_pTransform->SetLocalScale(Vector3(54.0f, 65.0f, 0.0f));
 
     if (m_pCollider == nullptr)
@@ -50,19 +51,12 @@ void CPlayer::Init()
         }
     }
 
-    // SpriteRenderer 설정
-    CTexture* playerTexture = CResourceManager::Find<CTexture>(L"Player");
-
-    CTexture::TextureSize textureSize = playerTexture->GetTextureSize();
-    float textureWidth = static_cast<float>(textureSize.width);
-    float textureHeight = static_cast<float>(textureSize.height);
-
-    CSpriteRenderer* sr = this->AddComponent<CSpriteRenderer>();
-    sr->SetTexture(playerTexture);
     CGravity* gravity = this->AddComponent<CGravity>();
     if (gravity) gravity->SetPlayer(this);
 
-    CPlayerScript* plSr = this->AddComponent<CPlayerScript>();
+    CPlayerScript* pScript = this->AddComponent<CPlayerScript>();
+    if (pScript)
+        OutputDebugString(L"[DEBUG] PlayerScript 정상 추가됨\n");
 }
 
 void CPlayer::Update()
@@ -85,8 +79,7 @@ bool CPlayer::CheckGround(Vector3 _fPlusCheckPos)
     if (IsGroundCheck == false) return false;
 
     float CurYPos = m_pTransform->GetWorldPosition().y;
-    //OutputDebugStringA(("Current Player Y Position: " + std::to_string(CurYPos) + "\n").c_str());
-
+    
     if (SkipGround != 0.0f && SkipGround <= CurYPos) return false;
     else if (SkipGround != 0.0f && SkipGround > CurYPos) SkipGround = 0.0f;
 
@@ -101,7 +94,7 @@ bool CPlayer::CheckGround(Vector3 _fPlusCheckPos)
         }
     }
 
-    // ✅ 현재 씬의 배경을 가져와서 넘겨줌
+    // 현재 씬의 배경을 가져와서 넘겨줌
     CScene* pCurrentScene = CSceneManager::GetCurScene();
     if (!pCurrentScene)
     {
@@ -116,10 +109,9 @@ bool CPlayer::CheckGround(Vector3 _fPlusCheckPos)
         return false;
     }
 
-    // ✅ 현재 y 좌표를 올바르게 전달하고 있는지 확인
+    // 현재 y 좌표를 올바르게 전달하고 있는지 확인
     Vector3 checkPos = m_pTransform->GetWorldPosition() + _fPlusCheckPos;
-    //OutputDebugStringA(("Checking color at~: (" + std::to_string(checkPos.x) + ", " + std::to_string(checkPos.y) + ")\n").c_str());
-
+   
     CGravity* gravityComponent = this->GetComponent<CGravity>();
     if (!gravityComponent)
     {
@@ -297,4 +289,66 @@ void CPlayer::Init()
     playerCollision->m_vTopRight = Vector3(2.0f, 2.0f, -1.0f);
 
     this->AddComponent<CRigidBody>();
+}*/
+
+//// SpriteRenderer 설정
+    //CTexture* playerTexture = CResourceManager::Find<CTexture>(L"Player");
+
+    //CTexture::TextureSize textureSize = playerTexture->GetTextureSize();
+    //float textureWidth = static_cast<float>(textureSize.width);
+    //float textureHeight = static_cast<float>(textureSize.height);
+
+    //CSpriteRenderer* sr = this->AddComponent<CSpriteRenderer>();
+    //sr->SetTexture(playerTexture);
+
+/*bool CPlayer::CheckGround(Vector3 _fPlusCheckPos)
+{
+    if (IsGroundCheck == false) return false;
+
+    float CurYPos = m_pTransform->GetWorldPosition().y;
+    //OutputDebugStringA(("Current Player Y Position: " + std::to_string(CurYPos) + "\n").c_str());
+
+    if (SkipGround != 0.0f && SkipGround <= CurYPos) return false;
+    else if (SkipGround != 0.0f && SkipGround > CurYPos) SkipGround = 0.0f;
+
+    set<float>::iterator StartIter = NotGround.begin();
+    set<float>::iterator EndIter = NotGround.end();
+
+    for (float CheckPos : NotGround)
+    {
+        if (CheckPos != 0.0f && (CheckPos + 1.0f >= CurYPos && CheckPos - 2.0f <= CurYPos))
+        {
+            return false;
+        }
+    }
+
+    // ✅ 현재 씬의 배경을 가져와서 넘겨줌
+    CScene* pCurrentScene = CSceneManager::GetCurScene();
+    if (!pCurrentScene)
+    {
+        OutputDebugStringA("ERROR: Current Scene is NULL!\n");
+        return false;
+    }
+
+    CBackGround* pCurBackGround = pCurrentScene->GetBackGround();
+    if (!pCurBackGround)
+    {
+        OutputDebugStringA("WARNING: BackGround is not set in current scene!\n");
+        return false;
+    }
+
+    // ✅ 현재 y 좌표를 올바르게 전달하고 있는지 확인
+    Vector3 checkPos = m_pTransform->GetWorldPosition() + _fPlusCheckPos;
+    //OutputDebugStringA(("Checking color at~: (" + std::to_string(checkPos.x) + ", " + std::to_string(checkPos.y) + ")\n").c_str());
+
+    CGravity* gravityComponent = this->GetComponent<CGravity>();
+    if (!gravityComponent)
+    {
+        OutputDebugStringA("ERROR: CGravity component not found in Player!\n");
+        return false;
+    }
+
+    Vector3 bottomPivot = _fPlusCheckPos + Vector3(0.0f, -32.5f, 0.0f);
+
+    return pCurBackGround->CheckGround(bottomPivot);
 }*/

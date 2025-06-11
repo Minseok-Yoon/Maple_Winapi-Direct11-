@@ -1,7 +1,7 @@
 ﻿#include "../pch.h"
 #include "CBackGround.h"
 #include "../Manager/CResourceManager.h"
-#include "../Manager/CCollisionManager.h"
+#include "../Manager/CColliderManager.h"
 #include "../Component/CCamera.h"
 #include "../Resource/CResource.h"
 #include "../Resource/CTexture.h"
@@ -17,6 +17,7 @@ extern CCore core;
 
 CBackGround::CBackGround() :
     m_strMapName(L""),
+    m_pMap(nullptr),
     m_pMapCollision(nullptr),
     m_pBackGroundTexture(nullptr),
     m_pPixBackGround(nullptr)
@@ -57,10 +58,6 @@ bool CBackGround::CheckGround(Vector3 _vPlusCheckPos)
     CBackGround* pCurBackGround = pCurScene->GetBackGround();
     if (!pCurBackGround) return false;
 
-    /*OutputDebugStringA(("Checking ground collision at: (" +
-        std::to_string(_vPlusCheckPos.x) + ", " +
-        std::to_string(_vPlusCheckPos.y) + ")\n").c_str());*/
-
     // 현재 위치의 색상 확인
     TextureColor CheckColor = pCurBackGround->GetColor(m_pTransform->GetWorldPosition() + _vPlusCheckPos, TextureColor(0, 0, 0, 255));
 
@@ -75,13 +72,18 @@ bool CBackGround::CheckGround(Vector3 _vPlusCheckPos)
         IsGround = true;
     }
 
-    //// 마젠타 색상과 충돌 체크
-    //if (CheckColor == TextureColor(255, 0, 255, 255))
-    //{
-    //    OutputDebugStringA("⚠️ WARNING: Player touched MAGENTA pixel! ⚠️\n");
-    //}
-
     return IsGround;
+}
+
+TextureColor CBackGround::GetPixelColor(const Vector3& _vWorldPos)
+{
+    if (!m_pMapCollision)
+    {
+        OutputDebugStringA("ERROR: CBackGround::GetPixelColor() - m_pMapCollision is NULL!\n");
+        return TextureColor(255, 0, 255, 255); // Magenta (에러용)
+    }
+
+    return GetColor(_vWorldPos, TextureColor(255, 0, 255, 255)); // 기본값은 Magenta
 }
 
 TextureColor CBackGround::GetColor(Vector3 _Pos, TextureColor _DefaultColor)
@@ -97,65 +99,57 @@ TextureColor CBackGround::GetColor(Vector3 _Pos, TextureColor _DefaultColor)
     UINT texWidth = textureSize.width;
     UINT texHeight = textureSize.height;
 
-    /*string debugSize = "🟢 Texture Size: (" + std::to_string(texWidth) + ", " + std::to_string(texHeight) + ")\n";
-    OutputDebugStringA(debugSize.c_str());
-
-    string debugMsg = "🟢 Input World Pos: (" + std::to_string(_Pos.x) + ", " + std::to_string(_Pos.y) + ")\n";
-    OutputDebugStringA(debugMsg.c_str());*/
-
     // 🟢 올바른 좌표 변환 적용
     int pixelX = static_cast<int>(_Pos.x);
     int pixelY = static_cast<int>(_Pos.y); // Y축 반전
-
-    // 디버깅 출력
-    /*std::string debugMsgs = "🔍 Checking color at (" + std::to_string(pixelX) + ", " + std::to_string(pixelY) + ")\n";
-    OutputDebugStringA(debugMsgs.c_str());*/
-
-    //if (pixelX < 0 || pixelX >= texWidth || pixelY < 0 || pixelY >= texHeight)
-    //{
-    //    std::string errorMsg = "⚠️ ERROR: GetColor() - Out of bounds: (" +
-    //        std::to_string(pixelX) + ", " + std::to_string(pixelY) + ")\n";
-    //    OutputDebugStringA(errorMsg.c_str());
-
-    //    // 🟢 추가: 현재 텍스처 크기 출력
-    //    std::string textureSizeMsg = "🟢 Texture Size: (" + std::to_string(texWidth) + ", " + std::to_string(texHeight) + ")\n";
-    //    OutputDebugStringA(textureSizeMsg.c_str());
-
-    //    return _DefaultColor;
-    //}
 
     return m_pMapCollision->GetColor(Vector3(pixelX, pixelY, 0.0f), _DefaultColor);
 }
 
 void CBackGround::CreateMap(wstring _MapName)
 {
-    // 이름을 저장하려면 왜 오류가 발생하는가?
-    //m_strMapName = _MapName;
-
     SetName(_MapName);
     m_strMapName = _MapName;
 
     UINT iWidth = core.GetWidth();
     UINT iHeight = core.GetHeight();
 
-    //CGameObject* backGround = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
     CTransform* bgTr = GetComponent<CTransform>();
     bgTr->SetLocalPosition(Vector3(0.0f, 0.0f, 0.0f));
 
-    m_pMapCollision = CResourceManager::Find<CTexture>(_MapName);
-    //if (nullptr != m_pMapCollision)
-    //{
-    //    // 텍스처 크기 설정하기
-    //    CTexture::TextureSize textureSize = m_pMapCollision->GetTextureSize();
-    //    if (textureSize.width <= iWidth || textureSize.height <= iHeight)
-    //    {
-    //        bgTr->SetLocalScale(Vector3(iWidth, iHeight, 0.0f));
-    //    }
-    //    else
-    //    {
-    //        bgTr->SetLocalScale(Vector3(textureSize.width, textureSize.height, 0.0f));
-    //    }
-    //}
+    m_pMap = CResourceManager::Find<CTexture>(_MapName);
+
+    // 스프라이트 렌더러 설정
+    CSpriteRenderer* sr = AddComponent<CSpriteRenderer>();
+    sr->SetTexture(m_pMap);
+
+    if (nullptr != m_pMap)
+    {
+        // 텍스처 크기 설정하기
+        CTexture::TextureSize textureSize = m_pMap->GetTextureSize();
+        if (textureSize.width <= iWidth || textureSize.height <= iHeight)
+        {
+            bgTr->SetLocalScale(Vector3(iWidth, iHeight, 0.0f));
+        }
+        else
+        {
+            bgTr->SetLocalScale(Vector3(textureSize.width, textureSize.height, 0.0f));
+        }
+    }
+}
+
+void CBackGround::CreateCollisionMap(wstring _MapCollisionName)
+{
+    SetName(_MapCollisionName);
+    m_strMapName = _MapCollisionName;
+
+    UINT iWidth = core.GetWidth();
+    UINT iHeight = core.GetHeight();
+
+    CTransform* bgTr = GetComponent<CTransform>();
+    bgTr->SetLocalPosition(Vector3(0.0f, 0.0f, 0.0f));
+
+    m_pMapCollision = CResourceManager::Find<CTexture>(_MapCollisionName);
 
     // 스프라이트 렌더러 설정
     CSpriteRenderer* sr = AddComponent<CSpriteRenderer>();
@@ -174,35 +168,6 @@ void CBackGround::CreateMap(wstring _MapName)
             bgTr->SetLocalScale(Vector3(textureSize.width, textureSize.height, 0.0f));
         }
     }
-}
-
-void CBackGround::CreateCollisionMap(wstring _MapCollisionName)
-{
-    UINT iWidth = core.GetWidth();
-    UINT iHeight = core.GetHeight();
-
-    CGameObject* backGround = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
-    CTransform* bgTr = backGround->GetComponent<CTransform>();
-    bgTr->SetLocalPosition(Vector3(0.0f, 0.0f, 1.0f));
-
-    m_pMapCollision = CResourceManager::Find<CTexture>(_MapCollisionName);
-    if (nullptr != m_pMapCollision)
-    {
-        // 텍스처 크기 설정하기
-        CTexture::TextureSize textureSize = m_pMapCollision->GetTextureSize();
-        if (textureSize.width <= iWidth || textureSize.height <= iHeight)
-        {
-            bgTr->SetLocalScale(Vector3(iWidth, iHeight, 0.0f));
-        }
-        else
-        {
-            bgTr->SetLocalScale(Vector3(textureSize.width, textureSize.height, 0.0f));
-        }
-    }
-
-    // 스프라이트 렌더러 설정
-    CSpriteRenderer* sr = backGround->AddComponent<CSpriteRenderer>();
-    sr->SetTexture(m_pMapCollision);
 }
 
 
@@ -343,3 +308,37 @@ if (bgTexture != nullptr)
     float scale = scaleX > scaleY ? scaleX : scaleY;
     bgTransform->SetLocalScale(Vector3(textureWidth * scale, textureHeight * scale, 1.0f));
 }*/
+
+// 디버깅 출력
+    /*std::string debugMsgs = "🔍 Checking color at (" + std::to_string(pixelX) + ", " + std::to_string(pixelY) + ")\n";
+    OutputDebugStringA(debugMsgs.c_str());*/
+
+    //if (pixelX < 0 || pixelX >= texWidth || pixelY < 0 || pixelY >= texHeight)
+    //{
+    //    std::string errorMsg = "⚠️ ERROR: GetColor() - Out of bounds: (" +
+    //        std::to_string(pixelX) + ", " + std::to_string(pixelY) + ")\n";
+    //    OutputDebugStringA(errorMsg.c_str());
+
+    //    // 🟢 추가: 현재 텍스처 크기 출력
+    //    std::string textureSizeMsg = "🟢 Texture Size: (" + std::to_string(texWidth) + ", " + std::to_string(texHeight) + ")\n";
+    //    OutputDebugStringA(textureSizeMsg.c_str());
+
+    //    return _DefaultColor;
+    //}
+
+/*string debugSize = "🟢 Texture Size: (" + std::to_string(texWidth) + ", " + std::to_string(texHeight) + ")\n";
+    OutputDebugStringA(debugSize.c_str());
+
+    string debugMsg = "🟢 Input World Pos: (" + std::to_string(_Pos.x) + ", " + std::to_string(_Pos.y) + ")\n";
+    OutputDebugStringA(debugMsg.c_str());*/
+
+    /*OutputDebugStringA(("Checking ground collision at: (" +
+            std::to_string(_vPlusCheckPos.x) + ", " +
+            std::to_string(_vPlusCheckPos.y) + ")\n").c_str());*/
+
+
+            //// 마젠타 색상과 충돌 체크
+            //if (CheckColor == TextureColor(255, 0, 255, 255))
+            //{
+            //    OutputDebugStringA("⚠️ WARNING: Player touched MAGENTA pixel! ⚠️\n");
+            //}

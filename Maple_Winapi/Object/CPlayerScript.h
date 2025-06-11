@@ -3,16 +3,17 @@
 #include "../Resource/CTexture.h"
 #include "../Component/CPixelCollider.h"
 
+class CMonster;
 class CPlayerScript : public CScript
 {
 public:
 	CPlayerScript();
 	virtual ~CPlayerScript();
 
-	void Init() override;
-	void Update() override;
-	void LateUpdate() override;
-	void Render(const Matrix& view, const Matrix& projection) override;
+	virtual void OnInit() override;
+	virtual void OnUpdate() override;
+	virtual void OnLateUpdate() override;
+	virtual void OnRender(const Matrix& view, const Matrix& projection) override;
 
 	void OnCollisionEnter(class CCollider* _pOther) override;
 	void OnCollisionStay(class CCollider* _pOther) override;
@@ -23,14 +24,16 @@ public:
 	void UpdateCollisionState(bool& _bIsColiding, bool _bCollisionDetected, const string& _strColTag, void (CPlayerScript::* onEnter)(), void (CPlayerScript::* onExit)());
 	void CheckPixelColor();*/
 
-	void OnStageCollisionEnter();
+	/*void OnStageCollisionEnter();
 	void OnStageCollisionExit();
 
 	void OnStageCollisionEnter(CCollider* _pOther);
 	void OnStageCollision(CCollider* _pOther);
-	void OnStageCollisionExit(CCollider* _pOther);
+	void OnStageCollisionExit(CCollider* _pOther);*/
 
 	void SetPixelCollider(CPixelCollider* _pPixelCollider) { m_pPixelCollider = _pPixelCollider; }
+
+	void PlayerAttack(CMonster* _pMonster);
 
 private:
 	void idle();
@@ -46,4 +49,14 @@ private:
 
 	CPixelCollider*		m_pPixelCollider;
 	vector<Vector3>		m_vecCollisionPoint;
+
+	// 2025-05-26 
+	bool				m_bIsNormalAttack = false;
+	bool				m_bHasDealtDamage = false;
+	CGameObject*		m_pColliderMonster = nullptr;
+
+	// 2025-06-06
+	CGameObject* m_pColliderItem = nullptr;
+	int m_iItemCnt = 0;
+	int m_iItemTarget = 10;
 };

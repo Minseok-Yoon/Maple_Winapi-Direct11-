@@ -41,5 +41,11 @@
     <FxCompile Include="$(MSBuildThisFileDirectory)WireframePS.hlsl">
       <Filter>PS</Filter>
     </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Sprite-BorderPS.hlsl">
+      <Filter>PS</Filter>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)Sprite-BorderVS.hlsl">
+      <Filter>VS</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

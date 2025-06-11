@@ -64,6 +64,9 @@ public:
 	Vector3 GetWorldBottomLeft() { return m_vWorldBottomLeft; }
 	Vector3 GetWorldTopRight() { return m_vWorldTopRight; }
 
+	void IsCollider(bool _IsColliding) { m_bIsColliding = _IsColliding; }
+	bool IsColliding() const { return m_bIsColliding; }
+
 public:
 	COLLIDER_TYPE	m_eColliderType;
 

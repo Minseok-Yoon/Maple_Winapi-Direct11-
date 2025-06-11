@@ -2,6 +2,9 @@
 #include "../Scene/CDontDestroyOnLoad.h"
 #include "CKeyManager.h"
 
+wstring CSceneManager::m_strNextSceneName = L"";
+bool CSceneManager::m_bSceneChangeRequested = false;
+
 CScene* CSceneManager::m_pCurScene = nullptr;
 CScene* CSceneManager::m_pDontDestroyOnLoad = nullptr;
 map<wstring, CScene*> CSceneManager::m_mapScene = {};
@@ -13,6 +16,12 @@ void CSceneManager::Init()
 
 void CSceneManager::Update()
 {
+	if (m_bSceneChangeRequested)
+	{
+		ChangeScene(m_strNextSceneName);  // 이제 오버로딩된 함수 또는 static 변수로 처리
+		m_bSceneChangeRequested = false;
+	}
+
 	m_pCurScene->Update();
 	m_pDontDestroyOnLoad->Update();
 }
@@ -96,7 +105,16 @@ CScene* CSceneManager::ChangeScene(const wstring& _strName,
 	const wstring& _strBackGroundName, const wstring& _strAudioName)
 {
 	if (m_pCurScene)
+	{
 		m_pCurScene->Exit();
+		
+		auto iter = m_mapScene.find(m_pCurScene->GetName());
+		if (iter != m_mapScene.end())
+		{
+			delete iter->second;
+			m_mapScene.erase(iter);
+		}
+	}
 
 	LoadScene(_strName, _strBackGroundName, _strAudioName);
 
@@ -112,4 +130,10 @@ vector<CGameObject*> CSceneManager::GetGameObjects(LAYER_TYPE _eLayerType)
 		dontDestroyOnLoad.begin(), dontDestroyOnLoad.end());
 
 	return gameObjects;
+}
+
+void CSceneManager::RequestSceneChange(const wstring& sceneName)
+{
+	m_strNextSceneName = sceneName;
+	m_bSceneChangeRequested = true;
 }

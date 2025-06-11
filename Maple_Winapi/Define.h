@@ -44,3 +44,8 @@ assert(false);
 #define CLEAR_NONE      0
 #define CLEAR_COLOR     1
 #define CLEAR_DEPTH     2
+
+#define UP_PIXEL_LIMIT 5
+#define DOWN_PIXEL_LIMIT 5
+
+#define MOVE_CHECK_FLOAT 1.0f

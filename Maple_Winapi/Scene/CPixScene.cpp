@@ -12,7 +12,7 @@
 #include "../Object/CMonsterScript.h"
 #include "../Component/CAnimator.h"
 #include "../Component/CRigidBody.h"
-#include "../Manager/CCollisionManager.h"
+#include "../Manager/CColliderManager.h"
 #include "../Core/CCore.h"
 #include "../Test/CDrawCollisionBox.h"
 #include "../Component/CLineRenderer.h"
@@ -58,7 +58,7 @@ void CPixScene::Init()
 	renderer::mainCamera = cameraComp;
 	renderer::activeCamera = renderer::mainCamera;
 
-	CreateTestRect(0.0f);
+	//CreateTestRect(0.0f);
 }
 
 void CPixScene::Update()

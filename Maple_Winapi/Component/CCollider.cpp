@@ -129,15 +129,15 @@ void CCollider::OnCollisionEnter(CCollider* _pOther)
         sr->OnCollisionEnter(_pOther);
     }
 
-    // 충돌한 오브젝트가 배경이라면 중력 해제
-    if (_pOther->GetOwner()->GetName() == L"BackGround")
-    {
-        CGravity* gravity = GetOwner()->GetComponent<CGravity>();
-        if (gravity)
-        {
-            gravity->SetGround(true);
-        }
-    }
+    //// 충돌한 오브젝트가 배경이라면 중력 해제
+    //if (_pOther->GetOwner()->GetName() == L"BackGround")
+    //{
+    //    CGravity* gravity = GetOwner()->GetComponent<CGravity>();
+    //    if (gravity)
+    //    {
+    //        gravity->SetGround(true);
+    //    }
+    //}
 
     m_bIsColliding = true;
 }
@@ -155,14 +155,14 @@ void CCollider::OnCollisionExit(CCollider* _pOther)
     m_bIsColliding = false;
 
     // 배경에서 벗어나면 중력 다시 적용
-    if (_pOther->GetOwner()->GetName() == L"BackGround")
+    /*if (_pOther->GetOwner()->GetName() == L"BackGround")
     {
         CGravity* gravity = GetOwner()->GetComponent<CGravity>();
         if (gravity)
         {
             gravity->SetGround(false);
         }
-    }
+    }*/
 
     CScript* sr = GetOwner()->GetComponent<CScript>();
     if (sr)
@@ -246,8 +246,19 @@ void CCollider::RenderUI()
 
     // 게임 오브젝트 이름 수집 및 변환
     for (CGameObject* obj : gameObjects) {
-        string name = WStringToString(obj->GetName());
-        gameObjectNames.push_back(name);
+        if (!obj || obj->IsDead()) continue;
+
+        try {
+            wstring name = obj->GetName();
+            if (name.empty()) continue;
+
+            string str = WStringToString(name);
+            gameObjectNames.push_back(str);
+        }
+        catch (...) {
+            OutputDebugStringA("Exception occurred while accessing object name\n");
+            continue;
+        }
     }
 
     // 문자열 포인터 벡터 초기화
@@ -457,11 +468,24 @@ void CCollider::RenderUI()
 
 string CCollider::WStringToString(const wstring& wstr)
 {
-	if (wstr.empty()) return "";
+	/*if (wstr.empty()) return "";
 	int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
 	string result(sizeNeeded, 0);
 	WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &result[0], sizeNeeded, NULL, NULL);
-	return result;
+	return result;*/
+    if (wstr.empty()) return "";
+
+    try {
+        int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+        if (sizeNeeded <= 0) return "";
+
+        string result(sizeNeeded, 0);
+        WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &result[0], sizeNeeded, NULL, NULL);
+        return result;
+    }
+    catch (...) {
+        return "[Invalid wstring]";
+    }
 }
 
 //void CCollider::RectCollider(const Vector2& scale, const Vector4& color, const Vector3& bottomLeft, const Vector3& topRight)

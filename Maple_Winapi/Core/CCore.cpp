@@ -4,7 +4,7 @@
 #include "../Manager/CResourceManager.h"
 #include "../Manager/CKeyManager.h"
 #include "../Manager/CUIManager.h"
-#include "../Manager/CCollisionManager.h"
+#include "../Manager/CColliderManager.h"
 #include "../Manager/CDamageManager.h"
 #include "../Component/CCamera.h"
 #include "../Module/SelectGDI.h"

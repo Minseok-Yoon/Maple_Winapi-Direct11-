@@ -7,7 +7,7 @@
 #include "../Component/CAudioListener.h"
 #include "../Component/CAudioSource.h"
 
-#include "../Manager/CCollisionManager.h"
+#include "../Manager/CColliderManager.h"
 #include "../Manager/CSceneManager.h"
 #include "../Manager/CResourceManager.h"
 #include "../Resource/CAudioClip.h"
@@ -175,16 +175,41 @@ void CScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioNa
 
 void CScene::Exit()
 {
-	// 배경 음악 중지
 	if (m_pAudioSource)
 	{
-		m_pAudioSource->Stop(); // 음악 정지
-		m_pAudioSource = nullptr; // 포인터 초기화
+		m_pAudioSource->Stop();
+		m_pAudioSource = nullptr;
 	}
 
-	m_pBackGround = nullptr;
+	if (m_pBackGround)
+	{
+		m_pBackGround->death();
+		m_pBackGround = nullptr;
+	}
+
+	DeleteAll(); // 모든 오브젝트, 카메라, 컴포넌트 제거
 
 	CColliderManager::Clear();
+}
+
+void CScene::DeleteAll()
+{
+	for (CLayer* layer : m_vecLayers)
+	{
+		if (layer == nullptr)
+			continue;
+
+		vector<CGameObject*>& objs = layer->GetGameObjects();
+		for (CGameObject* obj : objs)
+		{
+			if (obj)
+				obj->death(); // 상태만 Dead로 변경
+		}
+
+		layer->Destroy(); // 죽은 오브젝트 삭제
+	}
+
+	m_vecCameras.clear(); // 씬에 등록된 카메라도 정리
 }
 
 void CScene::AddGameObject(CGameObject* _pGameObj, const LAYER_TYPE _eLayerType)
@@ -295,6 +320,17 @@ void CScene::RenderRenderables(const vector<CGameObject*>& renderList,
 
 		obj->Render(view, projection);
 	}
+}
+
+CGameObject* CScene::FindObjectByName(const wstring& _strName)
+{
+	for (CLayer* layer : m_vecLayers)
+	{
+		CGameObject* found = layer->FindObjectByName(_strName);
+		if (found)
+			return found;
+	}
+	return nullptr;
 }
 
 void CScene::createLayers()

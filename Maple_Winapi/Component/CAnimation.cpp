@@ -30,25 +30,39 @@ void CAnimation::Update()
 	// 애니메이션 진행 시간 축적
 	m_fAccTime += CTimeManager::GetfDeltaTime();
 
-	// 프레임의 지속 시간이 초과되면 다음 프레임으로 넘어가기
-	if (m_fAccTime > m_vecAnimationFrm[m_iCurFrm].fDuration)
+	if (m_iCurFrm >= 0 && m_iCurFrm < m_vecAnimationFrm.size())
 	{
-		m_fAccTime = 0.0f;
-
-		// 현재 프레임이 마지막 프레임이 아니면, 다음 프레임으로 진행
-		if (m_iCurFrm < m_vecAnimationFrm.size() - 1)
+		float frameDuration = m_vecAnimationFrm[m_iCurFrm].fDuration;
+	
+		if (m_fAccTime > frameDuration)
 		{
-			m_iCurFrm++;
-		}
-		else
-		{
-			// 마지막 프레임에 도달하면 애니메이션 종료
-			m_bFinish = true;
+			m_fAccTime = 0.0f;
+			if (m_iCurFrm < m_vecAnimationFrm.size() - 1)
+				m_iCurFrm++;
+			else
+				m_bFinish = true;
 		}
 	}
+
+	////// 프레임의 지속 시간이 초과되면 다음 프레임으로 넘어가기
+	//if (m_fAccTime > m_vecAnimationFrm[m_iCurFrm].fDuration)
+	//{
+	//	m_fAccTime = 0.0f;
+	//
+	//	// 현재 프레임이 마지막 프레임이 아니면, 다음 프레임으로 진행
+	//	if (m_iCurFrm > m_vecAnimationFrm.size() - 1)
+	//	{
+	//		m_iCurFrm++;
+	//	}
+	//	else
+	//	{
+	//		// 마지막 프레임에 도달하면 애니메이션 종료
+	//		m_bFinish = true;
+	//	}
+	//}
 }
 
-void CAnimation::Render()
+void CAnimation::Render(const Matrix& view, const Matrix& projection)
 {
 	if (m_pTexture == nullptr)
 		return;
@@ -122,3 +136,21 @@ void CAnimation::SetCurrentFrame(int _iFrame)
 		m_fAccTime = 0.0f;   // 시간 리셋
 	}
 }
+
+
+//if (m_iCurFrm >= 0 && m_iCurFrm < m_vecAnimationFrm.size())
+//{
+//	float frameDuration = m_vecAnimationFrm[m_iCurFrm].fDuration;
+//	/*OutputDebugStringW((L"[Update] AccTime: " + to_wstring(m_fAccTime) +
+//		L", Frame: " + to_wstring(m_iCurFrm) +
+//		L", Duration: " + to_wstring(frameDuration) + L"\n").c_str());*/
+
+//	if (m_fAccTime > frameDuration)
+//	{
+//		m_fAccTime = 0.0f;
+//		if (m_iCurFrm < m_vecAnimationFrm.size() - 1)
+//			m_iCurFrm++;
+//		else
+//			m_bFinish = true;
+//	}
+//}

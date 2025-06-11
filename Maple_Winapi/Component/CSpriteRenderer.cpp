@@ -6,8 +6,7 @@
 #include "../Object/CGameObject.h"
 
 CSpriteRenderer::CSpriteRenderer() :
-	CBaseRenderer(COMPONENT_TYPE::CT_SpriteRenderer),
-	m_pTexture(nullptr)
+	CBaseRenderer(COMPONENT_TYPE::CT_SpriteRenderer)
 {
 }
 

@@ -53,10 +53,22 @@ public:
 
 	CAnimation* FindAnimation(const wstring& _strName);
 
+	bool HasAnimation(const wstring& _strAnimName) const;
+
 	void Play(const wstring& _strName, bool _bRepeat = true);
 	bool End() const;
 	void ResetAnimation();
 	bool IsFinish() const { return m_pCurAnimation->IsFinish(); }
+	bool IsPlaying() const 
+	{ 
+		if (m_pCurAnimation == nullptr) 
+			return false; 
+		
+		if (m_bRepeat) 
+			return true; 
+
+		return !m_pCurAnimation->IsFinish();
+	}
 
 	tEvents* FindEvents(const wstring& _strName);
 	function<void()>& GetStartEvent(const wstring& _strName);
@@ -66,6 +78,14 @@ public:
 	CAnimation* GetCurrentAnimation() { return m_pCurAnimation; }
 
 	void SetSpriteRenderer(CSpriteRenderer* _pSpriteRenderer) { m_pSpriteRenderer = _pSpriteRenderer; }
+
+	int GetCurrentFrameIndex() const
+	{
+		if (m_pCurAnimation == nullptr)
+			return -1;
+
+		return m_pCurAnimation->GetCurFrameIndex();
+	}
 
 private:
 	map<wstring, CAnimation*>	m_mapAnimations;	// ¸ðµç Animation

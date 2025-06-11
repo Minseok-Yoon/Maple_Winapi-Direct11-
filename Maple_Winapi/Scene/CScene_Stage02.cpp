@@ -9,7 +9,7 @@
 #include "../Object/CPlayer.h"
 #include "../Object/CBackGround.h"
 #include "../Object/CPortal.h"
-#include "../Manager/CCollisionManager.h"
+#include "../Manager/CColliderManager.h"
 
 CScene_Stage02::CScene_Stage02()
 {

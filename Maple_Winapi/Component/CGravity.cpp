@@ -9,7 +9,8 @@
 #include "../Object/CPlayer.h"
 
 CGravity::CGravity() :
-    m_bGround(true),
+    m_bPlayerGround(true),
+    m_bMonsterGround(true),
     m_bIsGravity(false),
     m_fGravityForce(0.0f),
     m_fGravitySpeed(15000.0f),
@@ -29,21 +30,38 @@ void CGravity::Init()
     CRigidBody::Init();
 
     m_pTransform = GetOwner()->GetComponent<CTransform>();
+
+    //// 강제 확인
+    //std::wstring name = GetOwner()->GetName();
+    //OutputDebugStringW((L"Gravity Init Owner: " + name + L"\n").c_str());
+    //OutputDebugStringA(typeid(*GetOwner()).name());  // RTTI 타입 이름 출력
 }
 
 void CGravity::Update()
 {
     CRigidBody::Update();
 
-    // 현재 씬에서 배경 가져오기
     CScene* pCurScene = CSceneManager::GetCurScene();
     if (!pCurScene) return;
 
     CBackGround* pBackGround = pCurScene->GetBackGround();
     if (!pBackGround) return;
 
-    // 플레이어의 위치에서 충돌 검사
-    m_bGround = m_pPlayer->CheckGround(m_pTransform->GetWorldPosition());
+    // 플레이어는 항상 검사
+    if (m_pPlayer)
+    {
+        m_bPlayerGround = m_pPlayer->CheckGround(m_pTransform->GetWorldPosition());
+    }
+
+    // 몬스터가 존재할 경우에만 검사
+    if (m_pMonster)
+    {
+        m_bMonsterGround = m_pMonster->CheckGround(m_pTransform->GetWorldPosition());
+    }
+
+    /*std::ostringstream oss;
+    oss << "[CGravity::Update] Owner: " << typeid(*GetOwner()).name() << " | 주소: " << GetOwner();
+    OutputDebugStringA(oss.str().c_str());*/
 
     Gravity();
 }
@@ -60,9 +78,9 @@ void CGravity::Render(const Matrix& view, const Matrix& projection)
 
 void CGravity::Jump(float _fJumpForce)
 {
-    if (!m_bGround) return; // 땅에 붙어 있지 않으면 점프 불가
+    if (!m_bPlayerGround) return; // 땅에 붙어 있지 않으면 점프 불가
 
-    m_bGround = false;
+    m_bPlayerGround = false;
 
     // Owner 객체의 Transform, RigidBody 컴포넌트를 가져온다.
     CTransform* tr = GetOwner()->GetComponent<CTransform>();
@@ -77,8 +95,16 @@ void CGravity::Jump(float _fJumpForce)
 
 void CGravity::Gravity()
 {
+    bool isGrounded = false;
+
+    if (m_pPlayer && m_bPlayerGround)
+        isGrounded = true;
+
+    if (m_pMonster && m_bMonsterGround)
+        isGrounded = true;
+
     // 땅에 닿아 있는 경우 수직 속도를 0으로 설정하여 중력 영향을 받지 않게 한다.
-    if (m_bGround)
+    if (isGrounded)
     {
         // 땅에 있을 경우 수직 속도를 0으로 설정
         m_vVelocity.y = 0.0f;
@@ -220,4 +246,22 @@ void CGravity::Gravity()
 //    }
 //
 //    return false; // 땅이 아님
+//}
+
+//void CGravity::Update()
+//{
+//    CRigidBody::Update();
+//
+//    // 현재 씬에서 배경 가져오기
+//    CScene* pCurScene = CSceneManager::GetCurScene();
+//    if (!pCurScene) return;
+//
+//    CBackGround* pBackGround = pCurScene->GetBackGround();
+//    if (!pBackGround) return;
+//
+//    // 플레이어의 위치에서 충돌 검사
+//    m_bPlayerGround = m_pPlayer->CheckGround(m_pTransform->GetWorldPosition());
+//    //m_bMonsterGround = m_pMonster->CheckGround(m_pTransform->GetWorldPosition());
+//
+//    Gravity();
 //}

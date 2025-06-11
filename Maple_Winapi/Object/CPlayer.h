@@ -1,8 +1,7 @@
 #pragma once
 #include "../Object/CGameObject.h"
-#include "../Component/CGravity.h"
+#include "../Object/CMonster.h"
 
-class CGravity;
 class CPlayer : public CGameObject
 {
 public:
@@ -13,8 +12,6 @@ public:
 	virtual void Update() override;
 	virtual void LateUpdate() override;
 	virtual void Render(const Matrix& view, const Matrix& projection) override;
-
-	void GroundCheck();
 
 	bool CheckGround(Vector3 _fPlusCheckPos);
 
@@ -30,6 +27,7 @@ private:
 	float SkipGround = 0.0f;
 	bool IsGroundCheck = true;
 
-
-	CGravity* m_pGravity = nullptr;
+	// 2025-05-24(플레이어 Hp, Mp 추가)
+	static int PlayerHp;
+	static int PlayerMp;
 };

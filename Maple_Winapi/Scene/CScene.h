@@ -25,6 +25,7 @@ public:
 	virtual void Enter(const wstring& _strBackGroundName, const wstring& _strAudioName);	// 해당 Scene에 진입 시 호출
 	virtual void Exit();	// 해당 Scene에 탈출 시 호출
 
+	void DeleteAll();
 	void AddGameObject(CGameObject* _pGameObj, const LAYER_TYPE _eLayerType);
 	void EraseGameObject(CGameObject* _pGameObj);
 	void AddCamera(CCamera* _pCamera);
@@ -52,6 +53,8 @@ public:
 	CBackGround* GetCurBackGround() { return m_pBackGround; }
 	CPlayer* GetPlayer() { return m_pPlayer; }
 
+	CGameObject* FindObjectByName(const wstring& _strName);
+
 private:
 	void createLayers();
 
@@ -62,6 +65,8 @@ public:
 
 protected:
 	class CAudioSource* m_pAudioSource;
+	wstring PrevScene = L"";
+	wstring NextScene = L"";
 
 private:
 	vector<CLayer*>		m_vecLayers;

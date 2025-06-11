@@ -26,7 +26,7 @@ public:
 	virtual ~CAnimation();
 
 	void Update();
-	void Render();
+	void Render(const Matrix& view, const Matrix& projection);
 
 	virtual HRESULT Load(const wstring& _strPath) override;
 
@@ -50,7 +50,9 @@ public:
 	void SetFinish(bool _bFinish) { m_bFinish = _bFinish; }
 	void SetCurrentFrame(int _iFrame);
 
-	void ResetTime();
+	int GetCurFrameIndex() const { return m_iCurFrm; }
+
+	//void ResetTime();
 
 private:
 	ANIMATION_STATE		m_eAnimationState;

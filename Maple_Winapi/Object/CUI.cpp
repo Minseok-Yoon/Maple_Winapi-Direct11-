@@ -8,7 +8,8 @@
 
 CUI::CUI(UI_TYPE _eUIType) :
 	m_eUIType(_eUIType),
-	m_bMouseOn(false)
+	m_bMouseOn(false),
+	m_bEnable(false)
 {
 }
 
@@ -53,6 +54,7 @@ void CUI::InActive()
 
 void CUI::UIClear()
 {
+	InActive();
 	OnClear();
 }
 

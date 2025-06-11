@@ -15,7 +15,7 @@
 #include "../Object/CPlayerScript.h"
 #include "../Component/CAnimator.h"
 #include "../Component/CRigidBody.h"
-#include "../Manager/CCollisionManager.h"
+#include "../Manager/CColliderManager.h"
 
 extern CCore core;
 

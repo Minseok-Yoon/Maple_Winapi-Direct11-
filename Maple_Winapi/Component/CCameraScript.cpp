@@ -17,6 +17,7 @@
 extern CCore core;
 
 CCameraScript::CCameraScript() :
+    CScript(SCRIPT_TYPE::ST_CameraScript),
 	m_vLookPosition(Vector2(0.0f, 0.0f)),
     m_bFreeCameraMode(false),
     m_pTarget(nullptr)

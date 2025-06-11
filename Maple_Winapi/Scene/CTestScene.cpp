@@ -18,13 +18,15 @@
 #include "../Component/CCollider.h"
 #include "../Component/CAudioListener.h"
 #include "../Object/CMiniMap.h"
+#include "../Object/CPortal.h"
+#include "../Object/CInventoryUI.h"
 
 extern CCore core;
 
 CTestScene::CTestScene()
 {
 	CResourceManager::Load<CTexture>(L"Lake of Oblivion_MiniMap", L"../Resources/Texture/MiniMap/Lake of Oblivion_MiniMap.png");
-	CResourceManager::Load<CTexture>(L"Lake of Oblivion_1", L"../Resources/Texture/Lake of Oblivion_1.png");
+	CResourceManager::Load<CTexture>(L"Lake of Oblivion_1", L"../Resources/Texture/Lake_of_Oblivion_1.png");
 	CResourceManager::Load<CTexture>(L"Lake of Oblivion_2", L"../Resources/Texture/Lake of Oblivion_2.png");
 	CAudioClip* ac = CResourceManager::Load<CAudioClip>(L"Lake of Oblivion", L"../Resources/Sound/Lake Of Oblivion.mp3");
 }
@@ -40,12 +42,13 @@ void CTestScene::Enter()
 	if (m_pBackGround == nullptr)
 	{
 		m_pBackGround = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
-		m_pBackGround->CreateMap(L"Lake of Oblivion_2");
+		m_pBackGround->CreateCollisionMap(L"Lake of Oblivion_2");
+		m_pBackGround->CreateMap(L"Lake of Oblivion_1");
 	}
 
 	if (m_pAudioSource == nullptr)
 	{
-		m_pBackGround->AddComponent< CAudioListener>();
+		m_pBackGround->AddComponent<CAudioListener>();
 		m_pAudioSource = m_pBackGround->AddComponent<CAudioSource>();
 
 		// 배경 음악 로드 및 재생
@@ -54,34 +57,29 @@ void CTestScene::Enter()
 		m_pAudioSource->Play();
 	}
 
-	// ✅ 여기서 MiniMap 동적 등록
-	if (CUIManager::GetUI(UI_TYPE::UT_MiniMap) == nullptr)
+	
+	/*if (CUIManager::GetUI(UI_TYPE::UI_Inventory) == nullptr)
 	{
-		CMiniMap* uiMiniMap = Instantiate<CMiniMap>(LAYER_TYPE::LT_UI);
-		CUIManager::RegisterUI(UI_TYPE::UT_MiniMap, uiMiniMap);
-	}
+		CUIManager::Push(UI_TYPE::UI_Inventory);
+	}*/
 
-	CUIManager::Push(UI_TYPE::UT_MiniMap);
-}
+	////// ✅ 여기서 MiniMap 동적 등록
+	////if (CUIManager::GetUI(UI_TYPE::UT_MiniMap) == nullptr)
+	////{
+	////	CMiniMap* uiMiniMap = Instantiate<CMiniMap>(LAYER_TYPE::LT_UI);
+	////	CUIManager::RegisterUI(UI_TYPE::UT_MiniMap, uiMiniMap);
+	////}
 
-void CTestScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioName)
-{
-}
+	////CUIManager::Push(UI_TYPE::UT_MiniMap);
 
-void CTestScene::Exit()
-{
-	CUIManager::Pop(UI_TYPE::UT_MiniMap);
+	m_pPlayer = InstantiateFromPool<CPlayer>(LAYER_TYPE::LT_Player, L"Player");
+	m_pPlayer->SetActive(true);
 
-	CScene::Exit();
-}
-
-void CTestScene::Init()
-{
-    CScene::Init();
-
-	// 플레이어 생성
-	// Instantiate의 vector로 캐릭터의 위치가 변경이 되지 않음... 왜?
-	m_pPlayer = Instantiate<CPlayer>(LAYER_TYPE::LT_Player);
+	// 포탈 생성
+	CPortal* portal = InstantiateFromPool<CPortal>(LAYER_TYPE::LT_Portal, L"The_Land_of_Weathered_gladness");
+	portal->SetActive(true);
+	portal->m_pTransform->SetLocalPosition(Vector3(2000.0f, -430.0f, -1.0f));
+	portal->SetMoveMap(L"The_Land_of_Weathered_gladness");
 
 	// 카메라 설정
 	CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
@@ -105,6 +103,42 @@ void CTestScene::Init()
 	uiCamera->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
 	uiCamera->SetCameraMask(1 << static_cast<UINT>(LAYER_TYPE::LT_UI));
 	m_vecCameras.push_back(uiCamera);
+
+	CColliderManager::CollisionLayerCheck(LAYER_TYPE::LT_Player, LAYER_TYPE::LT_Portal, true);
+}
+
+void CTestScene::Enter(const wstring& _strBackGroundName, const wstring& _strAudioName)
+{
+}
+
+void CTestScene::Exit()
+{
+	CScene::Exit();
+
+	if (m_pPlayer)
+		m_pPlayer->SetActive(false);
+
+	CPortal* portal = dynamic_cast<CPortal*>(FindObjectByName(L"The_Land_of_Weathered_gladness"));
+	if (portal)
+		portal->SetActive(false);
+
+	//CUIManager::Pop(UI_TYPE::UT_MiniMap);
+}
+
+void CTestScene::Init()
+{
+	NextScene = L"The_Land_of_Weathered_Gladness";
+
+    CScene::Init();
+
+	// 인게임 시작 씬 캐릭터 생성(만들어 두고 씬에 진입할 때만 활성화)
+	m_pPlayer = Instantiate<CPlayer>(LAYER_TYPE::LT_Player);
+	m_pPlayer->SetActive(false);
+
+	CPortal* portal = Instantiate<CPortal>(LAYER_TYPE::LT_Portal);
+	portal->SetName(L"The_Land_of_Weathered_gladness");
+	portal->m_pTransform->SetLocalPosition(Vector3(2000.0f, -430.0f, -1.0f));
+	portal->SetActive(false);
 }
 
 void CTestScene::Update()

@@ -5,13 +5,11 @@
 #include "../Component/CTransform.h"
 #include "..\Scene\CScene.h"
 
-
 void Destroy(CGameObject* _pGameObject)
 {
 	if (_pGameObject != nullptr)
 		_pGameObject->death();
 }
-
 
 CGameObject::CGameObject() :
 	m_eObjectState(OBJECT_STATE::OS_Active),
@@ -45,11 +43,13 @@ void CGameObject::Init()
 
 void CGameObject::Update()
 {
+	if (IsDead()) return;
+
 	for (CComponent* comp : m_vecComponents)
 	{
 		if (comp == nullptr)
 			continue;
-
+		
 		comp->Update();
 	}
 }
@@ -67,6 +67,11 @@ void CGameObject::LateUpdate()
 
 void CGameObject::Render(const Matrix& view, const Matrix& projection)
 {
+	// 몬스터의 체력이 0이 되면 오브젝트 사라지도록 구현
+	// 플레이어가 맵을 다시 이동 시 맵보다 뒤에 출력되는 현상 수정.
+	// 몬스터 죽으면 아이템 메소 떨어뜨리기.
+	if (!IsActive()) return;
+
 	for (CComponent* comp : m_vecComponents)
 	{
 		if (comp == nullptr)
@@ -74,6 +79,16 @@ void CGameObject::Render(const Matrix& view, const Matrix& projection)
 
 		comp->Render(view, projection);
 	}
+}
+
+void CGameObject::Reset()
+{
+	SetActive(false);
+	SetObjectState(OBJECT_STATE::OS_None);
+
+	// 위치 초기화, 컴포넌트 초기화 등
+	CTransform* tr = GetComponent<CTransform>();
+	if (tr) tr->SetLocalPosition(Vector3::Zero);
 }
 
 void CGameObject::initializeTransform()

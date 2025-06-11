@@ -75,7 +75,8 @@ void CScene_Start::LateUpdate()
 
 	if (KEY_TAP(KEY_CODE::Y))
 	{
-		CSceneManager::LoadScene(L"Stage01", L"Stage01_BG", L"Stage01_BGSound");
+		//CSceneManager::LoadScene(L"Stage01", L"Stage01_BG", L"Stage01_BGSound");
+		CSceneManager::LoadScene(L"Stage01");
 	}
 	if (KEY_TAP(KEY_CODE::U))
 	{
@@ -89,7 +90,7 @@ void CScene_Start::LateUpdate()
 
 	if (KEY_TAP(KEY_CODE::P))
 	{
-		CSceneManager::LoadScene(L"PixScene");
+		CSceneManager::LoadScene(L"The_Land_of_Weathered_gladness");
 	}
 }
 

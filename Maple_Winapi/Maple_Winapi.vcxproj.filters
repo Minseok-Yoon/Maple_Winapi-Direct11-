@@ -241,6 +241,36 @@
     <Filter Include="Engine\09. Component\Camera\Renderer\BaseRenderer">
       <UniqueIdentifier>{c6d7dd0e-fc97-40da-abae-05d1f63f3951}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\05. Object\Portal\PortalScript">
+      <UniqueIdentifier>{cf2fa2c1-7ae8-4661-8094-f765be278b95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\06. Scene\The_Land_of_Weathered_gladness">
+      <UniqueIdentifier>{6765905f-605a-4fbc-bf91-644039614bd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\06. Scene\The_Lake_of_Oblivion">
+      <UniqueIdentifier>{55045056-a379-431a-b2d3-3913fc14a0c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Monster\Erdas">
+      <UniqueIdentifier>{52d19e4f-2fdc-4b69-b6c0-4b7196cd38de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\NPC">
+      <UniqueIdentifier>{c2bf9f2d-81bb-4b9d-ab67-4ea320864274}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Item\CEtcItem">
+      <UniqueIdentifier>{10b2dd30-64d7-4ac9-bf0a-b574c2b67a8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Player\PlayerBehaviour">
+      <UniqueIdentifier>{26ac01b1-109b-4119-a533-909a66a17ee0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Item\ItemScript">
+      <UniqueIdentifier>{de379686-5f78-49a5-b406-8c1b8f480281}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\UI\InventoryUI">
+      <UniqueIdentifier>{256579c5-0ad6-41b8-9d53-996d74789045}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Inventory">
+      <UniqueIdentifier>{0ca81f04-9af6-493a-a29c-edcceccfa9f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -273,7 +303,7 @@
     <ClInclude Include="Entity\CEntity.h">
       <Filter>Engine\03. Entity</Filter>
     </ClInclude>
-    <ClInclude Include="Manager\CCollisionManager.h">
+    <ClInclude Include="Manager\CColliderManager.h">
       <Filter>Engine\04. Manager\CollisionManager</Filter>
     </ClInclude>
     <ClInclude Include="Manager\CDamageManager.h">
@@ -498,6 +528,42 @@
     <ClInclude Include="Component\CBaseRenderer.h">
       <Filter>Engine\09. Component\Camera\Renderer\BaseRenderer</Filter>
     </ClInclude>
+    <ClInclude Include="Component\CPortalScript.h">
+      <Filter>Engine\05. Object\Portal\PortalScript</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\The_Land_of_Weathered_gladness.h">
+      <Filter>Engine\06. Scene\The_Land_of_Weathered_gladness</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\The_Lake_of_Oblivion.h">
+      <Filter>Engine\06. Scene\The_Lake_of_Oblivion</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Erdas_of_Gladness.h">
+      <Filter>Engine\05. Object\Monster\Erdas</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CObjectPool.h">
+      <Filter>Engine\05. Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CNpc.h">
+      <Filter>Engine\05. Object\NPC</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\CRandom.h">
+      <Filter>Engine\14. Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CEtcItem.h">
+      <Filter>Engine\05. Object\Item\CEtcItem</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CPlayerBehavious.h">
+      <Filter>Engine\05. Object\Player\PlayerBehaviour</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CItemScript.h">
+      <Filter>Engine\05. Object\Item\ItemScript</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CInventoryUI.h">
+      <Filter>Engine\05. Object\UI\InventoryUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CInventory.h">
+      <Filter>Engine\05. Object\Inventory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -512,7 +578,7 @@
     <ClCompile Include="Entity\CEntity.cpp">
       <Filter>Engine\03. Entity</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\CCollisionManager.cpp">
+    <ClCompile Include="Manager\CColliderManager.cpp">
       <Filter>Engine\04. Manager\CollisionManager</Filter>
     </ClCompile>
     <ClCompile Include="Manager\CDamageManager.cpp">
@@ -725,6 +791,42 @@
     <ClCompile Include="Component\CBaseRenderer.cpp">
       <Filter>Engine\09. Component\Camera\Renderer\BaseRenderer</Filter>
     </ClCompile>
+    <ClCompile Include="Component\CPortalScript.cpp">
+      <Filter>Engine\05. Object\Portal\PortalScript</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\The_Land_of_Weathered_gladness.cpp">
+      <Filter>Engine\06. Scene\The_Land_of_Weathered_gladness</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\The_Lake_of_Oblivion.cpp">
+      <Filter>Engine\06. Scene\The_Lake_of_Oblivion</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Erdas_of_Gladness.cpp">
+      <Filter>Engine\05. Object\Monster\Erdas</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CObjectPool.cpp">
+      <Filter>Engine\05. Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CNpc.cpp">
+      <Filter>Engine\05. Object\NPC</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\CRandom.cpp">
+      <Filter>Engine\14. Test</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CEtcItem.cpp">
+      <Filter>Engine\05. Object\Item\CEtcItem</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CPlayerBehavious.cpp">
+      <Filter>Engine\05. Object\Player\PlayerBehaviour</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CItemScript.cpp">
+      <Filter>Engine\05. Object\Item\ItemScript</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CInventoryUI.cpp">
+      <Filter>Engine\05. Object\UI\InventoryUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CInventory.cpp">
+      <Filter>Engine\05. Object\Inventory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Maple_Winapi.rc">
@@ -743,5 +845,6 @@
     <None Include="..\..\imgui-master\examples\example_win32_directx9\imgui.ini">
       <Filter>소스 파일</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

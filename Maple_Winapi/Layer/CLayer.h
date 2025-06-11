@@ -2,9 +2,9 @@
 #include "../pch.h"
 #include "../Entity/CEntity.h"
 #include "../Object/CGameObject.h"
-#include "../Manager/CCollisionManager.h"
+#include "../Manager/CColliderManager.h"
 
-class CCollisionManager;
+class CColliderManager;
 class CLayer : public CEntity
 {
 public:
@@ -19,8 +19,11 @@ public:
 
 	void AddGameObject(CGameObject* _pAddGameObject);
 	void EraseGameObject(CGameObject* _pEraseGameObject);
+	void MoveToPool(CGameObject* _pGameObject);
+	CGameObject* FindObjectByName(const wstring& _strName);
 
 	vector<CGameObject*>& GetGameObjects() { return m_vecGameObjects; }
+	vector<CGameObject*>& GetPoolObjects() { return m_vecPoolObjects; }
 
 private:
 	void findDeadGameObjects(OUT vector<CGameObject*>& _vecGameObjects);
@@ -29,6 +32,7 @@ private:
 
 private:
 	vector<CGameObject*> m_vecGameObjects;
+	vector<CGameObject*> m_vecPoolObjects;
 };
 
 using CGameObjectIter = vector<CGameObject*>::iterator;

@@ -5,6 +5,8 @@
 #include "../Module/SelectGDI.h"
 #include "../Component/CTransform.h"
 #include "../Component/CRenderer.h"
+#include "../Manager/CResourceManager.h"
+#include "../Component/CSpriteRenderer.h"
 
 CItem::CItem()
 {
@@ -16,19 +18,71 @@ CItem::~CItem()
 
 void CItem::Init()
 {
+    CGameObject::Init();
+
+    if (!m_pTransform) {
+        m_pTransform = this->AddComponent<CTransform>();
+        if (!m_pTransform) {
+            OutputDebugStringA("ERROR: Transform creation failed in CMonster::Init()\n");
+        }
+    }
+
+    // Collider 컴포넌트 확인 및 추가
+    if (!m_pItemCollider) {
+        m_pItemCollider = this->AddComponent<CCollider>();
+        if (m_pItemCollider) {
+            m_pItemCollider->SetBottomLeft(Vector3(-0.5f, -0.5f, 0.0f));
+            m_pItemCollider->SetTopRight(Vector3(0.5f, 0.5f, 0.0f));
+            OutputDebugStringA("INFO: Collider successfully added to Item\n");
+        }
+        else {
+            OutputDebugStringA("ERROR: Collider creation failed in CEtcItem::Init()\n");
+        }
+    }
 }
 
 void CItem::Update()
 {
+    CGameObject::Update();
 }
 
 void CItem::LateUpdate()
 {
+    CGameObject::LateUpdate();
 }
 
 void CItem::Render(const Matrix& view, const Matrix& projection)
 {
-    //CGameObject* gameObj = m_pItem->GetOwner();
+    CGameObject::Render(view, projection);
+}
+
+void CItem::SetDropItem(wstring _MapName)
+{
+    SetName(_MapName);
+
+    CTransform* MonTr = GetComponent<CTransform>();
+    MonTr->SetLocalPosition(Vector3(0.0f, 0.0f, 0.0f));
+
+    m_pItemTexture = CResourceManager::Find<CTexture>(_MapName);
+
+    // 스프라이트 렌더러 설정
+    CSpriteRenderer* sr = AddComponent<CSpriteRenderer>();
+    sr->SetTexture(m_pItemTexture);
+
+    if (m_pItemTexture != nullptr)
+    {
+        // 텍스처의 실제 사이즈를 그대로 사용
+        CTexture::TextureSize textureSize = m_pItemTexture->GetTextureSize();
+        MonTr->SetLocalScale(Vector3(textureSize.width, textureSize.height, 0.0f));
+    }
+}
+
+void CItem::OnPickUp()
+{
+    // 사운드 재생 추가
+}
+
+//CGameObject* gameObj = m_pItem->GetOwner();
     //CTransform* tr = gameObj->GetComponent<CTransform>();
     //Vector2 vPos = tr->GetPosition();
 
@@ -52,4 +106,3 @@ void CItem::Render(const Matrix& view, const Matrix& projection)
     //    Vector2 colPos = itemCollider->GetPos();
     //    Vector2 colRenderPos = CCamera::GetInst()->GetRenderPos(colPos);
     //}
-}

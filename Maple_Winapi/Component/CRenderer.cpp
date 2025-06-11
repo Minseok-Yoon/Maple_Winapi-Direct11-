@@ -137,10 +137,10 @@ namespace renderer
 #pragma endregion
 #pragma region depthstencil state
 		D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-		dsDesc.DepthEnable = true;
+		dsDesc.DepthEnable = TRUE;
 		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-		dsDesc.StencilEnable = false;
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL; //D3D11_COMPARISON_LESS;
+		dsDesc.StencilEnable = FALSE;
 		GetDevice()->CreateDepthStencilState(
 			&dsDesc, depthStencilStates[static_cast<UINT>(DEPTHSTENCIL_STATE::DS_LessEqual)].GetAddressOf());
 
@@ -304,6 +304,10 @@ namespace renderer
 		auto* spriteMaterial = new CMaterial();
 		spriteMaterial->SetShader(CResourceManager::Find<CShader>(L"Sprite-Default-Shader"));
 		CResourceManager::Insert(L"Sprite-Default-Material", spriteMaterial);
+
+		auto* spriteBorderMaterial = new CMaterial();
+		spriteBorderMaterial->SetShader(CResourceManager::Find<CShader>(L"Sprite-Border-Material"));
+		CResourceManager::Insert(L"Sprite-Border-Material", spriteBorderMaterial);
 	}
 
 	void LoadConstantBuffers()
@@ -333,3 +337,9 @@ namespace renderer
 		}
 	}
 }
+
+// 2025-06-11 렌더링 파이프라인 문제점
+// 1. 텍스처가 없을 때, 명시적으로 투명 1x1 텍스처 바인딩
+// 2. 알파 블렌딩이 제대로 설정되지 않은 경우 - 가까이 가면 블렌딩 순서 문제로 Z-buffer에 의해서 알파가 무시되고
+// 불투명하게 보이는 경우. 또는 ID3D11BlendState 설정이 잘못되어 있음.
+// 3. Z-Buffer와 투명 오브젝트의 그리기 순서 - 그리기 순서를 카메라로부터 먼 것부터 가까운 순으로 수동 정렬해서 그려야 한다.

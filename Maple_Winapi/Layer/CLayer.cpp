@@ -1,5 +1,6 @@
 #include "CLayer.h"
-#include "../Manager/CCollisionManager.h"
+#include "../Manager/CColliderManager.h"
+#include "../Object/CObjectPool.h"
 
 CLayer::CLayer() :
 	m_vecGameObjects{}
@@ -39,7 +40,8 @@ void CLayer::Update()
 		if (gameObj->IsActive() == false)
 			continue;
 
-		gameObj->Update();
+		if (gameObj && !gameObj->IsDead())
+			gameObj->Update();
 	}
 }
 
@@ -101,6 +103,28 @@ void CLayer::EraseGameObject(CGameObject* _pEraseGameObject)
 #pragma endregion
 }
 
+void CLayer::MoveToPool(CGameObject* _pGameObject)
+{
+	auto iter = find(m_vecGameObjects.begin(), m_vecGameObjects.end(), _pGameObject);
+	if (iter != m_vecGameObjects.end())
+	{
+		m_vecGameObjects.erase(iter);
+		_pGameObject->SetActive(false);
+		m_vecPoolObjects.push_back(_pGameObject);
+	}
+}
+
+CGameObject* CLayer::FindObjectByName(const wstring& _strName)
+{
+	for (CGameObject* obj : m_vecGameObjects)
+	{
+		if (obj && obj->GetName() == _strName)
+			return obj;
+	}
+
+	return nullptr;
+}
+
 void CLayer::findDeadGameObjects(OUT vector<CGameObject*>& _vecGameObjects)
 {
 	for (CGameObject* gameObj : m_vecGameObjects)
@@ -113,10 +137,18 @@ void CLayer::findDeadGameObjects(OUT vector<CGameObject*>& _vecGameObjects)
 
 void CLayer::deleteGameObjects(vector<CGameObject*> _vecGameObjects)
 {
-	for (CGameObject* gameObj : m_vecGameObjects)
+	/*for (CGameObject* gameObj : _vecGameObjects)
 	{
 		delete gameObj;
 		gameObj = nullptr;
+	}*/
+	for (CGameObject* obj : _vecGameObjects)
+	{
+		obj->Reset(); // 상태 초기화 필요
+		obj->SetActive(false);
+
+		// 타입에 따라 풀에 넣기
+		CObjectPool::Get().Push(obj);
 	}
 }
 
@@ -148,3 +180,6 @@ void CLayer::eraseDeadGameObjects()
 
 		gameObj->Render();
 	}*/
+
+	// 맵 이동(씬 전환)할 때 객체를 제대로 삭제를 하거나, 다시 재사용할 것이라면 포인터 변수를 잘 사용할 것
+	// 지금 객체는 없는데 주소는 참조되고 있어 댕글링포인터 발생하는 것 같음.

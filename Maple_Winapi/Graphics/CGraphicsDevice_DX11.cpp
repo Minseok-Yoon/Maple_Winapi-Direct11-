@@ -421,6 +421,17 @@ void CGraphicDevice_DX11::BindRasterizerState(ID3D11RasterizerState* pRasterizer
 }
 void CGraphicDevice_DX11::BindBlendState(ID3D11BlendState* pBlendState, const FLOAT BlendFactor[4], UINT SampleMask)
 {
+	/*if (pBlendState == renderer::blendStates[static_cast<UINT>(BLEND_STATE::BS_Opaque)].Get())
+		OutputDebugStringA("[BlendState] BS_Opaque 바인딩됨\n");
+	else if (pBlendState == renderer::blendStates[static_cast<UINT>(BLEND_STATE::BS_Cutout)].Get())
+		OutputDebugStringA("[BlendState] BS_Cutout 바인딩됨\n");
+	else if (pBlendState == renderer::blendStates[static_cast<UINT>(BLEND_STATE::BS_Transparent)].Get())
+		OutputDebugStringA("[BlendState] BS_Transparent 바인딩됨\n");
+	else if (pBlendState == renderer::blendStates[static_cast<UINT>(BLEND_STATE::BS_OneOne)].Get())
+		OutputDebugStringA("[BlendState] BS_OneOne 바인딩됨\n");
+	else
+		OutputDebugStringA("[BlendState] 알 수 없는 블렌드 상태 바인딩됨\n");*/
+
 	mContext->OMSetBlendState(pBlendState, BlendFactor, SampleMask);
 }
 void CGraphicDevice_DX11::BindDepthStencilState(ID3D11DepthStencilState* pDepthStencilState, UINT StencilRef)
@@ -455,7 +466,7 @@ void CGraphicDevice_DX11::BindDefaultRenderTarget()
 
 void CGraphicDevice_DX11::ClearRenderTargetView()
 {
-	FLOAT backgroundColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	FLOAT backgroundColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	mContext->ClearRenderTargetView(mRenderTargetView.Get(), backgroundColor);
 }
 

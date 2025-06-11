@@ -1,7 +1,11 @@
+#include "../pch.h"
 #include "CUIManager.h"
 #include "../Object/CUIHUD.h"
 #include "../Object/CBtnUI.h"
+#include "../Object/CObject.h"
 #include "../Object/CMiniMap.h"
+#include "../Object/CInventoryUI.h"
+#include "../Manager/CKeyManager.h"
 
 unordered_map<UI_TYPE, CUI*> CUIManager::m_mapUI = {};
 stack<CUI*> CUIManager::m_stUI = {};
@@ -53,6 +57,18 @@ void CUIManager::Update()
 		m_quRequestUIQueue.pop();
 		OnLoad(requestUI);
 	}
+
+	if (KEY_TAP(KEY_CODE::I))
+	{
+		if (IsActive(UI_TYPE::UI_Inventory))
+		{
+			Pop(UI_TYPE::UI_Inventory);
+		}
+		else
+		{
+			Push(UI_TYPE::UI_Inventory);
+		}
+	}
 }
 
 void CUIManager::LateUpdate()
@@ -95,8 +111,11 @@ void CUIManager::Render()
 
 	for (CUI* ui : buff)
 	{
-		ui->Render();
-		m_stUI.push(ui);
+		if (ui->IsEnable()) // 이 조건 추가
+		{
+			ui->Render();
+			m_stUI.push(ui);
+		}
 	}
 }
 
@@ -106,6 +125,16 @@ void CUIManager::OnLoad(UI_TYPE _eUIType)
 
 	if (iter == m_mapUI.end())
 	{
+		// 만약 등록 안된 경우 여기서 인스턴스를 생성해도 됨
+		if (_eUIType == UI_TYPE::UI_Inventory)
+		{
+			CInventoryUI* pInventoryUI = Instantiate<CInventoryUI>(LAYER_TYPE::LT_UI);
+			pInventoryUI->SetInventory(CInventory::GetInst());
+			RegisterUI(_eUIType, pInventoryUI);
+			OnComplete(pInventoryUI);
+			return;
+		}
+
 		OnFail();
 		return;
 	}
@@ -162,47 +191,79 @@ void CUIManager::Push(UI_TYPE _eUIType)
 
 void CUIManager::Pop(UI_TYPE _eUIType)
 {
-	if (m_stUI.size() <= 0)
+	wchar_t szLog[256];
+	swprintf_s(szLog, L"Pop request: %d\n", static_cast<int>(_eUIType));
+	OutputDebugStringW(szLog);
+
+	if (m_stUI.empty())
 		return;
 
-	// 해당 ui 한개만 스택에서
 	stack<CUI*> tempStack;
+	CUI* targetUI = nullptr;
 
-	CUI* uiBase = nullptr;
-	while (m_stUI.size() > 0)
+	while (!m_stUI.empty())
 	{
-		uiBase = m_stUI.top();
+		CUI* ui = m_stUI.top();
 		m_stUI.pop();
 
-		if (uiBase->GetUIType() != _eUIType)
+		swprintf_s(szLog, L"Checking UI in stack: %d\n", static_cast<int>(ui->GetUIType()));
+		OutputDebugStringW(szLog);
+
+		if (ui->GetUIType() == _eUIType && !targetUI)
 		{
-			tempStack.push(uiBase);
+			//OutputDebugStringW(L"Found target UI. Clearing it.\n");
+			targetUI = ui;
 			continue;
 		}
 
-		if (uiBase->IsFullScreen())
+		tempStack.push(ui);
+	}
+
+	if (targetUI)
+	{
+		targetUI->UIClear();
+
+		if (targetUI->IsFullScreen())
 		{
-			stack<CUI*> uiBases = m_stUI;
-			while (!uiBases.empty())
+			stack<CUI*> tempRestore = tempStack;
+			while (!tempRestore.empty())
 			{
-				CUI* uiBase = uiBases.top();
-				uiBases.pop();
-				if (uiBase)
+				CUI* ui = tempRestore.top();
+				tempRestore.pop();
+
+				if (ui)
 				{
-					uiBase->Active();
+					//OutputDebugStringW(L"Re-activating previous UI below fullscreen UI.\n");
+					ui->Active();
 					break;
 				}
 			}
 		}
-		uiBase->UIClear();
 	}
 
-	while (tempStack.size() > 0)
+	while (!tempStack.empty())
 	{
-		uiBase = tempStack.top();
+		m_stUI.push(tempStack.top());
 		tempStack.pop();
-		m_stUI.push(uiBase);
 	}
+
+	//OutputDebugStringW(L"Pop() complete.\n");
+}
+
+bool CUIManager::IsActive(UI_TYPE _eUIType)
+{
+	stack<CUI*> tempStack = m_stUI;
+
+	while (!tempStack.empty())
+	{
+		CUI* pUI = tempStack.top();
+		tempStack.pop();
+
+		if (pUI && pUI->GetUIType() == _eUIType)
+			return true;
+	}
+
+	return false;
 }
 
 CUI* CUIManager::GetUI(UI_TYPE _eUIType)
@@ -221,3 +282,49 @@ void CUIManager::RegisterUI(UI_TYPE _eUIType, CUI* _pUI)
 	if (m_mapUI.find(_eUIType) == m_mapUI.end())
 		m_mapUI.insert(make_pair(_eUIType, _pUI));
 }
+
+// 2025-06-10 Pop함수 원본
+//void CUIManager::Pop(UI_TYPE _eUIType)
+//{
+//	//if (m_stUI.size() <= 0)
+//	//	return;
+//
+//	//// 해당 ui 한개만 스택에서
+//	//stack<CUI*> tempStack;
+//
+//	//CUI* uiBase = nullptr;
+//	//while (m_stUI.size() > 0)
+//	//{
+//	//	uiBase = m_stUI.top();
+//	//	m_stUI.pop();
+//
+//	//	if (uiBase->GetUIType() != _eUIType)
+//	//	{
+//	//		tempStack.push(uiBase);
+//	//		continue;
+//	//	}
+//
+//	//	if (uiBase->IsFullScreen())
+//	//	{
+//	//		stack<CUI*> uiBases = m_stUI;
+//	//		while (!uiBases.empty())
+//	//		{
+//	//			CUI* uiBase = uiBases.top();
+//	//			uiBases.pop();
+//	//			if (uiBase)
+//	//			{
+//	//				uiBase->Active();
+//	//				break;
+//	//			}
+//	//		}
+//	//	}
+//	//	uiBase->UIClear();
+//	//}
+//
+//	//while (tempStack.size() > 0)
+//	//{
+//	//	uiBase = tempStack.top();
+//	//	tempStack.pop();
+//	//	m_stUI.push(uiBase);
+//	//}
+//}

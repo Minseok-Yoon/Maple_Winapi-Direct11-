@@ -10,8 +10,11 @@
 #include "../Component/CRigidBody.h"
 #include "../Component/CRenderer.h"
 #include "../Component/CPixelCollider.h"
+#include "../Object/CItem.h"
+#include "CInventory.h"
 
 CPlayerScript::CPlayerScript() :
+	CScript(SCRIPT_TYPE::ST_PlayerScript),
 	m_ePlayerState(PLAYER_STATE::PS_Idle),
 	m_iDir(1),
 	m_pAnimator(nullptr),
@@ -23,18 +26,31 @@ CPlayerScript::~CPlayerScript()
 {
 }
 
-void CPlayerScript::Init()
+void CPlayerScript::OnInit()
 {
 }
 
-void CPlayerScript::Update()
+void CPlayerScript::OnUpdate()
 {
 	// 플레이어 객체 가져오기
 	CGameObject* pPlayer = renderer::selectedObject;
 	if (pPlayer != nullptr)
 	{
-		CAnimator* animator = pPlayer->GetComponent<CAnimator>();
+		m_pAnimator = pPlayer->GetComponent<CAnimator>();
 	}
+
+	if (m_pAnimator == nullptr)
+	{
+		m_pAnimator = GetOwner()->AddComponent<CAnimator>();
+	}
+
+	// SpriteRenderer 가져오기
+	CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
+	if (sr == nullptr)
+	{
+		sr = GetOwner()->AddComponent<CSpriteRenderer>();
+	}
+	m_pAnimator->SetSpriteRenderer(sr);
 
 	switch (m_ePlayerState)
 	{
@@ -54,13 +70,29 @@ void CPlayerScript::Update()
 		jump();
 		break;
 	}
+
+	// 아이템 줍기
+	if (KEY_TAP(KEY_CODE::Z) && m_pColliderItem)
+	{
+		std::wstring itemName = m_pColliderItem->GetName();
+
+		// 인벤토리에 아이템 추가
+		CInventory::GetInst()->AddItem(itemName, 1);
+
+		// 아이템을 습득했으니 배경에서 아이템 제거
+		Destroy(m_pColliderItem);  // 혹은 RemoveObject, 비활성화 등 프로젝트 방식에 따라 다름
+		m_pColliderItem = nullptr;
+		
+		std::wstring debugStr = L"[Player] 아이템 습득: " + itemName + L"\n";
+		OutputDebugString(debugStr.c_str());
+	}
 }
 
-void CPlayerScript::LateUpdate()
+void CPlayerScript::OnLateUpdate()
 {
 }
 
-void CPlayerScript::Render(const Matrix& view, const Matrix& projection)
+void CPlayerScript::OnRender(const Matrix& view, const Matrix& projection)
 {
 }
 
@@ -70,18 +102,71 @@ void CPlayerScript::OnCollisionEnter(CCollider* _pOther)
 
 void CPlayerScript::OnCollisionStay(CCollider* _pOther)
 {
+	if (_pOther && dynamic_cast<CMonster*>(_pOther->GetOwner()))
+	{
+		m_pColliderMonster = _pOther->GetOwner();
+	}
+
+	// 아이템 감지
+	if (_pOther && dynamic_cast<CItem*>(_pOther->GetOwner()))
+	{
+		m_pColliderItem = _pOther->GetOwner();
+	}
 }
 
 void CPlayerScript::OnCollisionExit(CCollider* _pOther)
 {
+	if (_pOther && _pOther->GetOwner() == m_pColliderItem)
+	{
+		m_pColliderItem = nullptr;
+	}
+}
+
+void CPlayerScript::PlayerAttack(CMonster* _pMonster)
+{
+	if (_pMonster)
+	{
+		bool isCriticalHit = (rand() % 10) < 2;  // 20% 확률로 크리티컬 히트
+
+		int attackDamage;
+		if (isCriticalHit)
+		{
+			// 크리티컬 데미지: 30 ~ 200
+			attackDamage = 30 + rand() % 171;  // rand() % 171은 0 ~ 170 범위의 값 생성
+		}
+		else
+		{
+			// 일반 데미지: 0 ~ 30
+			attackDamage = rand() % 31;  // rand() % 31은 0 ~ 30 범위의 값 생성
+		}
+
+		// 몬스터 위치에서 데미지를 출력
+		Vector3 monsterPos = _pMonster->GetTransform()->GetWorldPosition();
+		//CDamageManager::GetInst()->CreateDamage(attackDamage, monsterPos, isCriticalHit);
+
+		// 몬스터에 데미지를 입힘
+		_pMonster->ReduceHP(attackDamage);
+
+		// 디버그 출력
+		tMonInfo& monInfo = _pMonster->GetMonInfo();
+		char debugBuffer[256];
+		sprintf_s(debugBuffer,
+			"[ATTACK] %s attacked %s for %d damage (%s). Remaining HP: %.1f\n",
+			GetOwner()->GetName().c_str(),
+			monInfo.strTag.c_str(),
+			attackDamage,
+			isCriticalHit ? "CRITICAL" : "normal",
+			_pMonster->GetCurHp());
+		OutputDebugStringA(debugBuffer);
+	}
 }
 
 void CPlayerScript::idle()
 {
-	CAnimator* animator = GetOwner()->GetComponent<CAnimator>();
-	if (animator == nullptr)
+	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
+	if (m_pAnimator == nullptr)
 	{
-		animator = GetOwner()->AddComponent<CAnimator>();
+		m_pAnimator = GetOwner()->AddComponent<CAnimator>();
 	}
 
 	// SpriteRenderer 가져오기
@@ -99,7 +184,7 @@ void CPlayerScript::idle()
 	float frameDuration = 0.5f;  // 프레임 간 지속 시간 (0.5초로 설정)
 
 	// 애니메이션 추가
-	animator->AddFrameAnimation(
+	m_pAnimator->AddFrameAnimation(
 		animationName,
 		filePathPattern.c_str(),
 		frameCount,
@@ -112,7 +197,8 @@ void CPlayerScript::idle()
 	);
 
 	// 애니메이션 실행 (첫 번째 프레임 강제 설정하지 않음)
-	animator->Play(animationName, true);  // 반복 재생
+	//animator->SetSpriteRenderer(sr);
+	m_pAnimator->Play(animationName, true);  // 반복 재생
 
 	if (KEY_HOLD(KEY_CODE::LEFT) || KEY_TAP(KEY_CODE::LEFT) ||
 		KEY_HOLD(KEY_CODE::RIGHT) || KEY_TAP(KEY_CODE::RIGHT))
@@ -166,10 +252,10 @@ void CPlayerScript::move()
 	}
 
 
-	CAnimator* animator = GetOwner()->GetComponent<CAnimator>();
-	if (animator == nullptr)
+	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
+	if (m_pAnimator == nullptr)
 	{
-		animator = GetOwner()->AddComponent<CAnimator>();
+		m_pAnimator = GetOwner()->AddComponent<CAnimator>();
 	}
 
 	// SpriteRenderer 가져오기
@@ -186,7 +272,7 @@ void CPlayerScript::move()
 	float frameDuration = 0.5f;  // 프레임 간 지속 시간 (0.5초로 설정)
 
 	// 애니메이션 추가
-	animator->AddFrameAnimation(
+	m_pAnimator->AddFrameAnimation(
 		animationName,
 		filePathPattern.c_str(),
 		frameCount,
@@ -199,15 +285,15 @@ void CPlayerScript::move()
 	);
 
 	// 애니메이션 실행 (첫 번째 프레임 강제 설정하지 않음)
-	animator->Play(animationName, true);  // 반복 재생
+	m_pAnimator->Play(animationName, true);  // 반복 재생
 }
 
 void CPlayerScript::prone()
 {
-	CAnimator* animator = GetOwner()->GetComponent<CAnimator>();
-	if (animator == nullptr)
+	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
+	if (m_pAnimator == nullptr)
 	{
-		animator = GetOwner()->AddComponent<CAnimator>();
+		m_pAnimator = GetOwner()->AddComponent<CAnimator>();
 	}
 
 	// SpriteRenderer 가져오기
@@ -225,7 +311,7 @@ void CPlayerScript::prone()
 	float frameDuration = 0.5f;  // 프레임 간 지속 시간 (0.5초로 설정)
 
 	// 애니메이션 추가
-	animator->AddFrameAnimation(
+	m_pAnimator->AddFrameAnimation(
 		animationName,
 		filePathPattern.c_str(),
 		frameCount,
@@ -238,7 +324,7 @@ void CPlayerScript::prone()
 	);
 
 	// 애니메이션 실행 (첫 번째 프레임 강제 설정하지 않음)
-	animator->Play(animationName, true);  // 반복 재생
+	m_pAnimator->Play(animationName, true);  // 반복 재생
 
 	if(KEY_AWAY(KEY_CODE::DOWN))
 	{
@@ -248,10 +334,10 @@ void CPlayerScript::prone()
 
 void CPlayerScript::jump()
 {
-	CAnimator* animator = GetOwner()->GetComponent<CAnimator>();
-	if (animator == nullptr)
+	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
+	if (m_pAnimator == nullptr)
 	{
-		animator = GetOwner()->AddComponent<CAnimator>();
+		m_pAnimator = GetOwner()->AddComponent<CAnimator>();
 	}
 
 	// SpriteRenderer 가져오기
@@ -266,10 +352,10 @@ void CPlayerScript::jump()
 	wstring animationName = L"Jump";
 	wstring filePathPattern = L"../Resources/Texture/Player/Jump/" + direction + L"/%d.bmp";  // %d로 프레임 번호 변경
 	int frameCount = 1;  // 애니메이션 프레임 수 (예: 1.bmp, 2.bmp, 3.bmp)
-	float frameDuration = 0.5f;  // 프레임 간 지속 시간 (0.5초로 설정)
+	float frameDuration = 1.0f;  // 프레임 간 지속 시간 (0.5초로 설정)
 
 	// 애니메이션 추가
-	animator->AddFrameAnimation(
+	m_pAnimator->AddFrameAnimation(
 		animationName,
 		filePathPattern.c_str(),
 		frameCount,
@@ -282,7 +368,7 @@ void CPlayerScript::jump()
 	);
 
 	// 애니메이션 실행 (첫 번째 프레임 강제 설정하지 않음)
-	animator->Play(animationName, true);  // 반복 재생
+	m_pAnimator->Play(animationName, true);  // 반복 재생
 
 	if (KEY_AWAY(KEY_CODE::UP))
 	{
@@ -292,10 +378,10 @@ void CPlayerScript::jump()
 
 void CPlayerScript::attack()
 {
-	CAnimator* animator = GetOwner()->GetComponent<CAnimator>();
-	if (animator == nullptr)
+	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
+	if (m_pAnimator == nullptr)
 	{
-		animator = GetOwner()->AddComponent<CAnimator>();
+		m_pAnimator = GetOwner()->AddComponent<CAnimator>();
 	}
 
 	// SpriteRenderer 가져오기
@@ -309,10 +395,10 @@ void CPlayerScript::attack()
 	wstring animationName = L"Attack";
 	wstring filePathPattern = L"../Resources/Texture/Player/Attack/Right/%d.bmp";  // %d로 프레임 번호 변경
 	int frameCount = 3;  // 애니메이션 프레임 수 (예: 1.bmp, 2.bmp, 3.bmp)
-	float frameDuration = 0.5f;  // 프레임 간 지속 시간 (0.5초로 설정)
+	float frameDuration = 0.2f;  // 프레임 간 지속 시간 (0.5초로 설정)
 
 	// 애니메이션 추가
-	animator->AddFrameAnimation(
+	m_pAnimator->AddFrameAnimation(
 		animationName,
 		filePathPattern.c_str(),
 		frameCount,
@@ -325,11 +411,32 @@ void CPlayerScript::attack()
 	);
 
 	// 애니메이션 실행 (첫 번째 프레임 강제 설정하지 않음)
-	animator->Play(animationName, false);  // 반복되지 않도록 false 설정
+	m_pAnimator->Play(animationName, false);  // 반복되지 않도록 false 설정
 
-	// 애니메이션이 끝났는지 체크하고, 끝났으면 Idle 상태로 변경
-	if (animator->End())  // 애니메이션이 끝났다면
+	// 공격 타이밍 감지 및 데미지 처리
+	if (!m_bHasDealtDamage && m_pAnimator->GetCurrentFrameIndex() == 1) // 예: 2번째 프레임에서 공격 판정
 	{
-		m_ePlayerState = PLAYER_STATE::PS_Idle;  // Idle 상태로 변경
+		if (m_pColliderMonster)
+		{
+			CMonster* pMonster = dynamic_cast<CMonster*>(m_pColliderMonster);
+			if (pMonster)
+			{
+				// 이 부분 PlayerScript가 문제 발생 playerScri가 nullptr
+				CPlayerScript* playerScri = GetOwner()->GetComponent<CPlayerScript>();
+				if (playerScri)
+				{
+					playerScri->PlayerAttack(pMonster);  // 실제 데미지 주는 함수 호출
+					m_bHasDealtDamage = true;
+				}
+			}
+		}
+	}
+
+	// 애니메이션이 끝났으면 상태 초기화
+	if (m_pAnimator->End())
+	{
+		m_ePlayerState = PLAYER_STATE::PS_Idle;
+		m_bHasDealtDamage = false;
+		m_pColliderMonster = nullptr;
 	}
 }

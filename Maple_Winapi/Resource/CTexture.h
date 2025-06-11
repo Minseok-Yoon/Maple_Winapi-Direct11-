@@ -44,9 +44,6 @@ public:
     virtual HRESULT Load(const wstring& _strPath) override;
     void Bind(SHADER_STAGE _eShaderStage, UINT startSlot);
 
-    // 2025-04-09 텍스처 생성 함수
-    void CreateTexture(wstring _strName);
-
     TextureSize GetTextureSize() const { return m_tTextureSize; }
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetSRV() { return m_SRV; }
 

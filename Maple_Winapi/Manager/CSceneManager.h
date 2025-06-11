@@ -41,7 +41,17 @@ public:
 	void SelectObject(CGameObject* _pGameObject) { m_pSelectedObject = _pGameObject; }
 	CGameObject* GetSelectObject() { return m_pSelectedObject; }
 
+	static void RequestSceneChange(const wstring& sceneName);
+
+	static CScene* ChangeScene(const wstring& _strName)
+	{
+		return LoadScene(_strName);
+	}
+
 private:
+	static wstring m_strNextSceneName;
+	static bool m_bSceneChangeRequested;
+
 	static map<wstring, CScene*>	m_mapScene;	// ¸ðµç ¾À ¸ñ·Ï
 	static CScene* m_pCurScene;							// ÇöÀç ¾À
 	static CScene* m_pDontDestroyOnLoad;

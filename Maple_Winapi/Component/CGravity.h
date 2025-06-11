@@ -2,8 +2,10 @@
 #include "CRigidBody.h"
 #include "../Object/CBackGround.h"
 #include "../Object/CPlayer.h"
+#include "../Object/CMonster.h"
 
 class CPlayer;
+class CMonster;
 class CBackGround;
 class CGravity : public CRigidBody
 {
@@ -18,7 +20,8 @@ public:
 
 	void Jump(float _fJumpForce);
 
-	void SetGround(bool _bGround) { m_bGround = _bGround; }
+	void SetPlayerGround(bool _bPlayerGround) { m_bPlayerGround = _bPlayerGround; }
+	void SetMonsterGround(bool _bMonsterGround) { m_bMonsterGround = _bMonsterGround; }
 	/*bool IsOnGround() const { return m_bGround; }*/
 
 	//bool CheckGround(CBackGround* pGround, Vector3 _fPlusCheckPos);
@@ -37,10 +40,19 @@ public:
 	void Gravity();
 
 	void SetPlayer(CPlayer* _pPlayer) { m_pPlayer = _pPlayer; }
+	void SetMonster(CMonster* _pMonster) 
+	{ 
+		m_pMonster = _pMonster; 
+
+		char buffer[256];
+		sprintf_s(buffer, "[SetMonster] 받음: %p\n", m_pMonster);
+		OutputDebugStringA(buffer);
+	}
 
 private:
 	bool		m_bIsGravity;
-	bool		m_bGround;
+	bool		m_bPlayerGround;
+	bool		m_bMonsterGround;
 
 	float		m_fGravityForce;
 	float		m_fGravitySpeed;
@@ -52,11 +64,15 @@ private:
 
 	CTransform* m_pTransform;
 
-	bool IsGroundCheck = true;
-	float SkipGround = 0.0f;
-	set<float> NotGround;
+	//bool IsGroundCheck = true;
+	//float SkipGround = 0.0f;
+	//set<float> NotGround;
 
 	bool m_bPrevGround;
 
-	CPlayer* m_pPlayer;
+	CPlayer* m_pPlayer = nullptr;
+	CMonster* m_pMonster = nullptr;
 };
+
+// 몬스터의 배경 투명한거 왜 검게 나오는지 확인하기
+// 몬스터와 플레이어 공격, 죽었을 때 아이템 나오게 하기

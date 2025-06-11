@@ -33,3 +33,7 @@ private:
 	CTexture*		m_pAlbedoTexture;
 	CShader*		m_pShader;
 };
+
+// 2025-06-11 Material이란?
+// Material은 단어의 의미 그대로 '소재, 재질'을 의미한다. 약간 비유를 하자면 Geometry가 뼈대라면, Material은 살로 비유가 가능하다.
+// Material의 종류에 따라 재질이 달라지고, 재질은 얼마나 빛을 반사하는지, 빛에 반응하여 어떤 느낌을 내는 지를 주로 결정한다.
