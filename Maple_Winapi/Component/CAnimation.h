@@ -22,6 +22,12 @@ public:
 		{}
 	};
 
+	struct FrameEvent
+	{
+		function<void()> callback;
+		bool repeat;
+	};
+
 	CAnimation();
 	virtual ~CAnimation();
 
@@ -38,6 +44,7 @@ public:
 		Vector2 _vSize, Vector2 _vOffset, float _fDuration);
 	void ResetAnimation();
 
+	// Set/Get 함수
 	ANIMATION_STATE GetAnimationState() { return m_eAnimationState; }
 
 	UINT GetMaxFrame() { return (UINT)m_vecAnimationFrm.size(); }
@@ -52,6 +59,12 @@ public:
 
 	int GetCurFrameIndex() const { return m_iCurFrm; }
 
+	// 2025-08-06
+	void SetFrameEvent(int frameIndex, function<void()> func, bool repeat = false)
+	{
+		m_mapFrameEvents[frameIndex].push_back({ move(func), repeat });
+	}
+
 	//void ResetTime();
 
 private:
@@ -63,4 +76,7 @@ private:
 
 	class CAnimator* m_pAnimator;			// 애니메이션의 제어
 	CTexture* m_pTexture;				// 애니메이션이 사용할 택스처
+
+	map<int, vector<FrameEvent>> m_mapFrameEvents;
+	int m_iLastEventFrame = -1;
 };

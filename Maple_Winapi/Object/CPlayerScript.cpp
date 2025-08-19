@@ -6,18 +6,20 @@
 #include "../Object/CObject.h"
 #include "../Object/CPlayer.h"
 #include "../Component/CAnimator.h"
+#include "../Component/CGravity.h"
 #include "../Component/CTransform.h"
 #include "../Component/CRigidBody.h"
 #include "../Component/CRenderer.h"
 #include "../Component/CPixelCollider.h"
 #include "../Object/CItem.h"
 #include "CInventory.h"
+#include "Trinity.h"
+#include "../Manager/CSkillManager.h"
 
 CPlayerScript::CPlayerScript() :
 	CScript(SCRIPT_TYPE::ST_PlayerScript),
 	m_ePlayerState(PLAYER_STATE::PS_Idle),
 	m_iDir(1),
-	m_pAnimator(nullptr),
 	m_pPixelCollider(nullptr)
 {
 }
@@ -34,6 +36,16 @@ void CPlayerScript::OnUpdate()
 {
 	// 플레이어 객체 가져오기
 	CGameObject* pPlayer = renderer::selectedObject;
+
+	if (KEY_HOLD(KEY_CODE::RIGHT) || KEY_TAP(KEY_CODE::RIGHT))
+	{
+		m_iDir = 1;
+	}
+	if (KEY_HOLD(KEY_CODE::LEFT) || KEY_TAP(KEY_CODE::LEFT))
+	{
+		m_iDir = -1;
+	}
+
 	if (pPlayer != nullptr)
 	{
 		m_pAnimator = pPlayer->GetComponent<CAnimator>();
@@ -55,19 +67,19 @@ void CPlayerScript::OnUpdate()
 	switch (m_ePlayerState)
 	{
 	case PLAYER_STATE::PS_Idle:
-		idle();
+		idle(m_iDir);
 		break;
 	case PLAYER_STATE::PS_Walk:
-		move();
+		move(m_iDir);
 		break;
 	case PLAYER_STATE::PS_Attack:
-		attack();
+		attack(m_iDir);
 		break;
 	case PLAYER_STATE::PS_Prone:
-		prone();
+		prone(m_iDir);
 		break;
 	case PLAYER_STATE::PS_Jump:
-		jump();
+		jump(m_iDir);
 		break;
 	}
 
@@ -82,10 +94,41 @@ void CPlayerScript::OnUpdate()
 		// 아이템을 습득했으니 배경에서 아이템 제거
 		Destroy(m_pColliderItem);  // 혹은 RemoveObject, 비활성화 등 프로젝트 방식에 따라 다름
 		m_pColliderItem = nullptr;
-		
+
 		std::wstring debugStr = L"[Player] 아이템 습득: " + itemName + L"\n";
 		OutputDebugString(debugStr.c_str());
 	}
+
+	if (KEY_TAP(KEY_CODE::N) || KEY_HOLD(KEY_CODE::N))
+	{
+		//OutputDebugStringA("[DEBUG] N key pressed - Activating Trinity skill\n");
+		CSkillManager::GetInst()->ActiveSkill(SKILL_TYPE::ST_Trinity);
+	}
+
+	if (KEY_AWAY(KEY_CODE::N))
+	{
+		//OutputDebugStringA("[DEBUG] N key released - Deactivating Trinity skill\n");
+		CSkillManager::GetInst()->DeactiveSkill(SKILL_TYPE::ST_Trinity);
+
+	}
+
+	//CPlayer* player = dynamic_cast<CPlayer*>(GetOwner());
+	// 
+	//if (KEY_TAP(KEY_CODE::N) || KEY_HOLD(KEY_CODE::N))
+	//{
+	//	// 1. N키 입력이 실제로 감지되는지
+	//	OutputDebugStringA("[DEBUG] N key detected\n");
+	//	if (player->pTrinity)
+	//		player->pTrinity->UseSkill();
+	//}
+
+	//if (KEY_AWAY(KEY_CODE::N))
+	//{
+	//	// 1. N키 입력이 실제로 감지되는지
+	//	OutputDebugStringA("[DEBUG] N key detected\n");
+	//	if (player->pTrinity)
+	//		player->pTrinity->EndSkill();
+	//}
 }
 
 void CPlayerScript::OnLateUpdate()
@@ -161,8 +204,36 @@ void CPlayerScript::PlayerAttack(CMonster* _pMonster)
 	}
 }
 
-void CPlayerScript::idle()
+//Vector2 CPlayerScript::GetSlopeAdjustedForce(Vector2 baseForce)
+//{
+//	CPlayer* player = dynamic_cast<CPlayer*>(GetOwner());
+//	if (!player) return baseForce;
+//
+//	// 경사각 계산 (간단한 방법)
+//	Vector3 currentPos = GetOwner()->GetTransform()->GetWorldPosition();
+//	Vector3 frontPos = currentPos;
+//	frontPos.x += (baseForce.x > 0) ? 5.0f : -5.0f;
+//
+//	float currentY = player->FindClosestGroundY(currentPos);
+//	float frontY = player->FindClosestGroundY(frontPos);
+//
+//	float slope = (frontY - currentY) / 5.0f;
+//
+//	// 경사가 있으면 Y 방향 Force 추가
+//	if (abs(slope) > 0.1f)
+//	{
+//		baseForce.y = slope * 100.0f; // 경사에 따른 Y Force
+//	}
+//
+//	return baseForce;
+//}
+
+void CPlayerScript::idle(int _iDir)
 {
+	CRigidBody* rb = GetOwner()->GetComponent<CRigidBody>();
+	if (rb)
+		rb->ClearForce();
+
 	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
 	if (m_pAnimator == nullptr)
 	{
@@ -179,7 +250,7 @@ void CPlayerScript::idle()
 	// Idle 애니메이션 생성
 	wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
 	wstring animationName = L"Idle";
-	wstring filePathPattern = L"../Resources/Texture/Player/Idle/" + direction + L"/%d.bmp";  // %d로 프레임 번호 변경
+	wstring filePathPattern = L"../Resources/Texture/Player/Idle/" + direction + L"/%d.png";  // %d로 프레임 번호 변경
 	int frameCount = 3;  // 애니메이션 프레임 수 (예: 1.bmp, 2.bmp, 3.bmp)
 	float frameDuration = 0.5f;  // 프레임 간 지속 시간 (0.5초로 설정)
 
@@ -211,7 +282,7 @@ void CPlayerScript::idle()
 		m_ePlayerState = PLAYER_STATE::PS_Prone;
 	}
 
-	if (KEY_HOLD(KEY_CODE::UP) || KEY_TAP(KEY_CODE::UP))
+	if (KEY_HOLD(KEY_CODE::ALT) || KEY_TAP(KEY_CODE::ALT))
 	{
 		m_ePlayerState = PLAYER_STATE::PS_Jump;
 	}
@@ -222,32 +293,43 @@ void CPlayerScript::idle()
 	}
 }
 
-void CPlayerScript::move()
+void CPlayerScript::move(int _iDir)
 {
-	CRigidBody* rb = GetOwner()->GetComponent<CRigidBody>();
+	CTransform* transform = GetOwner()->GetComponent<CTransform>();
+	Vector3 pos = transform->GetWorldPosition();
+
+	float moveSpeed = 100.0f * CTimeManager::GetfDeltaTime(); // 프레임 독립적 이동
+
+	if (KEY_HOLD(KEY_CODE::RIGHT))
+	{
+		pos.x += moveSpeed;
+	}
+	if (KEY_HOLD(KEY_CODE::LEFT))
+	{
+		pos.x -= moveSpeed;
+	}
+
+	transform->SetWorldPosition(pos);
+	/*CRigidBody* rb = GetOwner()->GetComponent<CRigidBody>();
 	rb->ClearForce();
 
 	if (KEY_HOLD(KEY_CODE::RIGHT))
 	{
-		rb->AddForce(Vector2(100.0f, 0.0f));
+		rb->AddForce(Vector2(200.0f, 0.0f));
 	}
 	if (KEY_HOLD(KEY_CODE::LEFT))
 	{
-		rb->AddForce(Vector2(-100.0f, 0.0f));
-	}
-	if (KEY_HOLD(KEY_CODE::UP))
-	{
-		rb->AddForce(Vector2(0.0f, 100.0f));
-	}
-	if (KEY_HOLD(KEY_CODE::DOWN))
+		rb->AddForce(Vector2(-200.0f, 0.0f));
+	}*/
+	/*if (KEY_HOLD(KEY_CODE::DOWN))
 	{
 		rb->AddForce(Vector2(0.0f, -100.0f));
-	}
+	}*/
 
 	if (KEY_AWAY(KEY_CODE::RIGHT) || KEY_AWAY(KEY_CODE::LEFT) ||
 		KEY_AWAY(KEY_CODE::UP) || KEY_AWAY(KEY_CODE::DOWN))
 	{
-		rb->ClearForce();
+		pos.x = 0.0f;
 		m_ePlayerState = PLAYER_STATE::PS_Idle;
 	}
 
@@ -265,9 +347,10 @@ void CPlayerScript::move()
 		sr = GetOwner()->AddComponent<CSpriteRenderer>();
 	}
 
-	// Idle 애니메이션 생성
-	wstring animationName = L"Walk";
-	wstring filePathPattern = L"../Resources/Texture/Player/Walk/Right/%d.bmp";  // %d로 프레임 번호 변경
+	// Walk 애니메이션 생성
+	wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
+	wstring animationName = L"Walk" + direction;
+	wstring filePathPattern = L"../Resources/Texture/Player/Walk/" + direction + L"/%d.bmp";  // %d로 프레임 번호 변경
 	int frameCount = 4;  // 애니메이션 프레임 수 (예: 1.bmp, 2.bmp, 3.bmp)
 	float frameDuration = 0.5f;  // 프레임 간 지속 시간 (0.5초로 설정)
 
@@ -288,7 +371,7 @@ void CPlayerScript::move()
 	m_pAnimator->Play(animationName, true);  // 반복 재생
 }
 
-void CPlayerScript::prone()
+void CPlayerScript::prone(int _iDir)
 {
 	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
 	if (m_pAnimator == nullptr)
@@ -332,8 +415,11 @@ void CPlayerScript::prone()
 	}
 }
 
-void CPlayerScript::jump()
+void CPlayerScript::jump(int _iDir)
 {
+	CRigidBody* rb = GetOwner()->GetComponent<CRigidBody>();
+	rb->ClearForce();
+
 	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
 	if (m_pAnimator == nullptr)
 	{
@@ -368,15 +454,23 @@ void CPlayerScript::jump()
 	);
 
 	// 애니메이션 실행 (첫 번째 프레임 강제 설정하지 않음)
-	m_pAnimator->Play(animationName, true);  // 반복 재생
+	m_pAnimator->Play(animationName, false);  // 반복 재생
 
-	if (KEY_AWAY(KEY_CODE::UP))
+	// 2025-06-13
+	CGravity* gravity = GetOwner()->GetComponent<CGravity>();
+	if (gravity)
+	{
+		gravity->Jump(-500.0f);
+	}
+
+	// 애니메이션이 끝났으면 상태 초기화
+	if (m_pAnimator->End())
 	{
 		m_ePlayerState = PLAYER_STATE::PS_Idle;
 	}
 }
 
-void CPlayerScript::attack()
+void CPlayerScript::attack(int _iDir)
 {
 	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
 	if (m_pAnimator == nullptr)

@@ -5,6 +5,8 @@
 
 class CBaseRenderer : public CComponent
 {
+    friend class CCamera;
+
 public:
     CBaseRenderer(COMPONENT_TYPE type);
     virtual ~CBaseRenderer();
@@ -25,8 +27,27 @@ public:
     void SetPivotType(const Vector2& _vPivot) { m_vPivot = _vPivot; }
     Vector2 GetPivotType() const { return m_vPivot; }
 
+    // 2025-07-20
+    void SetCameraOrder(CAMERA_ORDER _eCamOrder);
+    void SetViewCameraSelect(int _iOrder);
+
+    // 2025-07-21
+    int GetOrder() { return m_iOrder; }
+
+    void SetEnabled(bool enabled) { m_bEnabled = enabled; }
+    bool IsEnabled() const { return m_bEnabled; }
+
 private:
     CMaterial* m_pMaterial;
     CMesh* m_pMesh;
     Vector2 m_vPivot = { 0.5f, 0.5f };
+
+    // 2025-07-20
+    CCamera* m_pCamera = nullptr;
+
+    // 2025-07-21
+    int m_iOrder = 0;
+
+    // 나중에 Component로 옮겨서 확인해보기
+    bool m_bEnabled = true;
 };

@@ -4,6 +4,15 @@
 
 class CItem;
 
+// 2025-07-24
+struct DropItemInfo
+{
+    wstring strItemName;  // 아이템 이름
+    float fDropRate;           // 드랍 확률 (0.0 ~ 1.0)
+    int iMinCount;             // 최소 개수
+    int iMaxCount;             // 최대 개수
+};
+
 struct tMonInfo
 {
     CMonster*   pMonster;
@@ -13,7 +22,7 @@ struct tMonInfo
     float       fRecoRange; // 인지 범위
     float       fAttRange;  // 공격 범위
     float       fAtt;       // 공격력
-    wstring     strDropItme;
+    vector<DropItemInfo> vecDropItems;
 };
 
 struct FieldMonsterInfo
@@ -59,7 +68,7 @@ public:
     FieldMonsterInfo& GetFieldMonInfo() { return m_tFieldMonInfo; }
 
     // 2025-05-30
-    void SetDropItem(const wstring& _strDrop) { m_strDropItem = _strDrop; }
+    void SetDropItems(const vector<DropItemInfo>& dropItems) { m_vecDropItems = dropItems; }
 
     // 2025-06-06
     float GetCurHp() const { return m_fCurHP; }
@@ -84,4 +93,5 @@ private:
     // 2025-05-30
     wstring             m_strDropItem;
     CItem*              m_pItem;
+    vector<DropItemInfo>   m_vecDropItems;
 };

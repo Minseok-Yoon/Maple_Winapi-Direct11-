@@ -16,14 +16,21 @@ Erdas_of_Gladness::Erdas_of_Gladness()
     tMonInfo info = {};
     info.strTag = "Erdas_of_Gladness";
     info.fHP = 300.0f;
-    info.strDropItme = L"Piece_of_Gledness";
+    
+    DropItemInfo item1;
+    item1.strItemName = L"Piece_of_Gledness";
+    item1.fDropRate = 1.0f;      // 80% È®·ü
+    item1.iMinCount = 1;
+    item1.iMaxCount = 1;
+
+    info.vecDropItems.push_back(item1);
 
     FieldMonsterInfo fieldMonInfo = {};
     fieldMonInfo.fRespawnTimer = 6.0f;
 
     SetMonInfo(info);
     SetFieldMonInfo(fieldMonInfo);
-    SetDropItem(info.strDropItme);
+    SetDropItems(info.vecDropItems);
 }
 
 Erdas_of_Gladness::~Erdas_of_Gladness()
@@ -58,6 +65,34 @@ void Erdas_of_Gladness::Init()
     }
     else {
         OutputDebugStringA("ERROR: Transform not found in Erdas_of_Gladness::Init()\n");
+    }
+
+    CMonsterScript* pScript = GetComponent<CMonsterScript>();
+    if (pScript)
+    {
+        MonsterAnimInfo idleData = {
+            L"../Resources/Texture/Monster/Erdas/Gladness/Stand/%s/Gladness_stand_%d.png",
+            8, 0.1f, Vector2(87.f, 108.f)
+        };
+        pScript->SetAnimationData(MON_STATE::MS_Idle, idleData);
+
+        MonsterAnimInfo moveData = {
+            L"../Resources/Texture/Monster/Erdas/Gladness/Move/%s/Gladness_move_%d.png",
+            6, 0.1f, Vector2(87.f, 108.f)
+        };
+        pScript->SetAnimationData(MON_STATE::MS_Move, moveData);
+
+        MonsterAnimInfo attackData = {
+            L"../Resources/Texture/Monster/Erdas/Gladness/Attack/%s/Gladness_attack_%d.png",
+            10, 0.08f, Vector2(87.f, 108.f)
+        };
+        pScript->SetAnimationData(MON_STATE::MS_Attack, attackData);
+
+        MonsterAnimInfo deadData = {
+            L"../Resources/Texture/Monster/Erdas/Gladness/Dead/%s/Gladness_Dead_%d.png",
+            12, 0.12f, Vector2(87.f, 108.f)
+        };
+        pScript->SetAnimationData(MON_STATE::MS_Dead, deadData);
     }
 }
 

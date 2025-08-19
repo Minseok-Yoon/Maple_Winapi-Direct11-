@@ -2,6 +2,8 @@
 #include "CKeyManager.h"
 #include "../Core/CCore.h"
 
+extern CCore core;
+
 vector<CKeyManager::tKeyInfo> CKeyManager::m_vecKey = {};
 Vector2 CKeyManager::m_vCurMousePos = Vector2(1.0f, 1.0f);
 
@@ -31,6 +33,7 @@ int g_arrVK[static_cast<UINT>(KEY_CODE::LAST)] =
 	'C',
 	'V',
 	'B',
+	'N',
 	VK_MENU,
 	VK_CONTROL,
 	VK_LSHIFT,
@@ -159,16 +162,20 @@ void CKeyManager::getMousePositionByWindow()
 	// 윈도우 좌표->클라이언트 좌표(인자로 현재 윈도우 핸들값 넣는다.)
 	ScreenToClient(CCore::GetInst()->GetMainHWnd(), &mousePos);
 
-	UINT width = CCore::GetInst()->GetWidth();
-	UINT height = CCore::GetInst()->GetHeight();
+	UINT width = core.GetWidth();
+	UINT height = core.GetHeight();
 
 	m_vCurMousePos.x = -1.0f;
 	m_vCurMousePos.y = -1.0f;
 
-	if (static_cast<UINT>(mousePos.x) > 0 && static_cast<UINT>(mousePos.x) < width)
+	if (mousePos.x >= 0 && mousePos.x < static_cast<int>(width))
+		m_vCurMousePos.x = static_cast<float>(mousePos.x);
+	if (mousePos.y >= 0 && mousePos.y < static_cast<int>(height))
+		m_vCurMousePos.y = static_cast<float>(mousePos.y);
+	/*if (static_cast<UINT>(mousePos.x) > 0 && static_cast<UINT>(mousePos.x) < width)
 		m_vCurMousePos.x = static_cast<float>(mousePos.x);
 	if (static_cast<UINT>(mousePos.y) > 0 && static_cast<UINT>(mousePos.y) < height)
-		m_vCurMousePos.y = static_cast<float>(mousePos.y);
+		m_vCurMousePos.y = static_cast<float>(mousePos.y);*/
 }
 
 void CKeyManager::clearKeys()

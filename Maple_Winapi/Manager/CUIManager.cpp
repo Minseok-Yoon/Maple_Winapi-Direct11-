@@ -5,12 +5,20 @@
 #include "../Object/CObject.h"
 #include "../Object/CMiniMap.h"
 #include "../Object/CInventoryUI.h"
+#include "../Object/CMentBox.h"
 #include "../Manager/CKeyManager.h"
+#include "../Manager/CResourceManager.h"
+#include "../Core/CCore.h"
+#include "../Component/CSpriteRenderer.h"
+
+extern CCore core;
 
 unordered_map<UI_TYPE, CUI*> CUIManager::m_mapUI = {};
 stack<CUI*> CUIManager::m_stUI = {};
 queue<UI_TYPE> CUIManager::m_quRequestUIQueue = {};
 CUI* CUIManager::m_pActiveUI = nullptr;
+wstring CUIManager::m_strPendingText = L"";
+CQuest* CUIManager::m_pPendingQuest = nullptr;
 
 CUIManager::CUIManager()
 {
@@ -134,6 +142,47 @@ void CUIManager::OnLoad(UI_TYPE _eUIType)
 			OnComplete(pInventoryUI);
 			return;
 		}
+		// 2025-06-24 Npc MentBox 추가
+		else if (_eUIType == UI_TYPE::UT_MentBox)
+		{
+			CMentBox* pMentBox = Instantiate<CMentBox>(LAYER_TYPE::LT_UI);
+			pMentBox->SetName(L"NpcMentBox"); // 2025-07-09 나중에 해당 Npc를 가져와 그 Npc의 이름과 합쳐보기
+			pMentBox->OnInit();
+
+			// 저장된 텍스트 설정
+			if (!m_strPendingText.empty())
+			{
+				pMentBox->SetText(m_strPendingText);
+				m_strPendingText.clear(); // 사용 후 초기화
+				OutputDebugStringA("MentBox text set from pending text\n");
+			}
+			else
+			{
+				// 기본 텍스트 설정
+				pMentBox->SetText(L"안녕하세요!");
+				OutputDebugStringA("MentBox set with default text\n");
+			}
+
+			// 2025-06-26
+			if (m_pPendingQuest != nullptr)
+			{
+				pMentBox->SetQuest(m_pPendingQuest);
+				m_pPendingQuest = nullptr;
+				OutputDebugStringA("MentBox quest set from pending quest\n");
+			}
+
+			//// 최종 Transform 상태 확인
+			//Vector3 finalPos = tr->GetLocalPosition();
+			//Vector3 finalScale = tr->GetLocalScale();
+			//wchar_t finalMsg[256];
+			//swprintf_s(finalMsg, 256, L"UIManager - Final MentBox Transform: Pos(%.2f, %.2f), Scale(%.2f, %.2f)\n",
+			//	finalPos.x, finalPos.y, finalScale.x, finalScale.y);
+			//OutputDebugString(finalMsg);
+
+			RegisterUI(_eUIType, pMentBox);
+			OnComplete(pMentBox);
+			return;
+		}
 
 		OnFail();
 		return;
@@ -234,7 +283,7 @@ void CUIManager::Pop(UI_TYPE _eUIType)
 				if (ui)
 				{
 					//OutputDebugStringW(L"Re-activating previous UI below fullscreen UI.\n");
-					ui->Active();
+					ui->InActive();
 					break;
 				}
 			}
@@ -281,6 +330,24 @@ void CUIManager::RegisterUI(UI_TYPE _eUIType, CUI* _pUI)
 {
 	if (m_mapUI.find(_eUIType) == m_mapUI.end())
 		m_mapUI.insert(make_pair(_eUIType, _pUI));
+}
+
+void CUIManager::PushWithText(UI_TYPE _eUIType, const wstring& _text, CQuest* _pQuest)
+{
+	m_strPendingText = _text;
+	m_pPendingQuest = _pQuest;
+	m_quRequestUIQueue.push(_eUIType);
+}
+
+void CUIManager::PushWithQuest(UI_TYPE _eUIType, const wstring& _text, CQuest* _pQuest)
+{
+	CMentBox* pMentBox = dynamic_cast<CMentBox*>(GetUI(_eUIType));
+	if (pMentBox)
+	{
+		pMentBox->SetText(_text);
+		pMentBox->SetQuest(_pQuest);
+		Push(_eUIType);
+	}
 }
 
 // 2025-06-10 Pop함수 원본

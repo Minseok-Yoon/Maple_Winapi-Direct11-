@@ -48,7 +48,14 @@ namespace math
 
 	const Quaternion Quaternion::Identity = { 0.f, 0.f, 0.f, 1.f };
 
+	// Vector3 -> Vector2 변환
+	Vector2 ToVector2(const Vector3& _v3) {
+		return Vector2(_v3.x, _v3.y);
+	}
 
+	Vector3 ToVector3(const Vector2& _v2) {
+		return Vector3(_v2.x, _v2.y, 0.0f);
+	}
 
 	using namespace DirectX;
 	//using namespace ya::math;
@@ -938,7 +945,6 @@ namespace math
 		XMVector2TransformNormalStream(resultArray, sizeof(XMFLOAT2), varray, sizeof(XMFLOAT2), count, M);
 	}
 
-
 	/****************************************************************************
 	 *
 	 * Vector3
@@ -1526,7 +1532,6 @@ namespace math
 		const XMMATRIX M = XMLoadFloat4x4(&m);
 		XMVector3TransformNormalStream(resultArray, sizeof(XMFLOAT3), varray, sizeof(XMFLOAT3), count, M);
 	}
-
 
 	/****************************************************************************
 	 *
@@ -3767,6 +3772,13 @@ namespace math
 		Color R;
 		XMStoreFloat4(&R, XMVectorScale(c1, S));
 		return R;
+	}
+
+	// 2025-06-30 좌표 유효성 검사
+	bool IsValidTextureCoord(const Vector2& texPos, int texWidth, int texHeight)
+	{
+		return texPos.x >= 0 && texPos.x < texWidth&&
+			texPos.y >= 0 && texPos.y <= texHeight;
 	}
 
 	//------------------------------------------------------------------------------

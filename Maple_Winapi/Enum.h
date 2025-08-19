@@ -45,6 +45,28 @@ enum class MON_STATE
 	MS_Dead,
 };
 
+enum class BOSS_MON_STATE
+{
+	BMS_Idle,		// 대기 상태
+	BMS_summon1,
+	BMS_Move,
+	BMS_Trace,		// 추적 상태
+	BMS_Attack,		// 공격
+	BMS_Run,
+	BMS_Dead,
+};
+
+enum class NPC_STATE
+{
+	NS_Idle,		// 대기 상태
+	NS_Move,
+	NS_Patrol,		// 순찰 상태
+	NS_Trace,		// 추적 상태
+	NS_Attack,		// 공격
+	NS_Run,
+	NS_Dead,
+};
+
 enum class PLAYER_STATE
 {
 	PS_Idle,
@@ -87,12 +109,6 @@ enum ITEM_TAG
 	IT_Size
 };
 
-enum class CAM_ORDER
-{
-	CO_Main,
-	CO_Ui
-};
-
 enum class CAM_EFFECT
 {
 	CE_None,
@@ -115,24 +131,30 @@ enum class LAYER_TYPE
 	LT_PixelBackGround,
 	LT_BackGround,
 	LT_Item,
+	LT_Npc,
 	LT_Player,
+	LT_Skill,
 	LT_Monster,
+	LT_BossMonster,
 	LT_Floor,
 	LT_Portal,
 	LT_Tile,
 	LT_Particle,
 	LT_UIBackGround,
 	LT_UI,
-	LT_End,
+	LT_End
 };
 
 enum class COMPONENT_TYPE
 {
 	CT_Transform,
+	CT_UITransform,
 	CT_Collider,
+	CT_PixelCollider,
 	CT_RigidBody,
 	CT_Gravity,
 	CT_Script,
+	CT_UIRenderer,
 	CT_SpriteRenderer,
 	CT_LineRenderer,
 	CT_Animator,
@@ -145,9 +167,12 @@ enum class COMPONENT_TYPE
 enum class SCRIPT_TYPE
 {
 	ST_CameraScript,
+	ST_NpcScript,
 	ST_PlayerScript,
+	ST_SkillScript,
 	ST_PlayerBehavious,
 	ST_MonsterScript,
+	ST_BossMonsterScript,
 	ST_ItemScript,
 	ST_PortalScript,
 	ST_End
@@ -181,7 +206,10 @@ enum class ANIMATION_STATE
 
 enum class UI_TYPE
 {
+	UT_NotificationToast,
 	UT_HpBar,
+	UT_MentBox,
+	UT_Text,
 	UI_Inventory,
 	UT_MiniMap,
 	UT_Button,
@@ -190,9 +218,8 @@ enum class UI_TYPE
 
 enum class CAMERA_ORDER
 {
-	CO_None = 0,
-	CO_Main = 1,
-	CO_UI = 10
+	CO_Main,
+	CO_UI
 };
 
 enum class CLEAR_FLAG
@@ -213,4 +240,17 @@ enum class PIVOT_TYPE
 	PT_LeftBottom,
 	PT_Left,
 	PT_LeftTop,
+};
+
+enum class Skill_State
+{
+	SS_Idle,
+	SS_Casting,
+	SS_Cooldown,
+	SS_End
+};
+
+enum class SKILL_TYPE
+{
+	ST_Trinity,
 };

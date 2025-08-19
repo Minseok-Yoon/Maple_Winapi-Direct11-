@@ -24,41 +24,44 @@ void CRigidBody::Init()
 
 void CRigidBody::Update()
 {
-	// f(힘) = m(질량) * a(가속도)
+	//// f(힘) = m(질량) * a(가속도)
 	m_vAccel = m_vForce / m_fMass;
 
-	// 속도에 가속도를 더한다.
-	m_vVelocity += m_vAccel * min(CTimeManager::GetfDeltaTime(), 0.016f);
+	// 속도에 일정한 속도로만 움직이게 할 수는 없나?
+	m_vVelocity.x = m_vAccel.x;
 
-	// 마찰력에 의한 반대방향으로의 가속도
-	if (!(m_vVelocity == Vector2(0.0f, 0.0f)))
-	{
-		Vector2 vFriction = -m_vVelocity;
-		vFriction.Normalize();
-		vFriction = vFriction * m_fFriction * m_fMass * CTimeManager::GetfDeltaTime();
+	// 속도에 가속도를 더한다.(중력)
+	m_vVelocity.y += m_vAccel.y * min(CTimeManager::GetfDeltaTime(), 0.016f);
 
-		if (m_vVelocity.Length() <= vFriction.Length())
-		{
-			// 마찰 가속도가 본래 속도보다 더 큰 경우
-			m_vVelocity = Vector2(0.0f, 0.0f);
-		}
+	//// 마찰력에 의한 반대방향으로의 가속도
+	//if (!(m_vVelocity == Vector2(0.0f, 0.0f)))
+	//{
+	//	Vector2 vFriction = -m_vVelocity;
+	//	vFriction.Normalize();
+	//	vFriction = vFriction * m_fFriction * m_fMass * CTimeManager::GetfDeltaTime();
 
-		else
-		{
-			m_vVelocity += vFriction;
-		}
-	}
+	//	if (m_vVelocity.Length() <= vFriction.Length())
+	//	{
+	//		// 마찰 가속도가 본래 속도보다 더 큰 경우
+	//		m_vVelocity = Vector2(0.0f, 0.0f);
+	//	}
 
-	// 속도 제한 검사
-	if (abs(m_vMaxVelocity.x) < abs(m_vVelocity.x))
-	{
-		m_vVelocity.x = (m_vVelocity.x / abs(m_vVelocity.x)) * abs(m_vMaxVelocity.x);
-	}
+	//	else
+	//	{
+	//		m_vVelocity += vFriction;
+	//	}
+	//}
 
-	if (abs(m_vMaxVelocity.y) < abs(m_vVelocity.y))
-	{
-		m_vVelocity.y = (m_vVelocity.y / abs(m_vVelocity.y)) * abs(m_vMaxVelocity.y);
-	}
+	//// 속도 제한 검사
+	//if (abs(m_vMaxVelocity.x) < abs(m_vVelocity.x))
+	//{
+	//	m_vVelocity.x = (m_vVelocity.x / abs(m_vVelocity.x)) * abs(m_vMaxVelocity.x);
+	//}
+
+	//if (abs(m_vMaxVelocity.y) < abs(m_vVelocity.y))
+	//{
+	//	m_vVelocity.y = (m_vVelocity.y / abs(m_vVelocity.y)) * abs(m_vMaxVelocity.y);
+	//}
 
 	// 속도에 따른 이동
 	Move();

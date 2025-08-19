@@ -3,6 +3,7 @@
 #include "../Resource/CTexture.h"
 #include "../Component/CPixelCollider.h"
 
+class Trinity;
 class CMonster;
 class CPlayerScript : public CScript
 {
@@ -35,16 +36,18 @@ public:
 
 	void PlayerAttack(CMonster* _pMonster);
 
+	//Vector2 GetSlopeAdjustedForce(Vector2 baseForce);
+
 private:
-	void idle();
-	void move();
-	void prone();
-	void jump();
-	void attack();
+	void idle(int _iDir);
+	void move(int _iDir);
+	void prone(int _iDir);
+	void jump(int _iDir);
+	void attack(int _iDir);
 
 private:
 	PLAYER_STATE		m_ePlayerState;
-	class CAnimator*	m_pAnimator;
+	//class CAnimator*	m_pAnimator;
 	int					m_iDir;
 
 	CPixelCollider*		m_pPixelCollider;
@@ -59,4 +62,6 @@ private:
 	CGameObject* m_pColliderItem = nullptr;
 	int m_iItemCnt = 0;
 	int m_iItemTarget = 10;
+
+	Trinity* m_pTrinity = nullptr;
 };

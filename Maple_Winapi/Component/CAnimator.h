@@ -56,6 +56,7 @@ public:
 	bool HasAnimation(const wstring& _strAnimName) const;
 
 	void Play(const wstring& _strName, bool _bRepeat = true);
+	void Stop();
 	bool End() const;
 	void ResetAnimation();
 	bool IsFinish() const { return m_pCurAnimation->IsFinish(); }

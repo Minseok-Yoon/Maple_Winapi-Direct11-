@@ -109,6 +109,7 @@ void CCamera::CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType)
 	GetClientRect(core.GetMainHWnd(), &winRect);
 	const float width = static_cast<float>(winRect.right - winRect.left);
 	const float height = static_cast<float>(winRect.bottom - winRect.top);
+
 	m_fAspectRatio = width / height;
 
 	switch (_eProjectionType)
@@ -120,10 +121,78 @@ void CCamera::CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType)
 	case PROJECTION_TYPE::PT_Orthographic:
 		m_ProjectionMatrix = Matrix::CreateOrthographicLH(width / m_fSize, height / m_fSize, m_fNear, m_fFar);
 		break;
+
+	default:
+		OutputDebugStringW(L"⚠️ 투영 타입이 잘못됨!\n");
+		break;
 	}
 
 	// 프로젝션 매트릭스 생성 로직
 	assert(m_ProjectionMatrix != Matrix::Identity);
+}
+
+Vector3 CCamera::ScreenToWorld(const Vector2& screenPos)
+{
+	RECT rc = {};
+	GetClientRect(core.GetMainHWnd(), &rc);
+
+	float width = static_cast<float>(rc.right - rc.left);
+	float height = static_cast<float>(rc.bottom - rc.top);
+
+	// 1. 클라이언트 좌표 → NDC 좌표 (-1 ~ 1)
+	float ndcX = (2.0f * screenPos.x / width) - 1.0f;
+	float ndcY = (2.0f * screenPos.y / height) - 1.0f; // Y축 뒤집기 (상단 기준이기 때문)
+
+	// 2. NDC → View 공간 (Orthographic의 경우 NDC 그대로 사용 가능)
+	Vector4 ndcPos = Vector4(ndcX, ndcY, 0.0f, 1.0f);
+
+	// 3. View 공간 → World 공간 (View * Projection 역행렬 적용)
+	Matrix viewProj = m_ViewMatrix * m_ProjectionMatrix;
+	Matrix invViewProj = viewProj.Invert();
+
+	Vector4 worldPos = Vector4::Transform(ndcPos, invViewProj);
+
+	if (fabs(worldPos.w) > 1e-6f)
+	{
+		worldPos.x /= worldPos.w;
+		worldPos.y /= worldPos.w;
+		worldPos.z /= worldPos.w;
+	}
+	else
+	{
+		// w가 거의 0이면 로그/디버그
+		OutputDebugStringA("Warning: worldPos.w is zero or near-zero in ScreenToWorld\n");
+	}
+
+	return Vector3(worldPos.x, worldPos.y, worldPos.z);
+
+	return Vector3(worldPos.x, worldPos.y, 0.0f);
+}
+
+bool CCamera::IsWorldPosVisible(const Vector3& worldPos, const Matrix& view, const Matrix& proj)
+{
+	Matrix viewProj = view * proj;
+	Vector4 clip = Vector4::Transform(Vector4(worldPos.x, worldPos.y, worldPos.z, 1.0f), viewProj);
+
+	// w 체크
+	if (fabs(clip.w) < 1e-6f) {
+		OutputDebugStringA("IsVisible: w nearly zero\n");
+		return false;
+	}
+
+	// 동차 나누기 -> NDC
+	Vector3 ndc(clip.x / clip.w, clip.y / clip.w, clip.z / clip.w);
+
+	// DirectX (D3D) 기본 z 범위는 0..1, X/Y는 -1..1
+	//char buf[256];
+	//sprintf_s(buf, "NDC = (%f, %f, %f)\n", ndc.x, ndc.y, ndc.z);
+	//OutputDebugStringA(buf);
+
+	bool inX = (ndc.x >= -1.0f && ndc.x <= 1.0f);
+	bool inY = (ndc.y >= -1.0f && ndc.y <= 1.0f);
+	bool inZ = (ndc.z >= 0.0f && ndc.z <= 1.0f); // D3D: 0..1
+
+	return inX && inY && inZ;
 }
 
 // 2025-04-17
@@ -230,3 +299,15 @@ void CCamera::CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType)
 //	//// GPU에 설정된 행렬 확인
 //	//OutputDebugStringW(L"View & Projection Matrix 업데이트 완료\n");
 //}
+
+// 2025-07-01
+// 여기서 드는 의문 카메라의 near와 far clip이 정확히 의미하는 의도는 뭘까?
+// -> nearClip은 보이기 시작하는 지점, farClip은 가장 멀리 보이는 지점
+// 또한 near = 1.0f이고 far = 1000.0f일 때 z = 0.0f 또는 z = -0.1f 이런 값들은 보이지 않는 이유는 무엇이며
+// 어째서 z = -1.0f의 값은 보이는 것인가?
+// -> 예시로 카메라 위치가 z = -10.0f, near = 1.0f, far = 1000.0f일 때
+// 렌더링 가능한 z 범위(월드 기준)
+// z = -10.0f + 1.0f = -9.0f (near plane 시작점)
+// z = -10.0f + 1000.0f = 990.0f (far plane 끝점)
+// 즉 -9.0f ~ 990.0f 사이에는 보인다는 점
+// 카메라의 좌표계와 클리핑 규칙을 명확히 이해할 것.

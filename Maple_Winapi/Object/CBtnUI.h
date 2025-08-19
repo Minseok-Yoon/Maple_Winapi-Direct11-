@@ -6,7 +6,7 @@ class CBtnUI : public CUI
 {
 public:
     CBtnUI();
-    ~CBtnUI();
+    virtual ~CBtnUI();
 
     virtual void OnInit() override;
     virtual void OnActive() override;
@@ -22,8 +22,44 @@ public:
     void SetBtnPosition(Vector2 _vPos) { m_vPos = _vPos; }
     Vector2 GetBtnPosition() const { return m_vPos; }
 
+    // 2025-07-18
+    void SetButtonClickEvent(function<void()> Function)
+    {
+        ButtonClickEvent = Function;
+    }
+    void SetButtonClickEndEvent(function<void()> Function)
+    {
+        ButtonClickEndEvent = Function;
+    }
+    void SetButtonClickStayEvent(function<void()> Function)
+    {
+        ButtonStayEvent = Function;
+    }
+
+    function<void()> GetButtonClickEvent()
+    {
+        return ButtonClickEvent;
+    }
+
+    function<void()> GetButtonClickEndEvent()
+    {
+        return ButtonClickEndEvent;
+    }
+
+    function<void()> GetButtonStayEvent()
+    {
+        return ButtonStayEvent;
+    }
+
+    void ClickUpdate();
+
 private:
     CTexture* m_pTexture;
     Vector2     m_vPos;
     tUIEvent    m_tOnClick;
+
+    // 2025-07-18
+    function<void()> ButtonClickEvent;
+    function<void()> ButtonClickEndEvent;
+    function<void()> ButtonStayEvent;
 };

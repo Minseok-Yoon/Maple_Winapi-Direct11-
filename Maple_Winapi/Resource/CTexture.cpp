@@ -2,6 +2,12 @@
 #include "../Core/CCore.h"
 #include "../Manager/CResourceManager.h"
 
+const TextureColor TextureColor::RED = { 255, 0,   0,   255 };
+const TextureColor TextureColor::BLUE = { 0,   0, 255, 255 };
+const TextureColor TextureColor::GREEN = { 0, 255,   0, 255 };
+const TextureColor TextureColor::MAGENTA = { 255, 0, 255, 255 };
+const TextureColor TextureColor::AQUA = { 0, 255, 255, 255 };
+
 extern CCore core;
 
 CTexture::CTexture() :
@@ -112,55 +118,107 @@ bool CTexture::GetDesc(D3D11_TEXTURE2D_DESC& desc) const
 
 TextureColor CTexture::GetColor(int _x, int _y, TextureColor _DefaultColor)
 {
-	// GetScale() 값을 한번만 저장 (불필요한 함수 호출 방지)
-	Vector3 scale = GetScale();
-	int texWidth = static_cast<int>(scale.x);
-	int texHeight = static_cast<int>(scale.y);
+	// 텍스처 사이즈 (메타데이터에서 가져온 값 사용)
+	int texWidth = static_cast<int>(m_tTextureSize.width);
+	int texHeight = static_cast<int>(m_tTextureSize.height);
 
-	// 중앙 기준 좌표를 텍스처 좌표로 변환
+	// 입력 좌표 -> 텍스처 좌표 변환 (사용하던 변환 유지)
 	int texX = _x + (texWidth / 2);
-	int texY = (_y * -1) + (texHeight / 2); // Y축 반전
+	int texY = (_y * -1) + (texHeight / 2); // Y 반전
 
-	//// 디버깅 로그 추가
-	//std::string debugMsg = "🔍 Texture Size: (" + std::to_string(texWidth) + ", " + std::to_string(texHeight) + ")\n";
-	//debugMsg += "🎯 Converted Coordinates: (" + std::to_string(texX) + ", " + std::to_string(texY) + ")\n";
-	//OutputDebugStringA(debugMsg.c_str());
-
-	// 변환된 좌표의 범위 검사
 	if (texX < 0 || texY < 0 || texX >= texWidth || texY >= texHeight)
-	{
-		//OutputDebugStringA(("⚠️ GetColor() - Converted Out of bounds: (" + std::to_string(texX) + ", " + std::to_string(texY) + ")\n").c_str());
 		return _DefaultColor;
-	}
 
-	// 픽셀 데이터 포인터 가져오기
-	unsigned char* Ptr = m_Image.GetPixels();
-	if (!Ptr)
-	{
-		//OutputDebugStringA("❌ GetColor() - Pixel data is null!\n");
+	// 이미지 획득 (첫 이미지, mip=0, array=0)
+	const Image* img = m_Image.GetImage(0, 0, 0);
+	if (!img || !img->pixels)
 		return _DefaultColor;
-	}
 
-	// 텍스처 형식 가져오기
-	DXGI_FORMAT Fmt = m_Image.GetMetadata().format;
+	UINT rowPitch = img->rowPitch; // 한 행의 바이트 수
+	DXGI_FORMAT fmt = img->format;
 
-	// 픽셀 데이터의 위치 계산 (Stride 고려)
-	unsigned char* pixelPtr = Ptr + ((texY * texWidth) + texX) * 4;
-
-	// 포맷에 따라 색상 변환
-	switch (Fmt)
+	// 바이트/픽셀 (일반적으로 4)
+	int bpp = 4;
+	switch (fmt)
 	{
 	case DXGI_FORMAT_B8G8R8A8_UNORM:
 	case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
-		return { pixelPtr[2], pixelPtr[1], pixelPtr[0], pixelPtr[3] }; // BGR → RGB 변환
-
 	case DXGI_FORMAT_R8G8B8A8_UNORM:
-		return { pixelPtr[0], pixelPtr[1], pixelPtr[2], pixelPtr[3] }; // 그대로 사용
-
-	default:
-		OutputDebugStringA(("⚠️ Unsupported texture format in GetColor(): " + std::to_string(Fmt) + "\n").c_str());
+	case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+		bpp = 4;
 		break;
+	default:
+		// 지원 포맷 아니면 기본 반환
+		return _DefaultColor;
 	}
 
-	return _DefaultColor;
+	unsigned char* rowStart = img->pixels + texY * rowPitch;
+	unsigned char* pixelPtr = rowStart + texX * bpp;
+
+	if (fmt == DXGI_FORMAT_B8G8R8A8_UNORM || fmt == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB)
+	{
+		return { pixelPtr[2], pixelPtr[1], pixelPtr[0], pixelPtr[3] }; // BGR -> RGB
+	}
+	else // R8G8B8A8
+	{
+		return { pixelPtr[0], pixelPtr[1], pixelPtr[2], pixelPtr[3] };
+	}
+	//// GetScale() 값을 한번만 저장 (불필요한 함수 호출 방지)
+	//Vector3 scale = GetScale();
+	//int texWidth = static_cast<int>(scale.x);
+	//int texHeight = static_cast<int>(scale.y);
+
+	//// 중앙 기준 좌표를 텍스처 좌표로 변환
+	//int texX = _x + (texWidth / 2);
+	//int texY = (_y * -1) + (texHeight / 2); // Y축 반전
+
+	//// 디버깅 로그
+	///*std::ostringstream oss;
+	//oss << "Input: (" << _x << ", " << _y << ") -> Texture: (" << texX << ", " << texY << ") Size: (" << texWidth << ", " << texHeight << ")\n";
+	//OutputDebugStringA(oss.str().c_str());*/
+
+	////// 디버깅 로그 추가
+	////std::string debugMsg = "🔍 Texture Size: (" + std::to_string(texWidth) + ", " + std::to_string(texHeight) + ")\n";
+	////debugMsg += "🎯 Converted Coordinates: (" + std::to_string(texX) + ", " + std::to_string(texY) + ")\n";
+	////OutputDebugStringA(debugMsg.c_str());
+
+	//// 변환된 좌표의 범위 검사
+	//if (texX < 0 || texY < 0 || texX >= texWidth || texY >= texHeight)
+	//{
+	//	/*oss.str("");
+	//	oss << "Out of bounds! Returning default color\n";
+	//	OutputDebugStringA(oss.str().c_str());*/
+	//	return _DefaultColor;
+	//}
+
+	//// 픽셀 데이터 포인터 가져오기
+	//unsigned char* Ptr = m_Image.GetPixels();
+	//if (!Ptr)
+	//{
+	//	//OutputDebugStringA("❌ GetColor() - Pixel data is null!\n");
+	//	return _DefaultColor;
+	//}
+
+	//// 텍스처 형식 가져오기
+	//DXGI_FORMAT Fmt = m_Image.GetMetadata().format;
+
+	//// 픽셀 데이터의 위치 계산 (Stride 고려)
+	//unsigned char* pixelPtr = Ptr + ((texY * texWidth) + texX) * 4;
+
+	//// 포맷에 따라 색상 변환
+	//switch (Fmt)
+	//{
+	//case DXGI_FORMAT_B8G8R8A8_UNORM:
+	//case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+	//	return { pixelPtr[2], pixelPtr[1], pixelPtr[0], pixelPtr[3] }; // BGR → RGB 변환
+
+	//case DXGI_FORMAT_R8G8B8A8_UNORM:
+	//	return { pixelPtr[0], pixelPtr[1], pixelPtr[2], pixelPtr[3] }; // 그대로 사용
+
+	//default:
+	//	OutputDebugStringA(("⚠️ Unsupported texture format in GetColor(): " + std::to_string(Fmt) + "\n").c_str());
+	//	break;
+	//}
+
+	//return _DefaultColor;
 }

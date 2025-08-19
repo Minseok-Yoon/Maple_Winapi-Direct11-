@@ -303,7 +303,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 ImGui::End();
             }
 
-            // Rendering
+            // Rendering 2025-08-17
             if (showColliderInspector)
             {
                 collider.RenderUI();
@@ -466,6 +466,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             core.ToggleFullScreen();
         }
+        break;
+    case WM_SYSKEYDOWN:
+        if (wParam == VK_MENU)
+        {
+            return 0;
+        }
+        break;
+    case WM_SYSKEYUP:
+        if (wParam == VK_MENU)
+        {
+            return 0;
+        }
+        break;
+    case WM_SYSCHAR:
+        return 0;
         break;
     case WM_DESTROY:
         PostQuitMessage(0);

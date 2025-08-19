@@ -9,6 +9,18 @@ CScene* CSceneManager::m_pCurScene = nullptr;
 CScene* CSceneManager::m_pDontDestroyOnLoad = nullptr;
 map<wstring, CScene*> CSceneManager::m_mapScene = {};
 
+CScene* CSceneManager::CreateSceneByName(const wstring& strName)
+{
+	CScene* scene = CSceneFactory::CreateScene(strName);
+	if (scene)
+	{
+		scene->SetName(strName);
+		scene->Init();
+		m_mapScene.insert({ strName, scene });
+	}
+	return scene;
+}
+
 void CSceneManager::Init()
 {
 	m_pDontDestroyOnLoad = CreateScene<CDontDestroyOnLoad>(L"DontDestroyOnLoad");

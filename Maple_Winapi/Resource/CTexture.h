@@ -71,6 +71,9 @@ public:
 
     Vector3 GetScale() { return { static_cast<float>(m_Desc.Width), static_cast<float>(m_Desc.Height), 1.0f }; }
 
+    // 2025-06-12 SRV Set/Get 함수 추가
+    void SetSRV(Microsoft::WRL::ComPtr< ID3D11ShaderResourceView> _SRV) { m_SRV = _SRV; }
+
 private:
     vector<PIXEL>   m_vecPixel;
     UINT            m_iWidth;

@@ -33,6 +33,18 @@ void CAnimator::Init()
 
 void CAnimator::Update()
 {
+	/*if (m_pCurAnimation)
+	{
+		std::wstring msg = L"[Animator::Update] CurAnim: " + m_pCurAnimation->GetName() +
+			L" SpriteRenderer: " + std::to_wstring((uintptr_t)m_pSpriteRenderer) +
+			L" FrameIdx: " + std::to_wstring(m_pCurAnimation->GetCurFrameIndex()) + L"\n";
+		OutputDebugStringW(msg.c_str());
+	}
+	else
+	{
+		OutputDebugStringW(L"[Animator::Update] CurAnim: null\n");
+	}*/
+
 	if (m_pCurAnimation)
 	{
 		m_pCurAnimation->Update(); // 현재 애니메이션 업데이트
@@ -57,8 +69,23 @@ void CAnimator::Update()
 				events->tCompleteEvent();
 
 			// 반복 재생 설정이 되어 있다면 애니메이션을 리셋하여 반복
-			if (m_bRepeat)
+			if (m_bRepeat && m_pCurAnimation->IsFinish())
 			{
+				if (events)
+					events->tEndEvent();
+
+				// 스프라이트를 명시적으로 비움(그래픽 잔상/쓰레기 방지)
+				if (m_pSpriteRenderer)
+				{
+					m_pSpriteRenderer->SetTexture(nullptr);
+				}
+
+				// 현재 애니메이션 포인터 해제
+				m_pCurAnimation = nullptr;
+			}
+			else if (m_bRepeat)
+			{
+				// 반복 재생이면 그냥 리셋
 				m_pCurAnimation->ResetAnimation();
 			}
 		}
@@ -213,6 +240,12 @@ void CAnimator::Play(const wstring& _strName, bool _bRepeat)
 		m_bRepeat = _bRepeat;
 	}
 	
+	if (m_pSpriteRenderer)
+	{
+		CTexture* tex = m_pCurAnimation->GetCurrentFrameTexture();
+		m_pSpriteRenderer->SetTexture(tex);
+	}
+
 	//// 애니메이션 진행 중 텍스처 출력
 	//CTexture* currentTexture = m_pCurAnimation->GetCurrentFrameTexture();
 	//if (currentTexture)
@@ -220,6 +253,26 @@ void CAnimator::Play(const wstring& _strName, bool _bRepeat)
 	//	wstring debugMessage = L"현재 출력 중인 텍스처: " + currentTexture->GetFilePath() + L"\n";
 	//	OutputDebugString(debugMessage.c_str());
 	//}
+}
+
+void CAnimator::Stop()
+{
+	if (m_pCurAnimation)
+	{
+		tEvents* currentEvents = FindEvents(m_pCurAnimation->GetName());
+		if (currentEvents)
+			currentEvents->tEndEvent();
+
+		m_pCurAnimation = nullptr;
+	}
+
+	if (m_pSpriteRenderer)
+	{
+		m_pSpriteRenderer->SetTexture(nullptr);
+	}
+	m_pSpriteRenderer = nullptr;
+
+	m_bRepeat = false;
 }
 
 bool CAnimator::End() const

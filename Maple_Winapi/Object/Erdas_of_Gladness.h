@@ -11,7 +11,4 @@ public:
     virtual void Update() override;
     virtual void LateUpdate() override;
     virtual void Render(const Matrix& view, const Matrix& projection) override;
-    
-private:
-
 };

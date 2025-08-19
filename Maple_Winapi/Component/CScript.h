@@ -1,6 +1,8 @@
 #pragma once
 #include "CComponent.h"
 
+class CAnimator;
+class CPlayer;
 class CScript : public CComponent
 {
 public:
@@ -23,6 +25,12 @@ public:
 
 	// 2025-06-05
 	SCRIPT_TYPE	GetScriptType() { return m_eScriptType; }
+
+	void SetPlayer(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
+
+protected:
+	CAnimator* m_pAnimator = nullptr;
+	CPlayer* m_pPlayer = nullptr;
 
 // 2025-06-05
 private:

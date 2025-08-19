@@ -4,6 +4,8 @@
 class CResourceManager
 {
 public:
+	static void Init();
+
 	template <typename T>
 	static T* Find(const wstring& _strKey)
 	{

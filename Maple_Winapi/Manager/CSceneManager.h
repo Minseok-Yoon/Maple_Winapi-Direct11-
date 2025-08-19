@@ -1,6 +1,7 @@
 #pragma once
 #include "../Scene/CScene.h"
 #include "../Object/CGameObject.h"
+#include "../Scene/CSceneFactory.h"
 
 class CScene;
 class CGameObject;
@@ -18,6 +19,9 @@ public:
 
 		return scene;
 	}
+
+	// 2025-07-23
+	static CScene* CreateSceneByName(const wstring& strName);
 
 public:
 	static void Init();

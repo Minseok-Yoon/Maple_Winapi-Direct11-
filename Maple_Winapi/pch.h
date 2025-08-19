@@ -7,6 +7,8 @@ using namespace std;
 #include <Windows.h>
 #include <assert.h>
 #include <iostream>
+#include <array>
+using std::array;
 
 #include <algorithm>
 using std::sort;

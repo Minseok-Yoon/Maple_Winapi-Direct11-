@@ -188,19 +188,31 @@ void CMonster::DropItem()
     CTransform* tr = this->GetComponent<CTransform>(); // GetOwner()가 필요 없음, 자신을 의미함
     Vector3 vPos = tr ? tr->GetWorldPosition() : Vector3(0.f, 0.f, 0.f);
 
-    // 50% 확률로 아이템 드롭
-    int itemDropChance = std::rand() % 100;
-    if (itemDropChance < 100 && !m_strDropItem.empty())
+    for (const auto& dropInfo : m_vecDropItems)
     {
-        m_pItem = Instantiate<CItem>(LAYER_TYPE::LT_Item);
-        m_pItem->SetDropItem(m_strDropItem);
+        float chance = static_cast<float>(rand()) / RAND_MAX; // 0~1 랜덤값
+        if (chance <= dropInfo.fDropRate)  // 드랍 확률 체크
+        {
+            int dropCount = rand() % (dropInfo.iMaxCount - dropInfo.iMinCount + 1) + dropInfo.iMinCount;
 
-        // 위치 설정
-        CTransform* itemTr = m_pItem->GetComponent<CTransform>();
-        if (itemTr)
-            itemTr->SetWorldPosition(vPos);
+            for (int i = 0; i < dropCount; ++i)
+            {
+                // 아이템 생성
+                CItem* pItem = Instantiate<CItem>(LAYER_TYPE::LT_Item);
+                pItem->SetDropItem(dropInfo.strItemName); // 여기서 texture 설정
 
-        OutputDebugStringA(("Item dropped: " + std::string(m_strDropItem.begin(), m_strDropItem.end()) + "\n").c_str());
+                // 위치 설정 (랜덤 오프셋)
+                CTransform* itemTr = pItem->GetComponent<CTransform>();
+                if (itemTr)
+                {
+                    Vector3 randomOffset = Vector3((rand() % 40 - 20) * 1.f, 0.f, 0.f);
+                    itemTr->SetWorldPosition(vPos + randomOffset);
+                }
+
+                std::string itemName(dropInfo.strItemName.begin(), dropInfo.strItemName.end());
+                OutputDebugStringA(("Item dropped: " + itemName + "\n").c_str());
+            }
+        }
     }
 
     //    // 100% 확률로 돈 드롭

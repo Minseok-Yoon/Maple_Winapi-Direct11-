@@ -1,8 +1,9 @@
 #pragma once
-#include "CCamera.h"
 #include "../Graphics/CGraphicsDevice_DX11.h"
 #include "../Graphics/CConstantBuffer.h"
 
+class CCamera;
+class CGameObject;
 namespace renderer
 {
 	extern CCamera* mainCamera;

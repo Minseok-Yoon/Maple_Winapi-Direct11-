@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Engine">
       <UniqueIdentifier>{02f65f42-4fd5-4999-a9b1-e6209936fb18}</UniqueIdentifier>
     </Filter>
@@ -226,9 +222,6 @@
     <Filter Include="Engine\04. Manager\DebugManager">
       <UniqueIdentifier>{cf0d2f43-cd94-4dae-af77-d9c7ab613682}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\09. Component\Camera\Renderer\DebugRenderer">
-      <UniqueIdentifier>{e032121a-fae8-4504-acce-97a84b1a6e71}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\05. Object\Ground\CLineGround">
       <UniqueIdentifier>{fa8dce3a-1049-4bfb-afa0-a0986a03a461}</UniqueIdentifier>
     </Filter>
@@ -270,6 +263,103 @@
     </Filter>
     <Filter Include="Engine\05. Object\Inventory">
       <UniqueIdentifier>{0ca81f04-9af6-493a-a29c-edcceccfa9f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\NPC\NpcScript">
+      <UniqueIdentifier>{0701bd40-8548-4cdb-845e-78ee09b11bef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\06. Scene\The_Lake_of_Oblivion\The_Lake_of_Oblivion%28Npc%29">
+      <UniqueIdentifier>{55d76e80-6b2d-42fa-a0d1-68a28f12c197}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\UI\MentBox">
+      <UniqueIdentifier>{f3fd039a-e633-4090-8475-6ab96cb85f4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\04. Manager\FontManager">
+      <UniqueIdentifier>{97e9a225-0fa1-415d-9d7e-42a7fa166814}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\15. ThirdParty">
+      <UniqueIdentifier>{525690a4-a53f-4333-8d92-7a8feb831166}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\15. ThirdParty\Debug">
+      <UniqueIdentifier>{38e2cdf4-2ac5-4956-a119-d0db10745c96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\15. ThirdParty\inc">
+      <UniqueIdentifier>{86ea0f07-6c26-4ec3-8fea-1e81c7368bf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\15. ThirdParty\Release">
+      <UniqueIdentifier>{3ddab063-c384-47e1-8029-90c9c365b9f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\16. Quest">
+      <UniqueIdentifier>{eddac3dc-d59f-4113-a03c-99c5be40d367}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\04. Manager\QuestManager">
+      <UniqueIdentifier>{e6690f10-9e47-4a82-bc40-b3d7364c92a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\UI\NotificationToast">
+      <UniqueIdentifier>{fd7d7c1a-61c5-42e6-aee3-1fe65ede461a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\09. Component\Collider\CollisionChecker">
+      <UniqueIdentifier>{bc7b0dc2-b518-4dab-a254-b4d22440250e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\14. Test\DebugDraw">
+      <UniqueIdentifier>{cae14035-2b28-4ca6-8c8d-a1cd20301bde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\09. Component\Transform\UITransform">
+      <UniqueIdentifier>{87ba0a3c-607b-4322-9c6b-f375dd9fce22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\09. Component\SpriteRenderer\UISpriteRenderer">
+      <UniqueIdentifier>{fc45cb58-9c46-4562-9e65-37ac4f4751ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\UI\UIText">
+      <UniqueIdentifier>{aadd62d8-59a4-4623-b897-1398aa2cdae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\09. Component\Camera\Renderer\BaseRenderer\CUIRenderer">
+      <UniqueIdentifier>{9648adf0-f3bb-448b-be61-47186b73e39a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\06. Scene\SceneFactory">
+      <UniqueIdentifier>{d0b1590b-d5c7-44e4-937d-7521eaf1ef40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Monster\Boss_Reward_Box">
+      <UniqueIdentifier>{510e3ce2-8c9f-412e-b961-21a886a1e2d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\06. Scene\Boss_Clear_Room">
+      <UniqueIdentifier>{c0b1f85e-30fd-43cd-9028-95c7a290871e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\17. Effect">
+      <UniqueIdentifier>{be02d4e6-4b1e-495c-a24b-212e13955932}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Engine\05. Object\Boss">
+      <UniqueIdentifier>{42a3c7aa-e34d-403e-b151-85eb00769679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Boss\Jinhilla_Phase1">
+      <UniqueIdentifier>{f941d7c5-b6ae-4e8c-97c9-ab8153bdd6e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\18. GameEngineGUI">
+      <UniqueIdentifier>{dc35b646-b24a-43ec-b30b-950fde0e4539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\06. Scene\Jinhillah_Scene">
+      <UniqueIdentifier>{4c78894e-a76c-496e-a6f1-5adae50ebded}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Boss\BossScript">
+      <UniqueIdentifier>{a7090990-7ef1-4170-bc1c-702033c6c9c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Boss\Jinhilla_Phase1\Manifestation_of_Desire">
+      <UniqueIdentifier>{7e843026-a3aa-4c9a-bee0-fe1daefca9ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Player\Skill">
+      <UniqueIdentifier>{fd0c6229-138a-4454-944e-904da1c37d3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Player\Skill\Trinity">
+      <UniqueIdentifier>{6b285976-08ce-4029-b57e-f8acb54fcace}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\04. Manager\SkillManager">
+      <UniqueIdentifier>{572b920a-f674-45b9-9157-9082b1d7d393}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\05. Object\Monster\TestMonster">
+      <UniqueIdentifier>{2356d5de-3d8c-42b8-9159-2c10abda4964}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -564,6 +654,96 @@
     <ClInclude Include="Object\CInventory.h">
       <Filter>Engine\05. Object\Inventory</Filter>
     </ClInclude>
+    <ClInclude Include="Object\CNpcScript.h">
+      <Filter>Engine\05. Object\NPC\NpcScript</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Legato.h">
+      <Filter>Engine\06. Scene\The_Lake_of_Oblivion\The_Lake_of_Oblivion%28Npc%29</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CMentBox.h">
+      <Filter>Engine\05. Object\UI\MentBox</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\CFontManager.h">
+      <Filter>Engine\04. Manager\FontManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\FW1FontWrapper\inc\FW1FontWrapper.h">
+      <Filter>Engine\15. ThirdParty\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Quest\CQuest.h">
+      <Filter>Engine\16. Quest</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\CQuestManager.h">
+      <Filter>Engine\04. Manager\QuestManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CNotificationToast.h">
+      <Filter>Engine\05. Object\UI\NotificationToast</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\CCollisionChecker.h">
+      <Filter>Engine\09. Component\Collider\CollisionChecker</Filter>
+    </ClInclude>
+    <ClInclude Include="Test\CDebugDraw.h">
+      <Filter>Engine\14. Test\DebugDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\CUITransform.h">
+      <Filter>Engine\09. Component\Transform\UITransform</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\CUISpriteRenderer.h">
+      <Filter>Engine\09. Component\SpriteRenderer\UISpriteRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CUIText.h">
+      <Filter>Engine\05. Object\UI\UIText</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\CUIRenderer.h">
+      <Filter>Engine\09. Component\Camera\Renderer\BaseRenderer\CUIRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\CSceneFactory.h">
+      <Filter>Engine\06. Scene\SceneFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CBoss_Reward_Box.h">
+      <Filter>Engine\05. Object\Monster\Boss_Reward_Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\CBoss_Clear_Room.h">
+      <Filter>Engine\06. Scene\Boss_Clear_Room</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect\CEffect.h">
+      <Filter>Engine\17. Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CBoss.h">
+      <Filter>Engine\05. Object\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEngineGUI\CGameEngineGUI.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Jinhillah_Scene.h">
+      <Filter>Engine\06. Scene\Jinhillah_Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CBossScript.h">
+      <Filter>Engine\05. Object\Boss\BossScript</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Jinhilla_Phase1.h">
+      <Filter>Engine\05. Object\Boss\Jinhilla_Phase1</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Manifestation_of_Desire.h">
+      <Filter>Engine\05. Object\Boss\Jinhilla_Phase1\Manifestation_of_Desire</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CBaseSkill.h">
+      <Filter>Engine\05. Object\Player\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Trinity.h">
+      <Filter>Engine\05. Object\Player\Skill\Trinity</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\TrinityScript.h">
+      <Filter>Engine\05. Object\Player\Skill\Trinity</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\CBaseSkillScript.h">
+      <Filter>Engine\05. Object\Player\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\CSkillManager.h">
+      <Filter>Engine\04. Manager\SkillManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\TestMonster.h">
+      <Filter>Engine\05. Object\Monster\TestMonster</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -827,6 +1007,93 @@
     <ClCompile Include="Object\CInventory.cpp">
       <Filter>Engine\05. Object\Inventory</Filter>
     </ClCompile>
+    <ClCompile Include="Object\CNpcScript.cpp">
+      <Filter>Engine\05. Object\NPC\NpcScript</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Legato.cpp">
+      <Filter>Engine\06. Scene\The_Lake_of_Oblivion\The_Lake_of_Oblivion%28Npc%29</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CMentBox.cpp">
+      <Filter>Engine\05. Object\UI\MentBox</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\CFontManager.cpp">
+      <Filter>Engine\04. Manager\FontManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Quest\CQuest.cpp">
+      <Filter>Engine\16. Quest</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\CQuestManager.cpp">
+      <Filter>Engine\04. Manager\QuestManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CNotificationToast.cpp">
+      <Filter>Engine\05. Object\UI\NotificationToast</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\CCollisionChecker.cpp">
+      <Filter>Engine\09. Component\Collider\CollisionChecker</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\CDebugDraw.cpp">
+      <Filter>Engine\14. Test\DebugDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\CUITransform.cpp">
+      <Filter>Engine\09. Component\Transform\UITransform</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\CUISpriteRenderer.cpp">
+      <Filter>Engine\09. Component\SpriteRenderer\UISpriteRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CUIText.cpp">
+      <Filter>Engine\05. Object\UI\UIText</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\CUIRenderer.cpp">
+      <Filter>Engine\09. Component\Camera\Renderer\BaseRenderer\CUIRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\CSceneFactory.cpp">
+      <Filter>Engine\06. Scene\SceneFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CBoss_Reward_Box.cpp">
+      <Filter>Engine\05. Object\Monster\Boss_Reward_Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\CBoss_Clear_Room.cpp">
+      <Filter>Engine\06. Scene\Boss_Clear_Room</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect\CEffect.cpp">
+      <Filter>Engine\17. Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CBoss.cpp">
+      <Filter>Engine\05. Object\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="GameEngineGUI\CGameEngineGUI.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Jinhillah_Scene.cpp">
+      <Filter>Engine\06. Scene\Jinhillah_Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CBossScript.cpp">
+      <Filter>Engine\05. Object\Boss\BossScript</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Jinhilla_Phase1.cpp">
+      <Filter>Engine\05. Object\Boss\Jinhilla_Phase1</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Manifestation_of_Desire.cpp">
+      <Filter>Engine\05. Object\Boss\Jinhilla_Phase1\Manifestation_of_Desire</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CBaseSkill.cpp">
+      <Filter>Engine\05. Object\Player\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Trinity.cpp">
+      <Filter>Engine\05. Object\Player\Skill\Trinity</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\TrinityScript.cpp">
+      <Filter>Engine\05. Object\Player\Skill\Trinity</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\CBaseSkillScript.cpp">
+      <Filter>Engine\05. Object\Player\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\CSkillManager.cpp">
+      <Filter>Engine\04. Manager\SkillManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\TestMonster.cpp">
+      <Filter>Engine\05. Object\Monster\TestMonster</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Maple_Winapi.rc">
@@ -842,9 +1109,23 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\imgui-master\examples\example_win32_directx9\imgui.ini">
-      <Filter>소스 파일</Filter>
-    </None>
     <None Include="packages.config" />
+    <None Include="..\ThirdParty\FW1FontWrapper\lib\Debug\FW1FontWrapper.dll">
+      <Filter>Engine\15. ThirdParty\Debug</Filter>
+    </None>
+    <None Include="..\ThirdParty\FW1FontWrapper\lib\Release\FW1FontWrapper.dll">
+      <Filter>Engine\15. ThirdParty\Release</Filter>
+    </None>
+    <None Include="..\..\imgui-master\examples\example_win32_directx9\imgui.ini">
+      <Filter>헤더 파일</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\ThirdParty\FW1FontWrapper\lib\Debug\FW1FontWrapper.lib">
+      <Filter>Engine\15. ThirdParty\Debug</Filter>
+    </Library>
+    <Library Include="..\ThirdParty\FW1FontWrapper\lib\Release\FW1FontWrapper.lib">
+      <Filter>Engine\15. ThirdParty\Release</Filter>
+    </Library>
   </ItemGroup>
 </Project>

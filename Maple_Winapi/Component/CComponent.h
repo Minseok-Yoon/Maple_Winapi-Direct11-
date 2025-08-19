@@ -21,9 +21,14 @@ public:
 
 	COMPONENT_TYPE GetComponentType() { return m_eComponentType; }
 
+	void SetActive(bool bActive) { m_bActive = bActive; }
+
 public:
 	CGameObject* m_pOwner;
+	CCollider* m_pDetectedCollision;
+	CCollider* m_pHitCollision;
 
 private:
 	COMPONENT_TYPE	m_eComponentType;
+	bool			m_bActive = false;
 };

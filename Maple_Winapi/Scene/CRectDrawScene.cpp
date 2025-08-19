@@ -138,7 +138,7 @@ void CRectDrawScene::Init()
     pPlayer->AddComponent<CPlayerScript>();
 
 	CPlayerScript* plSr = pPlayer->GetComponent<CPlayerScript>();
-	plSr->SetPixelCollider(bg->GetPixelCollider());
+	//plSr->SetPixelCollider(bg->GetPixelCollider());
 
     pPlayer->AddComponent<CRigidBody>();
 

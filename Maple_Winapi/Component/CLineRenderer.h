@@ -1,6 +1,7 @@
  #pragma once
 #include "CComponent.h"
 #include "../Graphics/CGraphicsDevice_DX11.h"
+#include "../Resource/CTexture.h"
 
 class CLineRenderer : public CComponent
 {
@@ -21,12 +22,16 @@ public:
 	void SetFollowParent(bool follow) { m_bFollowParent = follow; }
 	bool IsFollowingParent() const { return m_bFollowParent; }
 
+	// 2025-06-30
+	void DrawLine(const Vector3& start, const Vector3& end, const TextureColor& color);
+
 private:
 	bool m_bFollowParent; // 부모 오브젝트를 따라다닐지 여부
 
 	ID3D11Buffer* m_pVertexBuffer;
 
-	std::vector<Vertex> m_Vertices; // 선분 데이터를 저장
+	vector<Vertex> m_Vertices; // 선분 데이터를 저장
 
-	Vector4 m_LineColor; // 선분 색상s
+	Vector4 m_LineColor;
+	// 선분 색상s
 };

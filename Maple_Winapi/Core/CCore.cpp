@@ -11,6 +11,7 @@
 #include "../Resource/CTexture.h"
 #include "../Fmod/CFmod.h"
 #include "../Component/CRenderer.h"
+#include "../Manager/CFontManager.h"
 
 CCore::CCore() :
 	m_hWnd(nullptr),
@@ -50,7 +51,13 @@ int CCore::Init(HWND _hWnd, UINT _iWidth, UINT _iHeight)
 	CColliderManager::GetInst()->Init();
 	CUIManager::GetInst()->Init();
 	CSceneManager::Init();
+	CResourceManager::Init();
+	CFontManager::GetInst()->Init(m_GraphicDevice.get());
 	CDamageManager::GetInst()->Init();
+
+	char dbg[128];
+	sprintf_s(dbg, "[CCore::Init] This instance: %p\n", this);
+	OutputDebugStringA(dbg);
 
 	return S_OK;
 }
@@ -155,15 +162,25 @@ void CCore::ToggleFullScreen()
 
 void CCore::adjustWindowRect(HWND _hWnd, UINT _iWidth, UINT _iHeight)
 {
+	char dbg[128];
+	sprintf_s(dbg, "[Init arg] _iWidth: %u, _iHeight: %u\n", _iWidth, _iHeight);
+	OutputDebugStringA(dbg);
+
 	// 해상도에 맞게 윈도우 크기 조정
 	RECT rt = { 0, 0, static_cast<LONG>(_iWidth), static_cast<LONG>(_iHeight) };	// 좌상단(0, 0) ~ 우하단(1280, 760)
 	::AdjustWindowRect(&rt, WS_OVERLAPPEDWINDOW, false);
 
 	m_iWidth = rt.right - rt.left;
 	m_iHeight = rt.bottom - rt.top;
+	SetWidth(m_iWidth);
+	SetHeight(m_iHeight);
 
-	SetWindowPos(_hWnd, nullptr, 0, 0, _iWidth, _iHeight, 0);
+	SetWindowPos(_hWnd, nullptr, 0, 0, m_iWidth, m_iHeight, 0);
 	ShowWindow(_hWnd, true);
+
+	char dbgs[128];
+	sprintf_s(dbgs, "[adjustWindowRect FINAL] m_iWidth: %u, m_iHeight: %u\n", m_iWidth, m_iHeight);
+	OutputDebugStringA(dbgs);
 }
 
 void CCore::createHBrush()

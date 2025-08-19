@@ -33,13 +33,13 @@ struct GpuBuffer
 
 enum class SHADER_STAGE
 {
-	SS_VS,		// Vertex Shader
-	SS_HS,		// Hull Shader
-	SS_DS,		// Domain Shader
-	SS_GS,		// Gemetry Shader
-	SS_PS,		// Pixel Shader
-	SS_CS,		// Compute Shader
-	SS_ALL,
+	SS_VS = 1,		// Vertex Shader
+	SS_HS = 2,		// Hull Shader
+	SS_DS = 3,		// Domain Shader
+	SS_GS = 4,		// Gemetry Shader
+	SS_PS = 5,		// Pixel Shader
+	SS_CS = 6,		// Compute Shader
+	SS_ALL = 7,
 };
 
 enum class CB_TYPE

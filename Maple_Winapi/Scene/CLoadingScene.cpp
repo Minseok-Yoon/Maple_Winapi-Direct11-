@@ -7,11 +7,12 @@
 #include "../Scene/CScene_Start.h"
 #include "../Scene/CScene_Stage01.h"
 #include "../Manager/CKeyManager.h"
-
+#include "../Scene/CBoss_Clear_Room.h"
 #include "../Scene/CTestScene.h"
 #include "../Scene/CRectDrawScene.h"
 #include "../Scene/CPixScene.h"
 #include "../Scene/The_Land_of_Weathered_gladness.h"
+#include "Jinhillah_Scene.h"
 
 extern CCore core;
 
@@ -50,6 +51,7 @@ void CLoadingScene::LateUpdate()
     if (m_bLoadCompleted.load()) // atomic 변수 사용
     {
         CSceneManager::LoadScene(L"StartScene", L"BG", L"BGSound");
+        //CSceneManager::LoadScene(L"Boss_Clear_Room");
     }
 }
 
@@ -68,9 +70,11 @@ void CLoadingScene::resourcesLoad(std::mutex& _pMutex)
             CSceneManager::CreateScene<CScene_Start>(L"StartScene");
             //CSceneManager::CreateScene<CScene_Stage01>(L"Stage01");
             CSceneManager::CreateScene<CTestScene>(L"TestScene");
-            CSceneManager::CreateScene<The_Land_of_Weathered_gladness>(L"The_Land_of_Weathered_gladness");
+            //CSceneManager::CreateScene<The_Land_of_Weathered_gladness>(L"The_Land_of_Weathered_gladness");
             /*CSceneManager::CreateScene<CRectDrawScene>(L"DrawRectScene");*/
-            CSceneManager::CreateScene<CPixScene>(L"PixScene");
+            //CSceneManager::CreateScene<CPixScene>(L"PixScene");
+            //CSceneManager::CreateScene<CBoss_Clear_Room>(L"Boss_Clear_Room");
+            //CSceneManager::CreateScene<Jinhillah_Scene>(L"Jinhillah_Scene");
         }
         _pMutex.unlock();
 

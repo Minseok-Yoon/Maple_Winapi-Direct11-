@@ -1,3 +1,4 @@
+#include "../pch.h"
 #include "CGameObject.h"
 #include "../Manager/CKeyManager.h"
 #include "../Manager/CTimeManager.h"
@@ -11,9 +12,7 @@ void Destroy(CGameObject* _pGameObject)
 		_pGameObject->death();
 }
 
-CGameObject::CGameObject() :
-	m_eObjectState(OBJECT_STATE::OS_Active),
-	m_eLayerType(LAYER_TYPE::LT_None)
+CGameObject::CGameObject()
 {
 	m_vecComponents.resize((UINT)COMPONENT_TYPE::CT_End);
 	initializeTransform();

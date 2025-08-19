@@ -14,8 +14,7 @@
 
 CMonsterScript::CMonsterScript() :
 	CScript(SCRIPT_TYPE::ST_MonsterScript),
-	m_iDir(1),
-	m_pAnimator(nullptr)
+	m_iDir(1)
 {
 	srand(static_cast<unsigned int>(time(nullptr)));
 }
@@ -60,12 +59,16 @@ void CMonsterScript::OnUpdate()
 	switch (m_pMonOwner->GetCurState())  // Monster에서 직접 가져오기
 	{
 	case MON_STATE::MS_Idle:
-		idle();
+		PlayAnimation(MON_STATE::MS_Idle);
 		break;
 	case MON_STATE::MS_Move:
-		move();
+		PlayAnimation(MON_STATE::MS_Move);
+		break;
+	case MON_STATE::MS_Attack:
+		PlayAnimation(MON_STATE::MS_Attack);
 		break;
 	case MON_STATE::MS_Dead:
+		PlayAnimation(MON_STATE::MS_Dead);
 		dead();
 		break;
 	}
@@ -112,6 +115,56 @@ void CMonsterScript::RandomChangeDir()
 		changeDir();
 	}
 	return;
+}
+
+void CMonsterScript::PlayAnimation(MON_STATE state)
+{
+	if (!m_pAnimator)
+		m_pAnimator = GetOwner()->GetComponent<CAnimator>();
+	if (!m_pAnimator)
+		m_pAnimator = GetOwner()->AddComponent<CAnimator>();
+
+	CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
+	if (!sr)
+		sr = GetOwner()->AddComponent<CSpriteRenderer>();
+
+	m_pAnimator->SetSpriteRenderer(sr);
+
+	if (m_AnimMap.find(state) == m_AnimMap.end())
+	{
+		OutputDebugStringA("ERROR: No animation data found for state\n");
+		return;
+	}
+
+	const MonsterAnimInfo& animData = m_AnimMap[state];
+	std::wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
+	std::wstring animName = std::to_wstring(static_cast<int>(state)) + L"_" + direction;
+
+	if (m_strCurAnimName == animName && m_pAnimator->IsPlaying())
+		return;
+
+	if (!m_pAnimator->HasAnimation(animName))
+	{
+		std::wstring path = animData.pathPattern;
+		// path에서 %s → direction 치환
+		size_t pos = path.find(L"%s");
+		if (pos != std::wstring::npos)
+			path.replace(pos, 2, direction);
+
+		m_pAnimator->AddFrameAnimation(
+			animName,
+			path.c_str(),
+			animData.frameCount,
+			Vector2(0.f, 0.f),
+			animData.frameSize.x,
+			animData.frameSize.y,
+			0.f, 0.f,
+			animData.frameDuration
+		);
+	}
+
+	m_pAnimator->Play(animName, true);
+	m_strCurAnimName = animName;
 }
 
 TextureColor CMonsterScript::checkGroundColor(const Vector3& _vPos)
@@ -198,51 +251,87 @@ void CMonsterScript::moveUpdate()
 
 void CMonsterScript::idle()
 {
-	if (m_pAnimator == nullptr)
+	/*if (!m_pAnimator)
 		m_pAnimator = GetOwner()->GetComponent<CAnimator>();
 
-	if (m_pAnimator == nullptr)
-		return;
+	if (!m_pAnimator)
+		m_pAnimator = GetOwner()->AddComponent<CAnimator>();
 
-	// SpriteRenderer 설정
 	CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
-	if (sr == nullptr)
+	if (!sr)
 		sr = GetOwner()->AddComponent<CSpriteRenderer>();
 
 	m_pAnimator->SetSpriteRenderer(sr);
 
-	// 애니메이션 이름 생성
-	wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
-	wstring animationName = L"Monster_Idle_" + direction;
+	std::wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
+	std::wstring animationName = L"Monster_Idle_" + direction;
 
-	// 이미 이 애니메이션이 재생 중이면 아무것도 안 함
 	if (m_strCurAnimName == animationName && m_pAnimator->IsPlaying())
 		return;
 
-	// 애니메이션 중복 추가 방지
 	if (!m_pAnimator->HasAnimation(animationName))
 	{
-		wstring filePathPattern = L"../Resources/Texture/Monster/Erdas/Gladness/Stand/" + direction + L"/Gladness_stand_%d.png";
-		int frameCount = 8;
-		float frameDuration = 0.1f;
+		std::wstring filePathPattern = m_tMonsterAnimInfo.pathPattern;
+		int frameCount = m_tMonsterAnimInfo.frameCount;
 
 		m_pAnimator->AddFrameAnimation(
 			animationName,
 			filePathPattern.c_str(),
 			frameCount,
 			Vector2(0.f, 0.f),
-			87.f,
-			108.f,
+			m_tMonsterAnimInfo.frameSize.x,
+			m_tMonsterAnimInfo.frameSize.y,
 			0.f,
 			0.f,
-			frameDuration
+			0.1f
 		);
 	}
 
-
-	// 새 애니메이션 재생
 	m_pAnimator->Play(animationName, true);
-	m_strCurAnimName = animationName;
+	m_strCurAnimName = animationName;*/
+
+	//if (m_pAnimator == nullptr)
+	//	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
+
+	//// SpriteRenderer 설정
+	//CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
+	//if (sr == nullptr)
+	//	sr = GetOwner()->AddComponent<CSpriteRenderer>();
+
+	//m_pAnimator->SetSpriteRenderer(sr);
+
+	//// 애니메이션 이름 생성
+	//wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
+	//wstring animationName = L"Monster_Idle_" + direction;
+
+	//// 이미 이 애니메이션이 재생 중이면 아무것도 안 함
+	//if (m_strCurAnimName == animationName && m_pAnimator->IsPlaying())
+	//	return;
+
+	//// 애니메이션 중복 추가 방지
+	//if (!m_pAnimator->HasAnimation(animationName))
+	//{
+	//	wstring filePathPattern = L"../Resources/Texture/Monster/Erdas/Gladness/Stand/" + direction + L"/Gladness_stand_%d.png";
+	//	int frameCount = 8;
+	//	float frameDuration = 0.1f;
+
+	//	m_pAnimator->AddFrameAnimation(
+	//		animationName,
+	//		filePathPattern.c_str(),
+	//		frameCount,
+	//		Vector2(0.f, 0.f),
+	//		87.f,
+	//		108.f,
+	//		0.f,
+	//		0.f,
+	//		frameDuration
+	//	);
+	//}
+
+
+	//// 새 애니메이션 재생
+	//m_pAnimator->Play(animationName, true);
+	//m_strCurAnimName = animationName;
 }
 
 void CMonsterScript::move()
@@ -253,73 +342,100 @@ void CMonsterScript::move()
 
 void CMonsterScript::dead()
 {
-	if (m_pAnimator == nullptr)
-		m_pAnimator = GetOwner()->GetComponent<CAnimator>();
+	std::wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
+	std::wstring animName = std::to_wstring(static_cast<int>(MON_STATE::MS_Dead)) + L"_" + direction;
 
-	if (m_pAnimator == nullptr)
+	if (!m_pAnimator || !m_pAnimator->HasAnimation(animName))
 		return;
 
-	// SpriteRenderer 설정
-	CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
-	if (sr == nullptr)
-		sr = GetOwner()->AddComponent<CSpriteRenderer>();
-
-	m_pAnimator->SetSpriteRenderer(sr);
-
-	// 애니메이션 이름 생성
-	wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
-	wstring animationName = L"Monster_Dead_" + direction;
-
-	// 이미 이 애니메이션이 재생 중이면 아무것도 안 함
-	if (m_strCurAnimName == animationName && m_pAnimator->IsPlaying())
-		return;
-
-	// 애니메이션 중복 추가 방지
-	if (!m_pAnimator->HasAnimation(animationName))
-	{
-		wstring filePathPattern;
-		if (direction == L"Right")
-		{
-			filePathPattern = L"../Resources/Texture/Monster/Erdas/Gladness/Dead/" + direction + L"/Gladness_Dead_Right_%d.png";
-		}
-		else
-		{
-			filePathPattern = L"../Resources/Texture/Monster/Erdas/Gladness/Dead/" + direction + L"/Gladness_Dead_Left_%d.png";
-		}
-		int frameCount = 8;
-		float frameDuration = 0.1f;
-
-		m_pAnimator->AddFrameAnimation(
-			animationName,
-			filePathPattern.c_str(),
-			frameCount,
-			Vector2(0.f, 0.f),
-			203.f,
-			160.f,
-			0.f,
-			0.f,
-			frameDuration
-		);
-	}
-
-	if (m_strCurAnimName == animationName && m_pAnimator->IsPlaying())
-		return;
-
-	function<void()>& completeEvent = m_pAnimator->GetCompleteEvent(animationName);
-
-	if (!completeEvent)
+	function<void()>& completeEvent = m_pAnimator->GetCompleteEvent(animName);
+	if (!completeEvent)  //  중복 등록 방지
 	{
 		completeEvent = [this]() {
 			if (m_pMonOwner)
 				m_pMonOwner->DropItem();
 
 			GetOwner()->SetDead();
+
+			if (CPlayer* pPlayer = CSceneManager::GetCurScene()->GetPlayer())
+				pPlayer->OnMonsterKilled(L"Gladness_of_Erdas");
 		};
 	}
-
-	m_pAnimator->Play(animationName, false);
-	m_strCurAnimName = animationName;
 }
+	//if (m_pAnimator == nullptr)
+	//	m_pAnimator = GetOwner()->GetComponent<CAnimator>();
+
+	//if (m_pAnimator == nullptr)
+	//	return;
+
+	//// SpriteRenderer 설정
+	//CSpriteRenderer* sr = GetOwner()->GetComponent<CSpriteRenderer>();
+	//if (sr == nullptr)
+	//	sr = GetOwner()->AddComponent<CSpriteRenderer>();
+
+	//m_pAnimator->SetSpriteRenderer(sr);
+
+	//// 애니메이션 이름 생성
+	//wstring direction = (m_iDir == 1) ? L"Right" : L"Left";
+	//wstring animationName = L"Monster_Dead_" + direction;
+
+	//// 이미 이 애니메이션이 재생 중이면 아무것도 안 함
+	//if (m_strCurAnimName == animationName && m_pAnimator->IsPlaying())
+	//	return;
+
+	//// 애니메이션 중복 추가 방지
+	//if (!m_pAnimator->HasAnimation(animationName))
+	//{
+	//	wstring filePathPattern;
+	//	if (direction == L"Right")
+	//	{
+	//		filePathPattern = L"../Resources/Texture/Monster/Erdas/Gladness/Dead/" + direction + L"/Gladness_Dead_Right_%d.png";
+	//	}
+	//	else
+	//	{
+	//		filePathPattern = L"../Resources/Texture/Monster/Erdas/Gladness/Dead/" + direction + L"/Gladness_Dead_Left_%d.png";
+	//	}
+	//	int frameCount = 8;
+	//	float frameDuration = 0.1f;
+
+	//	m_pAnimator->AddFrameAnimation(
+	//		animationName,
+	//		filePathPattern.c_str(),
+	//		frameCount,
+	//		Vector2(0.f, 0.f),
+	//		203.f,
+	//		160.f,
+	//		0.f,
+	//		0.f,
+	//		frameDuration
+	//	);
+	//}
+
+	//if (m_strCurAnimName == animationName && m_pAnimator->IsPlaying())
+	//	return;
+
+	//function<void()>& completeEvent = m_pAnimator->GetCompleteEvent(animationName);
+
+	//if (!completeEvent)
+	//{
+	//	completeEvent = [this]() {
+	//		if (m_pMonOwner)
+	//			m_pMonOwner->DropItem();
+
+	//		GetOwner()->SetDead();
+	//	};
+	//}
+
+	//m_pAnimator->Play(animationName, false);
+	//m_strCurAnimName = animationName;
+
+	//// 몬스터 사망 시, 플레이어에게 알림
+	//// pPlayer가 nullptr로 나옴 여기서 부터 수정하기
+	//CPlayer* pPlayer = CSceneManager::GetCurScene()->GetPlayer();
+	//if (pPlayer)
+	//{
+	//	pPlayer->OnMonsterKilled(L"Gladness_of_Erdas");
+	//}
 
 //// 몬스터의 객체를 어떻게 가져올까?
 	//CGameObject* pMonster = GetOwner();

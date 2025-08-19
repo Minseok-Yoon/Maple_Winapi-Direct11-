@@ -2,7 +2,7 @@
 #include "CScene.h"
 #include "../Object/CMonster.h"
 
-#define RESPAWN_TIME 6.0f
+//#define RESPAWN_TIME 6.0f
 
 class The_Lake_of_Oblivion : public CScene
 {
@@ -19,7 +19,7 @@ public:
     void LateUpdate() override;
     void Render() override;
 
-    template <typename MonsterType>
+    /*template <typename MonsterType>
     void CreateMonster(Vector3 _vRespawnPos)
     {
         FieldMonsterInfo MonInfo;
@@ -31,7 +31,7 @@ public:
         MonInfo.fRespawnPos = _vRespawnPos;
 
         AllMonster.push_back(MonInfo);
-    }
+    }*/
 
 private:
     void respawnMonster();

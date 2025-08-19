@@ -142,8 +142,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>DirectXTex.lib;fmodL_vc.lib;fmodstudioL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;C:\Users\socls\Desktop\Maple_Winapi\External\Library\Fmod\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTex.lib;fmodL_vc.lib;fmodstudioL_vc.lib;FW1FontWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\socls\Desktop\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;C:\Users\socls\Desktop\Maple_Winapi\External\Library\Fmod\Debug;C:\Users\socls\Desktop\Maple_Winapi\ThirdParty\FW1FontWrapper\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -167,6 +167,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\ThirdParty\FW1FontWrapper\inc\FW1FontWrapper.h" />
     <ClInclude Include="CLoadScene.h" />
     <ClInclude Include="CMath.h" />
     <ClInclude Include="Component\CAnimation.h" />
@@ -179,24 +180,34 @@
     <ClInclude Include="Component\CCameraScript.h" />
     <ClInclude Include="Component\CCircleCollider2D.h" />
     <ClInclude Include="Component\CCollider.h" />
+    <ClInclude Include="Component\CCollisionChecker.h" />
     <ClInclude Include="Component\CComponent.h" />
     <ClInclude Include="Component\CDebugRenderer.h" />
     <ClInclude Include="Component\CGravity.h" />
     <ClInclude Include="Component\CLineCollider.h" />
     <ClInclude Include="Component\CLineRenderer.h" />
-    <ClInclude Include="Component\CPixelCollider.h" />
+    <ClInclude Include="Component\CPixelCollider.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Component\CPortalScript.h" />
     <ClInclude Include="Component\CRenderer.h" />
     <ClInclude Include="Component\CRigidBody.h" />
     <ClInclude Include="Component\CScript.h" />
     <ClInclude Include="Component\CSpriteRenderer.h" />
     <ClInclude Include="Component\CTransform.h" />
+    <ClInclude Include="Component\CUIRenderer.h" />
+    <ClInclude Include="Component\CUISpriteRenderer.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Component\CUITransform.h" />
     <ClInclude Include="Core\CCore.h" />
     <ClInclude Include="Define.h" />
+    <ClInclude Include="Effect\CEffect.h" />
     <ClInclude Include="Entity\CEntity.h" />
     <ClInclude Include="Enum.h" />
     <ClInclude Include="Fmod\CFmod.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GameEngineGUI\CGameEngineGUI.h" />
     <ClInclude Include="Graphics\CConstantBuffer.h" />
     <ClInclude Include="Graphics\CGraphics.h" />
     <ClInclude Include="Graphics\CGraphicsDevice_DX11.h" />
@@ -212,14 +223,22 @@
     <ClInclude Include="Manager\CDebugManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Manager\CFontManager.h" />
     <ClInclude Include="Manager\CKeyManager.h" />
     <ClInclude Include="Manager\CPathManager.h" />
+    <ClInclude Include="Manager\CQuestManager.h" />
     <ClInclude Include="Manager\CResourceManager.h" />
     <ClInclude Include="Manager\CSceneManager.h" />
+    <ClInclude Include="Manager\CSkillManager.h" />
     <ClInclude Include="Manager\CTimeManager.h" />
     <ClInclude Include="Manager\CUIManager.h" />
     <ClInclude Include="Maple_Winapi.h" />
     <ClInclude Include="Module\SelectGDI.h" />
+    <ClInclude Include="Object\CBaseSkill.h" />
+    <ClInclude Include="Object\CBaseSkillScript.h" />
+    <ClInclude Include="Object\CBoss.h" />
+    <ClInclude Include="Object\CBossScript.h" />
+    <ClInclude Include="Object\CBoss_Reward_Box.h" />
     <ClInclude Include="Object\CBtnUI.h" />
     <ClInclude Include="Object\CDamage.h" />
     <ClInclude Include="Object\CEtcItem.h" />
@@ -232,11 +251,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Object\CLineBackGround.h" />
+    <ClInclude Include="Object\CMentBox.h" />
     <ClInclude Include="Object\CMeso.h" />
     <ClInclude Include="Object\CMiniMap.h" />
     <ClInclude Include="Object\CMonster.h" />
     <ClInclude Include="Object\CMonsterScript.h" />
+    <ClInclude Include="Object\CNotificationToast.h" />
     <ClInclude Include="Object\CNpc.h" />
+    <ClInclude Include="Object\CNpcScript.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Object\CObject.h" />
     <ClInclude Include="Object\CObjectPool.h" />
     <ClInclude Include="Object\CPlayer.h" />
@@ -247,8 +271,18 @@
     <ClInclude Include="Object\CPortal.h" />
     <ClInclude Include="Object\CUI.h" />
     <ClInclude Include="Object\CUIHUD.h" />
+    <ClInclude Include="Object\CUIText.h" />
     <ClInclude Include="Object\Erdas_of_Gladness.h" />
+    <ClInclude Include="Object\Jinhilla_Phase1.h" />
+    <ClInclude Include="Object\Legato.h" />
+    <ClInclude Include="Object\Manifestation_of_Desire.h" />
+    <ClInclude Include="Object\TestMonster.h" />
+    <ClInclude Include="Object\Trinity.h" />
+    <ClInclude Include="Object\TrinityScript.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Quest\CQuest.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Resource\CAudioClip.h" />
     <ClInclude Include="Resource\CMaterial.h" />
@@ -257,19 +291,23 @@
     <ClInclude Include="Resource\CShader.h" />
     <ClInclude Include="Resource\CTexture.h" />
     <ClInclude Include="sample.h" />
+    <ClInclude Include="Scene\CBoss_Clear_Room.h" />
     <ClInclude Include="Scene\CDontDestroyOnLoad.h" />
     <ClInclude Include="Scene\CLoadingScene.h" />
     <ClInclude Include="Scene\CPixScene.h" />
     <ClInclude Include="Scene\CRectDrawScene.h" />
     <ClInclude Include="Scene\CScene.h" />
+    <ClInclude Include="Scene\CSceneFactory.h" />
     <ClInclude Include="Scene\CScene_Stage01.h" />
     <ClInclude Include="Scene\CScene_Stage02.h" />
     <ClInclude Include="Scene\CScene_Start.h" />
     <ClInclude Include="Scene\CTestScene.h" />
+    <ClInclude Include="Scene\Jinhillah_Scene.h" />
     <ClInclude Include="Scene\The_Lake_of_Oblivion.h" />
     <ClInclude Include="Scene\The_Land_of_Weathered_gladness.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Test\CDebugDraw.h" />
     <ClInclude Include="Test\CDrawCollisionBox.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -287,21 +325,31 @@
     <ClCompile Include="Component\CCameraScript.cpp" />
     <ClCompile Include="Component\CCircleCollider2D.cpp" />
     <ClCompile Include="Component\CCollider.cpp" />
+    <ClCompile Include="Component\CCollisionChecker.cpp" />
     <ClCompile Include="Component\CComponent.cpp" />
     <ClCompile Include="Component\CDebugRenderer.cpp" />
     <ClCompile Include="Component\CGravity.cpp" />
     <ClCompile Include="Component\CLineCollider.cpp" />
     <ClCompile Include="Component\CLineRenderer.cpp" />
-    <ClCompile Include="Component\CPixelCollider.cpp" />
+    <ClCompile Include="Component\CPixelCollider.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Component\CPortalScript.cpp" />
     <ClCompile Include="Component\CRenderer.cpp" />
     <ClCompile Include="Component\CRigidBody.cpp" />
     <ClCompile Include="Component\CScript.cpp" />
     <ClCompile Include="Component\CSpriteRenderer.cpp" />
     <ClCompile Include="Component\CTransform.cpp" />
+    <ClCompile Include="Component\CUIRenderer.cpp" />
+    <ClCompile Include="Component\CUISpriteRenderer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Component\CUITransform.cpp" />
     <ClCompile Include="Core\CCore.cpp" />
+    <ClCompile Include="Effect\CEffect.cpp" />
     <ClCompile Include="Entity\CEntity.cpp" />
     <ClCompile Include="Fmod\CFmod.cpp" />
+    <ClCompile Include="GameEngineGUI\CGameEngineGUI.cpp" />
     <ClCompile Include="Graphics\CConstantBuffer.cpp" />
     <ClCompile Include="Graphics\CGraphicsDevice_DX11.cpp" />
     <ClCompile Include="Graphics\CIndexBuffer.cpp" />
@@ -316,14 +364,22 @@
     <ClCompile Include="Manager\CDebugManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Manager\CFontManager.cpp" />
     <ClCompile Include="Manager\CKeyManager.cpp" />
     <ClCompile Include="Manager\CPathManager.cpp" />
+    <ClCompile Include="Manager\CQuestManager.cpp" />
     <ClCompile Include="Manager\CResourceManager.cpp" />
     <ClCompile Include="Manager\CSceneManager.cpp" />
+    <ClCompile Include="Manager\CSkillManager.cpp" />
     <ClCompile Include="Manager\CTimeManager.cpp" />
     <ClCompile Include="Manager\CUIManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Module\SelectGDI.cpp" />
+    <ClCompile Include="Object\CBaseSkill.cpp" />
+    <ClCompile Include="Object\CBaseSkillScript.cpp" />
+    <ClCompile Include="Object\CBoss.cpp" />
+    <ClCompile Include="Object\CBossScript.cpp" />
+    <ClCompile Include="Object\CBoss_Reward_Box.cpp" />
     <ClCompile Include="Object\CBtnUI.cpp" />
     <ClCompile Include="Object\CDamage.cpp" />
     <ClCompile Include="Object\CEtcItem.cpp" />
@@ -336,11 +392,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Object\CLineBackGround.cpp" />
+    <ClCompile Include="Object\CMentBox.cpp" />
     <ClCompile Include="Object\CMeso.cpp" />
     <ClCompile Include="Object\CMiniMap.cpp" />
     <ClCompile Include="Object\CMonster.cpp" />
     <ClCompile Include="Object\CMonsterScript.cpp" />
+    <ClCompile Include="Object\CNotificationToast.cpp" />
     <ClCompile Include="Object\CNpc.cpp" />
+    <ClCompile Include="Object\CNpcScript.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Object\CObject.cpp" />
     <ClCompile Include="Object\CObjectPool.cpp" />
     <ClCompile Include="Object\CPlayer.cpp" />
@@ -351,24 +412,38 @@
     <ClCompile Include="Object\CPortal.cpp" />
     <ClCompile Include="Object\CUI.cpp" />
     <ClCompile Include="Object\CUIHUD.cpp" />
+    <ClCompile Include="Object\CUIText.cpp" />
     <ClCompile Include="Object\Erdas_of_Gladness.cpp" />
+    <ClCompile Include="Object\Jinhilla_Phase1.cpp" />
+    <ClCompile Include="Object\Legato.cpp" />
+    <ClCompile Include="Object\Manifestation_of_Desire.cpp" />
+    <ClCompile Include="Object\TestMonster.cpp" />
+    <ClCompile Include="Object\Trinity.cpp" />
+    <ClCompile Include="Object\TrinityScript.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Quest\CQuest.cpp" />
     <ClCompile Include="Resource\CAudioClip.cpp" />
     <ClCompile Include="Resource\CMaterial.cpp" />
     <ClCompile Include="Resource\CMesh.cpp" />
     <ClCompile Include="Resource\CResource.cpp" />
     <ClCompile Include="Resource\CShader.cpp" />
     <ClCompile Include="Resource\CTexture.cpp" />
+    <ClCompile Include="Scene\CBoss_Clear_Room.cpp" />
     <ClCompile Include="Scene\CDontDestroyOnLoad.cpp" />
     <ClCompile Include="Scene\CLoadingScene.cpp" />
     <ClCompile Include="Scene\CPixScene.cpp" />
     <ClCompile Include="Scene\CRectDrawScene.cpp" />
     <ClCompile Include="Scene\CScene.cpp" />
+    <ClCompile Include="Scene\CSceneFactory.cpp" />
     <ClCompile Include="Scene\CScene_Stage01.cpp" />
     <ClCompile Include="Scene\CScene_Stage02.cpp" />
     <ClCompile Include="Scene\CScene_Start.cpp" />
     <ClCompile Include="Scene\CTestScene.cpp" />
+    <ClCompile Include="Scene\Jinhillah_Scene.cpp" />
     <ClCompile Include="Scene\The_Lake_of_Oblivion.cpp" />
     <ClCompile Include="Scene\The_Land_of_Weathered_gladness.cpp" />
+    <ClCompile Include="Test\CDebugDraw.cpp" />
     <ClCompile Include="Test\CDrawCollisionBox.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -383,7 +458,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\imgui-master\examples\example_win32_directx9\imgui.ini" />
+    <None Include="..\ThirdParty\FW1FontWrapper\lib\Debug\FW1FontWrapper.dll" />
+    <None Include="..\ThirdParty\FW1FontWrapper\lib\Release\FW1FontWrapper.dll" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\ThirdParty\FW1FontWrapper\lib\Debug\FW1FontWrapper.lib" />
+    <Library Include="..\ThirdParty\FW1FontWrapper\lib\Release\FW1FontWrapper.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

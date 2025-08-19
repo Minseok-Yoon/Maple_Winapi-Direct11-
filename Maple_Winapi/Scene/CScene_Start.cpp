@@ -76,7 +76,7 @@ void CScene_Start::LateUpdate()
 	if (KEY_TAP(KEY_CODE::Y))
 	{
 		//CSceneManager::LoadScene(L"Stage01", L"Stage01_BG", L"Stage01_BGSound");
-		CSceneManager::LoadScene(L"Stage01");
+		CSceneManager::LoadScene(L"Jinhillah_Scene");
 	}
 	if (KEY_TAP(KEY_CODE::U))
 	{
@@ -85,7 +85,7 @@ void CScene_Start::LateUpdate()
 
 	if (KEY_TAP(KEY_CODE::O))
 	{
-		CSceneManager::LoadScene(L"DrawRectScene");
+		CSceneManager::LoadScene(L"Stage01", L"Stage01_BG", L"Stage01_BGSound");
 	}
 
 	if (KEY_TAP(KEY_CODE::P))

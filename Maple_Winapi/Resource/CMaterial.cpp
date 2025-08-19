@@ -2,7 +2,7 @@
 
 CMaterial::CMaterial() :
 	CResource(RESOURCE_TYPE::RT_Material),
-	m_eRenderingMode(RENDERING_MODE::RM_Opaque),
+	m_eRenderingMode(RENDERING_MODE::RM_Transparent),
 	m_pAlbedoTexture(nullptr),
 	m_pShader(nullptr)
 {
@@ -59,7 +59,7 @@ void CMaterial::SetRenderingMode(const RENDERING_MODE _eRenderingMode)
 	case RENDERING_MODE::RM_Transparent:
 		m_pShader->SetRasterizerState(RASTERIZER_STATE::RS_SolidNone);
 		m_pShader->SetBlendState(BLEND_STATE::BS_Transparent);
-		m_pShader->SetDepthStencilState(DEPTHSTENCIL_STATE::DS_Always);
+		m_pShader->SetDepthStencilState(DEPTHSTENCIL_STATE::DS_DepthNone);
 		break;
 
 	default:

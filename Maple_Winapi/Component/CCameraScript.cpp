@@ -34,6 +34,23 @@ void CCameraScript::Init()
 
 void CCameraScript::Update()
 {
+    CScript::Update();
+
+    //OutputDebugStringW(L"[Enter] CCameraScript::Update() 호출됨\n");
+    /*OutputDebugString(std::format(L"[Update] script this: {}, m_pTarget: {}\n",
+        (void*)this, (void*)m_pTarget).c_str());*/
+
+    if (m_pTarget == nullptr)
+    {
+        return;
+    }
+    else
+    {
+        //wchar_t buffer[256];
+        //swprintf_s(buffer, 256, L"[Update] m_pTarget 주소: %p\n", m_pTarget);
+        //OutputDebugStringW(buffer);
+    }
+
     CTransform* tr = GetOwner()->GetComponent<CTransform>();
     Vector3 vPos = tr->GetWorldPosition();
 
@@ -71,26 +88,13 @@ void CCameraScript::Update()
         vPos = ClampCameraPosition(vPos);
         vPos.z = -10.0f;  // 직교 카메라는 보통 고정
 
-        tr->SetLocalPosition(vPos);
+        tr->SetWorldPosition(vPos);
         return;
     }
 
     // 🔹 타겟 추적 모드
     if (m_pTarget != nullptr)
     {
-        //CTransform* targetTr = m_pTarget->GetComponent<CTransform>();
-        //Vector3 targetPos = targetTr->GetWorldPosition();
-        //Vector3 desiredPos = targetPos + m_vOffset;
-        //desiredPos.z = -10.0f;
-
-        //Vector3 smoothPos = Vector3::Lerp(vPos, desiredPos, 5.0f * CTimeManager::GetfDeltaTime());
-
-        //// 🔹 Clamp 적용
-        //smoothPos = ClampCameraPosition(smoothPos);
-        //smoothPos.z = -10.0f;
-
-        //tr->SetWorldPosition(smoothPos);
-        //OutputDebugStringW(L"타겟 설정됨 -> 추적 로직 실행 시작\n");
         CTransform* targetTr = m_pTarget->GetComponent<CTransform>();
         if (targetTr != nullptr)
         {
@@ -98,40 +102,50 @@ void CCameraScript::Update()
             Vector3 desiredPos = targetPos + m_vOffset;
             desiredPos.z = -10.0f;
 
-            //OutputDebugStringW((L"타겟 위치: " + to_wstring(targetPos.x) + L", " + to_wstring(targetPos.y) + L"\n").c_str());
-            //OutputDebugStringW((L"목표 카메라 위치: " + to_wstring(desiredPos.x) + L", " + to_wstring(desiredPos.y) + L"\n").c_str());
-
             Vector3 smoothPos = Vector3::Lerp(vPos, desiredPos, 15.0f * CTimeManager::GetfDeltaTime());
-            //OutputDebugStringW((L"보간 카메라 위치: " + to_wstring(smoothPos.x) + L", " + to_wstring(smoothPos.y) + L"\n").c_str());
-
+            
             smoothPos = ClampCameraPosition(smoothPos);
             smoothPos.z = -10.0f;
-
-            //OutputDebugStringW((L"최종 카메라 위치: " + to_wstring(smoothPos.x) + L", " + to_wstring(smoothPos.y) + L"\n").c_str());
 
             tr->SetWorldPosition(smoothPos);
 
             // 위치 설정 후 재확인
             Vector3 finalPos = tr->GetWorldPosition();
-            if (finalPos != smoothPos)
-            {
-                //OutputDebugStringW(L"⚠️ 카메라 위치 설정 실패!\n");
-                //OutputDebugStringW((L"실제 설정된 위치: " + to_wstring(finalPos.x) + L", " + to_wstring(finalPos.y) + L"\n").c_str());
-            }
         }
-        else
-        {
-            //OutputDebugStringW(L"❌ 타겟의 Transform 컴포넌트를 가져올 수 없습니다\n");
-        }
-    }
-    else
-    {
-        //OutputDebugStringW(L"❌ 타겟이 NULL입니다\n");
     }
 }
 
 void CCameraScript::LateUpdate()
 {
+    // 2025-07-01 프리카메라와 타켓카메라의 view/projection 행렬 로그 출력
+    /*CCamera* pCam = GetOwner()->GetComponent<CCamera>();
+    if (pCam)
+    {
+        const Matrix& view = pCam->GetViewMatrix();
+        const Matrix& projection = pCam->GetProjectionMatrix();
+
+        OutputDebugStringW(m_bFreeCameraMode ?
+            L"======= FreeCamera Matrix Info =======\n" :
+            L"======= TargetCamera Matrix Info =======\n");
+
+        for (int i = 0; i < 4; ++i)
+        {
+            wchar_t buf[128];
+            swprintf_s(buf, L"View row %d: %.2f %.2f %.2f %.2f\n",
+                i,
+                view.m[i][0], view.m[i][1], view.m[i][2], view.m[i][3]);
+            OutputDebugStringW(buf);
+        }
+
+        for (int i = 0; i < 4; ++i)
+        {
+            wchar_t buf[128];
+            swprintf_s(buf, L"Projection row %d: %.2f %.2f %.2f %.2f\n",
+                i,
+                projection.m[i][0], projection.m[i][1], projection.m[i][2], projection.m[i][3]);
+            OutputDebugStringW(buf);
+        }
+    }*/
 }
 
 void CCameraScript::Render(const Matrix& view, const Matrix& projection)
@@ -185,3 +199,101 @@ Vector3 CCameraScript::ClampCameraPosition(const Vector3& _vPos)
 
     return result;
 }
+
+//void CCameraScript::Update()
+//{
+//    CTransform* tr = GetOwner()->GetComponent<CTransform>();
+//    Vector3 vPos = tr->GetWorldPosition();
+//
+//    // 🔹 F2 키로 프리카메라 모드 토글
+//    if (KEY_TAP(KEY_CODE::F2))
+//    {
+//        m_bFreeCameraMode = !m_bFreeCameraMode;
+//
+//        wstring camName = GetOwner()->GetName();
+//        wstring camType;
+//
+//        if (camName.find(L"UICamera") != wstring::npos) camType = L"UI 카메라";
+//        else if (camName.find(L"MainCamera") != wstring::npos) camType = L"Main 카메라";
+//        else camType = L"카메라 없음";
+//
+//        wstring debugStr = m_bFreeCameraMode ?
+//            L"프리카메라 모드 활성화 - " + camType + L"\n" :
+//            L"프리카메라 모드 비활성화 - " + camType + L"\n";
+//
+//        OutputDebugStringW(debugStr.c_str());
+//    }
+//
+//    if (m_bFreeCameraMode)
+//    {
+//        if (KEY_HOLD(KEY_CODE::A))
+//            vPos.x -= 200.0f * CTimeManager::GetfDeltaTime();
+//        if (KEY_HOLD(KEY_CODE::D))
+//            vPos.x += 200.0f * CTimeManager::GetfDeltaTime();
+//        if (KEY_HOLD(KEY_CODE::W))
+//            vPos.y += 200.0f * CTimeManager::GetfDeltaTime();
+//        if (KEY_HOLD(KEY_CODE::S))
+//            vPos.y -= 200.0f * CTimeManager::GetfDeltaTime();
+//
+//        // 클램프 후 적용
+//        vPos = ClampCameraPosition(vPos);
+//        vPos.z = -10.0f;  // 직교 카메라는 보통 고정
+//
+//        tr->SetLocalPosition(vPos);
+//        return;
+//    }
+//
+//    // 🔹 타겟 추적 모드
+//    if (m_pTarget != nullptr)
+//    {
+//        //CTransform* targetTr = m_pTarget->GetComponent<CTransform>();
+//        //Vector3 targetPos = targetTr->GetWorldPosition();
+//        //Vector3 desiredPos = targetPos + m_vOffset;
+//        //desiredPos.z = -10.0f;
+//
+//        //Vector3 smoothPos = Vector3::Lerp(vPos, desiredPos, 5.0f * CTimeManager::GetfDeltaTime());
+//
+//        //// 🔹 Clamp 적용
+//        //smoothPos = ClampCameraPosition(smoothPos);
+//        //smoothPos.z = -10.0f;
+//
+//        //tr->SetWorldPosition(smoothPos);
+//        //OutputDebugStringW(L"타겟 설정됨 -> 추적 로직 실행 시작\n");
+//        CTransform* targetTr = m_pTarget->GetComponent<CTransform>();
+//        if (targetTr != nullptr)
+//        {
+//            Vector3 targetPos = targetTr->GetWorldPosition();
+//            Vector3 desiredPos = targetPos + m_vOffset;
+//            desiredPos.z = -10.0f;
+//
+//            //OutputDebugStringW((L"타겟 위치: " + to_wstring(targetPos.x) + L", " + to_wstring(targetPos.y) + L"\n").c_str());
+//            //OutputDebugStringW((L"목표 카메라 위치: " + to_wstring(desiredPos.x) + L", " + to_wstring(desiredPos.y) + L"\n").c_str());
+//
+//            Vector3 smoothPos = Vector3::Lerp(vPos, desiredPos, 15.0f * CTimeManager::GetfDeltaTime());
+//            //OutputDebugStringW((L"보간 카메라 위치: " + to_wstring(smoothPos.x) + L", " + to_wstring(smoothPos.y) + L"\n").c_str());
+//
+//            smoothPos = ClampCameraPosition(smoothPos);
+//            smoothPos.z = -10.0f;
+//
+//            //OutputDebugStringW((L"최종 카메라 위치: " + to_wstring(smoothPos.x) + L", " + to_wstring(smoothPos.y) + L"\n").c_str());
+//
+//            tr->SetWorldPosition(smoothPos);
+//
+//            // 위치 설정 후 재확인
+//            Vector3 finalPos = tr->GetWorldPosition();
+//            if (finalPos != smoothPos)
+//            {
+//                //OutputDebugStringW(L"⚠️ 카메라 위치 설정 실패!\n");
+//                //OutputDebugStringW((L"실제 설정된 위치: " + to_wstring(finalPos.x) + L", " + to_wstring(finalPos.y) + L"\n").c_str());
+//            }
+//        }
+//        else
+//        {
+//            //OutputDebugStringW(L"❌ 타겟의 Transform 컴포넌트를 가져올 수 없습니다\n");
+//        }
+//    }
+//    else
+//    {
+//        //OutputDebugStringW(L"❌ 타겟이 NULL입니다\n");
+//    }
+//}

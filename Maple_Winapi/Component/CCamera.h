@@ -1,5 +1,6 @@
 #pragma once
-#include "../Component/CComponent.h"
+#include "CComponent.h"
+#include "CRenderer.h"
 
 using namespace math;
 
@@ -12,29 +13,14 @@ struct tCamEffect
 
 class CCamera : public CComponent
 {
+	friend class CBaseRenderer;
+
 public:
 	enum class PROJECTION_TYPE
 	{
 		PT_Perspective,			// 원근 투영
 		PT_Orthographic			// 직교 투영
 	};
-
-	void SetProjectionType(const PROJECTION_TYPE _eProjectionType) { m_eProjectionType = _eProjectionType; }
-	PROJECTION_TYPE GetProjectionType() const { return m_eProjectionType; }
-
-	const Matrix& GetViewMatrix() { return m_ViewMatrix; }
-	const Matrix& GetProjectionMatrix() { return m_ProjectionMatrix; }
-	void SetSize(const float _fSize) { m_fSize = _fSize; }
-
-	void SetCameraType(CAMERA_ORDER _eCameraOrder) { m_eCameraOrder = _eCameraOrder; }
-	
-	wstring FormatVector3(const Vector3& vec);
-
-	Vector3 CaluatePosition(Vector3 _vPos) { return _vPos - m_vDistance; }
-	Vector2 CaluatePosition2D(Vector2 _vPos) { return _vPos - m_vDistance; }
-
-	void SetCameraMask(UINT mask) { m_CameraMask = mask; }
-	UINT GetCameraMask() const { return m_CameraMask; }
 
 	CCamera();
 	virtual ~CCamera();
@@ -49,18 +35,48 @@ public:
 
 	void CreateViewMatrix();
 	void CreateProjectionMatrix(PROJECTION_TYPE _eProjectionType);
+
+	wstring FormatVector3(const Vector3& vec);
+
+	// 2025-06-18
+	Vector3 ScreenToWorld(const Vector2& screenPos);
+
+	// 2025-06-20
+	static CCamera* GetMainCam() { return renderer::mainCamera; }
+
+	void SetProjectionType(const PROJECTION_TYPE _eProjectionType) { m_eProjectionType = _eProjectionType; }
+	PROJECTION_TYPE GetProjectionType() const { return m_eProjectionType; }
+
+	const Matrix& GetViewMatrix() { return m_ViewMatrix; }
+	const Matrix& GetProjectionMatrix() { return m_ProjectionMatrix; }
+	void SetSize(const float _fSize) { m_fSize = _fSize; }
+
+	void SetCameraType(CAMERA_ORDER _eCameraOrder) { m_eCameraOrder = _eCameraOrder; }
+
+	Vector3 CaluatePosition(Vector3 _vPos) { return _vPos - m_vDistance; }
+	Vector2 CaluatePosition2D(Vector2 _vPos) { return _vPos - m_vDistance; }
+
+	void SetCameraMask(UINT mask) { m_CameraMask = mask; }
+	UINT GetCameraMask() const { return m_CameraMask; }
+
+	void SetCameraOrder(int _order) { m_iCameraOrder = _order; }
+	int GetCameraOrder() const { return m_iCameraOrder; }
 	
+	// 특정 레이어가 이 카메라에 의해 렌더링되는지 확인
+	bool IsLayerVisible(LAYER_TYPE _type) const
+	{
+		return (m_LayerMask & (1 << static_cast<UINT>(_type))) != 0;
+	}
+
+	// test code
+	bool IsWorldPosVisible(const Vector3& worldPos, const Matrix& view, const Matrix& proj);
+
 public:
 	class CTransform* m_pTransform;
 	float			m_fAspectRatio;
 	float			m_fSize;
 
-	vector<CGameObject*>	m_vecRenderTargets;
-
 private:
-	//Matrix	ViewMatrix;
-	//Matrix	ProjectionMatrix;
-
 	PROJECTION_TYPE m_eProjectionType;
 	Matrix			m_ViewMatrix;
 	Matrix			m_ProjectionMatrix;
@@ -76,6 +92,12 @@ private:
 
 	CAMERA_ORDER m_eCameraOrder;
 	UINT m_CameraMask = 0xFFFFFFFF; 
+
+	UINT	m_LayerMask = 0xFFFFFFFF;
+
+	// 2025-07-21
+	unordered_map<int, list<class CBaseRenderer*>> m_mapRenderers;
+	int m_iOrder = 0;
 };
 
 //void SetLayerMask(UINT _mask) { m_LayerMask = _mask; }

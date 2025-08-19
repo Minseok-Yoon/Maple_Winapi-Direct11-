@@ -1930,4 +1930,7 @@ namespace math
             return DirectX::XMMatrixMultiply(A.DirectXMatrix, B.DirectXMatrix);
         }
     };
+
+    // 2025-06-30 좌표 유효성 검사
+    static bool IsValidTextureCoord(const Vector2& texPos, int texWidth, int texHeight);
 }

@@ -59,7 +59,14 @@ bool CBackGround::CheckGround(Vector3 _vPlusCheckPos)
     if (!pCurBackGround) return false;
 
     // 현재 위치의 색상 확인
-    TextureColor CheckColor = pCurBackGround->GetColor(m_pTransform->GetWorldPosition() + _vPlusCheckPos, TextureColor(0, 0, 0, 255));
+    //TextureColor CheckColor = pCurBackGround->GetColor(m_pTransform->GetWorldPosition() + _vPlusCheckPos, TextureColor(0, 0, 0, 255));
+    TextureColor CheckColor = GetColor(_vPlusCheckPos, TextureColor(0, 0, 0, 255));
+
+    /*std::ostringstream oss;
+    oss << "Color: ("
+        << static_cast<int>(CheckColor.R) << ", " << static_cast<int>(CheckColor.G) << ", "
+        << static_cast<int>(CheckColor.B) << ")\n";
+    OutputDebugStringA(oss.str().c_str());*/
 
     // 바닥 여부 판별
     if (CheckColor == GROUND_COLOR)
@@ -88,22 +95,33 @@ TextureColor CBackGround::GetPixelColor(const Vector3& _vWorldPos)
 
 TextureColor CBackGround::GetColor(Vector3 _Pos, TextureColor _DefaultColor)
 {
-    if (!m_pMapCollision)
-    {
-        OutputDebugStringA("ERROR: CBackGround::GetColor() - m_pMapCollision is NULL!\n");
-        return _DefaultColor;
-    }
+    //if (!m_pMapCollision)
+    //{
+    //    OutputDebugStringA("ERROR: CBackGround::GetColor() - m_pMapCollision is NULL!\n");
+    //    return _DefaultColor;
+    //}
 
-    // 텍스처 크기 가져오기
-    CTexture::TextureSize textureSize = m_pMapCollision->GetTextureSize();
-    UINT texWidth = textureSize.width;
-    UINT texHeight = textureSize.height;
+    //// 텍스처 크기 가져오기
+    //CTexture::TextureSize textureSize = m_pMapCollision->GetTextureSize();
+    //UINT texWidth = textureSize.width;
+    //UINT texHeight = textureSize.height;
 
-    // 🟢 올바른 좌표 변환 적용
-    int pixelX = static_cast<int>(_Pos.x);
-    int pixelY = static_cast<int>(_Pos.y); // Y축 반전
+    //// 올바른 좌표 변환 적용
+    //int pixelX = static_cast<int>(_Pos.x);
+    //int pixelY = static_cast<int>(_Pos.y);  // Y축 반전 포함
 
-    return m_pMapCollision->GetColor(Vector3(pixelX, pixelY, 0.0f), _DefaultColor);
+    //std::ostringstream oss;
+    //oss << "GetColor check at (" << pixelX << ", " << pixelY << ") | Texture Size: (" << texWidth << ", " << texHeight << ")\n";
+    //OutputDebugStringA(oss.str().c_str());
+
+    //return m_pMapCollision->GetColor(Vector3(pixelX, pixelY, 0.0f), _DefaultColor);
+    if (!m_pMapCollision) return _DefaultColor;
+
+    int pixelX = static_cast<int>(round(_Pos.x));
+    int pixelY = static_cast<int>(round(_Pos.y));
+
+    // CTexture와 동일한 변환 방식 사용
+    return m_pMapCollision->GetColor(static_cast<int>(_Pos.x), static_cast<int>(_Pos.y), _DefaultColor);
 }
 
 void CBackGround::CreateMap(wstring _MapName)
@@ -115,7 +133,7 @@ void CBackGround::CreateMap(wstring _MapName)
     UINT iHeight = core.GetHeight();
 
     CTransform* bgTr = GetComponent<CTransform>();
-    bgTr->SetLocalPosition(Vector3(0.0f, 0.0f, 0.0f));
+    bgTr->SetLocalPosition(Vector3(0.0f, 0.0f, -1.0f));
 
     m_pMap = CResourceManager::Find<CTexture>(_MapName);
 
@@ -147,7 +165,7 @@ void CBackGround::CreateCollisionMap(wstring _MapCollisionName)
     UINT iHeight = core.GetHeight();
 
     CTransform* bgTr = GetComponent<CTransform>();
-    bgTr->SetLocalPosition(Vector3(0.0f, 0.0f, 0.0f));
+    bgTr->SetLocalPosition(Vector3(0.0f, 0.0f, 5.0f));
 
     m_pMapCollision = CResourceManager::Find<CTexture>(_MapCollisionName);
 
@@ -209,10 +227,12 @@ void CBackGround::CreateTextureFromPixel()
     texDesc.Height = height;
     texDesc.MipLevels = 1;
     texDesc.ArraySize = 1;
-    texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+    texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     texDesc.SampleDesc.Count = 1;
-    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.SampleDesc.Quality = 0;
+    texDesc.Usage = D3D11_USAGE_IMMUTABLE;
     texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    texDesc.CPUAccessFlags = 0;
 
     std::vector<uint32_t> rawData(width * height);
     for (int i = 0; i < pixelData.size(); ++i) {
@@ -268,6 +288,19 @@ void CBackGround::CreateTextureFromPixel()
 
     // 텍스처의 크기를 스케일에 맞게 조정
     bgTr->SetLocalScale(Vector3(static_cast<float>(width), static_cast<float>(height), 1.0f));
+}
+float CBackGround::GetGroundHeight(Vector3 _pos)
+{
+    // 위에서 아래로 스캔하여 바닥 높이 찾기
+    for (int y = static_cast<int>(_pos.y); y < static_cast<int>(_pos.y) + 50; y++)
+    {
+        TextureColor color = GetColor(Vector3(_pos.x, y, 0), TextureColor(0, 0, 0, 0));
+        if (color == GROUND_COLOR || color == FOOTHOLD_COLOR)
+        {
+            return static_cast<float>(y);
+        }
+    }
+    return _pos.y + 50; // 바닥을 찾지 못하면 기본값
 }
 
 /*void CBackGround::SetBackGroundTexture(CTexture* _pBackGroundTexture)

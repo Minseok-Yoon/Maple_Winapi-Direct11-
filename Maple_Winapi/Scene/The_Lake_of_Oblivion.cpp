@@ -55,7 +55,7 @@ void The_Lake_of_Oblivion::respawnMonster()
 {
 	for (FieldMonsterInfo& monInfo : AllMonster)
 	{
-		if (!monInfo.pMonster->IsUpdate()) // 죽은 상태라면
+		if (!monInfo.pMonster->IsActive()) // 죽은 상태라면
 		{
 			monInfo.fRespawnTimer -= CTimeManager::GetfDeltaTime();
 

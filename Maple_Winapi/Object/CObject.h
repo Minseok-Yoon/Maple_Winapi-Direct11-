@@ -37,6 +37,7 @@ static T* Instantiate(LAYER_TYPE _eLayerType, Vector3 _vPosition)
 	return gameObject;
 }
 
+
 template <typename T>
 static T* InstantiateFromPool(LAYER_TYPE _eLayerType, const wstring& _strName)
 {

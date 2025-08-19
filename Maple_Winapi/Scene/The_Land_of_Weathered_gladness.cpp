@@ -42,8 +42,23 @@ void The_Land_of_Weathered_gladness::Enter()
 		m_pAudioSource->Play();
 	}
 
-	m_pPlayer = InstantiateFromPool<CPlayer>(LAYER_TYPE::LT_Player, L"Player");
+	/*m_pPlayer = InstantiateFromPool<CPlayer>(LAYER_TYPE::LT_Player, L"Player");
 	m_pPlayer->SetActive(true);
+	CSceneManager::GetCurScene()->SetPlayer(m_pPlayer);*/
+	CPlayer* player = dynamic_cast<CPlayer*>(
+		CSceneManager::GetDontDestroyOnLoad()->FindObjectByName(L"Player")
+		);
+
+	if (player)
+	{
+		m_pPlayer = player;
+		m_pPlayer->SetActive(true);
+		m_pPlayer->GetComponent<CTransform>()->SetLocalPosition(Vector3(0.0f, 0.0f, -1.0f));
+		
+		// 현재 씬에 재등록 (중복 Add 방지 로직은 따로 있으면 좋음)
+		GetLayer(LAYER_TYPE::LT_Player)->AddGameObject(m_pPlayer);
+		CSceneManager::GetCurScene()->SetPlayer(m_pPlayer);
+	}
 
 	// 포탈 생성
 	CPortal* portal = InstantiateFromPool<CPortal>(LAYER_TYPE::LT_Portal, L"The_Land_of_Lake");

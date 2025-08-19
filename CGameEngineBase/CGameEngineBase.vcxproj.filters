@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="01. PreCompileHeader">
+      <UniqueIdentifier>{1cbddc62-9ea9-4514-a831-8c7c538ded6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. EnginePath">
+      <UniqueIdentifier>{dc04dd69-a6ed-4350-bdc0-6fa21eff92a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. EngineInput">
+      <UniqueIdentifier>{37a47a77-681a-4350-a654-dd219370c6c5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PreCompileHeader\CPreCompileHeader.h">
+      <Filter>01. PreCompileHeader</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineFilePath\EngineFilePath.h">
+      <Filter>02. EnginePath</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PreCompileHeader\CPreCompileHeader.cpp">
+      <Filter>01. PreCompileHeader</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineFilePath\EngineFilePath.cpp">
+      <Filter>02. EnginePath</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

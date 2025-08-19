@@ -59,7 +59,7 @@ void CPortal::Init()
 	// 애니메이션 실행 (첫 번째 프레임 강제 설정하지 않음)
 	animator->Play(animationName, true);  // 반복 재생
 
-    if (m_pPortalCollision == nullptr)
+    /*if (m_pPortalCollision == nullptr)
     {
         m_pPortalCollision = AddComponent<CCollider>();
         m_pPortalCollision->SetBottomLeft(Vector3(-0.5f, -0.5f, 0.0f));
@@ -73,7 +73,7 @@ void CPortal::Init()
         {
             OutputDebugStringA("INFO: Collider successfully added to Portal\n");
         }
-    }
+    }*/
 	this->AddComponent<CPortalScript>();
 }
 

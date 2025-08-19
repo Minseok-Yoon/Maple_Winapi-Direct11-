@@ -44,6 +44,21 @@ void CAnimation::Update()
 		}
 	}
 
+	int curFrame = GetCurFrameIndex();
+
+	if (m_mapFrameEvents.find(curFrame) != m_mapFrameEvents.end())
+	{
+		for (auto& evt : m_mapFrameEvents[curFrame])
+		{
+			if (evt.repeat || m_iLastEventFrame != curFrame)
+			{
+				evt.callback();
+			}
+		}
+	}
+
+	m_iLastEventFrame = curFrame;
+
 	////// 프레임의 지속 시간이 초과되면 다음 프레임으로 넘어가기
 	//if (m_fAccTime > m_vecAnimationFrm[m_iCurFrm].fDuration)
 	//{

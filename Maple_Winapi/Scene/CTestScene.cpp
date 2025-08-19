@@ -20,6 +20,9 @@
 #include "../Object/CMiniMap.h"
 #include "../Object/CPortal.h"
 #include "../Object/CInventoryUI.h"
+#include "../Object/CNpc.h"
+#include "../Object/Legato.h"
+#include "../Object/CBackGround.h"
 
 extern CCore core;
 
@@ -39,11 +42,13 @@ void CTestScene::Enter()
 {
 	CScene::Enter();
 
+	OutputDebugStringW(L"[Enter] CTestScene::Enter() 호출됨\n");
+
 	if (m_pBackGround == nullptr)
 	{
 		m_pBackGround = Instantiate<CBackGround>(LAYER_TYPE::LT_BackGround);
-		m_pBackGround->CreateCollisionMap(L"Lake of Oblivion_2");
-		m_pBackGround->CreateMap(L"Lake of Oblivion_1");
+		//m_pBackGround->CreateCollisionMap(L"Lake of Oblivion_2");
+		//m_pBackGround->CreateMap(L"Lake of Oblivion_1");
 	}
 
 	if (m_pAudioSource == nullptr)
@@ -63,46 +68,43 @@ void CTestScene::Enter()
 		CUIManager::Push(UI_TYPE::UI_Inventory);
 	}*/
 
-	////// ✅ 여기서 MiniMap 동적 등록
-	////if (CUIManager::GetUI(UI_TYPE::UT_MiniMap) == nullptr)
-	////{
-	////	CMiniMap* uiMiniMap = Instantiate<CMiniMap>(LAYER_TYPE::LT_UI);
-	////	CUIManager::RegisterUI(UI_TYPE::UT_MiniMap, uiMiniMap);
-	////}
+	// 여기서 MiniMap 동적 등록
+	/*if (CUIManager::GetUI(UI_TYPE::UT_MiniMap) == nullptr)
+	{
+		CMiniMap* uiMiniMap = Instantiate<CMiniMap>(LAYER_TYPE::LT_UI);
+		CUIManager::RegisterUI(UI_TYPE::UT_MiniMap, uiMiniMap);
+	}
 
-	////CUIManager::Push(UI_TYPE::UT_MiniMap);
+	CUIManager::Push(UI_TYPE::UT_MiniMap);*/
 
-	m_pPlayer = InstantiateFromPool<CPlayer>(LAYER_TYPE::LT_Player, L"Player");
-	m_pPlayer->SetActive(true);
+	// 플레이어 재생성
+	CPlayer* player = dynamic_cast<CPlayer*>(
+		CSceneManager::GetDontDestroyOnLoad()->FindObjectByName(L"Player")
+		);
 
-	// 포탈 생성
-	CPortal* portal = InstantiateFromPool<CPortal>(LAYER_TYPE::LT_Portal, L"The_Land_of_Weathered_gladness");
-	portal->SetActive(true);
-	portal->m_pTransform->SetLocalPosition(Vector3(2000.0f, -430.0f, -1.0f));
-	portal->SetMoveMap(L"The_Land_of_Weathered_gladness");
+	if (player)
+	{
+		m_pPlayer = player;
+		m_pPlayer->SetActive(true);
+
+		CSceneManager::GetDontDestroyOnLoad()->GetLayer(LAYER_TYPE::LT_Player)->EraseGameObject(m_pPlayer);
+
+		// 현재 씬에 재등록
+		GetLayer(LAYER_TYPE::LT_Player)->AddGameObject(m_pPlayer);
+		CSceneManager::GetCurScene()->SetPlayer(m_pPlayer);
+	}
+
+	//// 포탈 생성
+	//CPortal* portal = InstantiateFromPool<CPortal>(LAYER_TYPE::LT_Portal, L"The_Land_of_Weathered_gladness");
+	//portal->SetActive(true);
+	//portal->m_pTransform->SetLocalPosition(Vector3(2000.0f, -430.0f, 0.0f));
+	//portal->SetMoveMap(L"The_Land_of_Weathered_gladness");
+
+	// npc 생성
+	//CreateNpc<Legato>(L"Legato", Vector3(200.0f, -200.0f, 1.0f), true);
 
 	// 카메라 설정
-	CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
-	camera->SetName(L"MainCamera");
-	CCamera* cameraComp = camera->AddComponent<CCamera>();
-	cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
-
-	CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
-	cameraScript->SetTarget(m_pPlayer); // 추적 카메라 거리
-
-	renderer::mainCamera = cameraComp;
-	renderer::activeCamera = renderer::mainCamera;
-	cameraComp->SetCameraMask(~(1 << static_cast<UINT>(LAYER_TYPE::LT_UI)));
-	m_vecCameras.push_back(cameraComp);
-
-	// UI 카메라
-	CGameObject* uiCamObj = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.f, 0.f, -5.0f));
-	uiCamObj->SetName(L"UICamera");
-
-	CCamera* uiCamera = uiCamObj->AddComponent<CCamera>();
-	uiCamera->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
-	uiCamera->SetCameraMask(1 << static_cast<UINT>(LAYER_TYPE::LT_UI));
-	m_vecCameras.push_back(uiCamera);
+	CreateCamera(m_pPlayer);
 
 	CColliderManager::CollisionLayerCheck(LAYER_TYPE::LT_Player, LAYER_TYPE::LT_Portal, true);
 }
@@ -118,9 +120,9 @@ void CTestScene::Exit()
 	if (m_pPlayer)
 		m_pPlayer->SetActive(false);
 
-	CPortal* portal = dynamic_cast<CPortal*>(FindObjectByName(L"The_Land_of_Weathered_gladness"));
+	/*CPortal* portal = dynamic_cast<CPortal*>(FindObjectByName(L"The_Land_of_Weathered_gladness"));
 	if (portal)
-		portal->SetActive(false);
+		portal->SetActive(false);*/
 
 	//CUIManager::Pop(UI_TYPE::UT_MiniMap);
 }
@@ -132,13 +134,19 @@ void CTestScene::Init()
     CScene::Init();
 
 	// 인게임 시작 씬 캐릭터 생성(만들어 두고 씬에 진입할 때만 활성화)
-	m_pPlayer = Instantiate<CPlayer>(LAYER_TYPE::LT_Player);
-	m_pPlayer->SetActive(false);
+	if (CSceneManager::GetDontDestroyOnLoad()->FindObjectByName(L"Player") == nullptr)
+	{
+		CPlayer* player = Instantiate<CPlayer>(LAYER_TYPE::LT_Player);
+		player->SetActive(false);
+		DontDestroyOnLoad(player);
+	}
 
-	CPortal* portal = Instantiate<CPortal>(LAYER_TYPE::LT_Portal);
+	/*CPortal* portal = Instantiate<CPortal>(LAYER_TYPE::LT_Portal);
 	portal->SetName(L"The_Land_of_Weathered_gladness");
 	portal->m_pTransform->SetLocalPosition(Vector3(2000.0f, -430.0f, -1.0f));
-	portal->SetActive(false);
+	portal->SetActive(false);*/
+
+	//CreateNpc<Legato>(L"Legato", Vector3(0.0f, 0.0f, -1.0f), false);
 }
 
 void CTestScene::Update()
@@ -340,3 +348,29 @@ renderer::selectedObject = pPlayer;*/
 	//CCamera* uiCam = uiCamObj->AddComponent<CCamera>();
 	//uiCam->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
 	//m_vecCameras.push_back(uiCam);
+
+//CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
+	//camera->SetName(L"MainCamera");
+	//CCamera* cameraComp = camera->AddComponent<CCamera>();
+	//cameraComp->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+
+	//CCameraScript* cameraScript = camera->AddComponent<CCameraScript>();
+	//cameraScript->SetTarget(m_pPlayer); // 추적 카메라 거리
+	//OutputDebugString(std::format(L"[Debug] 카메라 이름: {}\n", camera->GetName()).c_str());
+
+	//renderer::mainCamera = cameraComp;
+	//renderer::activeCamera = renderer::mainCamera;
+	//cameraComp->SetCameraMask(~(1 << static_cast<UINT>(LAYER_TYPE::LT_UI)));
+	//m_vecCameras.push_back(cameraComp);
+
+	// //UI 카메라
+	//CGameObject* uiCamObj = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.f, 0.f, -5.0f));
+	//uiCamObj->SetName(L"UICamera");
+
+	//CCamera* uiCamera = uiCamObj->AddComponent<CCamera>();
+	//uiCamera->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+	//CCameraScript* cameraUiScript = uiCamObj->AddComponent<CCameraScript>();
+
+	//renderer::uiCamera = uiCamera;
+	//uiCamera->SetCameraMask(1 << static_cast<UINT>(LAYER_TYPE::LT_UI));
+	//m_vecCameras.push_back(uiCamera);

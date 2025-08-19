@@ -44,7 +44,7 @@ void CLineRenderer::LateUpdate()
 
 void CLineRenderer::Render(const Matrix& view, const Matrix& projection)
 {
-    if(m_Vertices.empty() || m_pVertexBuffer == nullptr)
+    if (m_Vertices.empty() || m_pVertexBuffer == nullptr)
         return;
 
     // Vertex Buffer에 데이터 업로드
@@ -52,27 +52,69 @@ void CLineRenderer::Render(const Matrix& view, const Matrix& projection)
     HRESULT hr = GetDeviceContext()->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if (SUCCEEDED(hr))
     {
-        // 로컬 좌표를 사용
-        for (auto& vertex : m_Vertices)
-        {
-            vertex.isLine = 1.0f;
-        }
         memcpy(mappedResource.pData, m_Vertices.data(), sizeof(Vertex) * m_Vertices.size());
         GetDeviceContext()->Unmap(m_pVertexBuffer, 0);
     }
+    else
+    {
+        OutputDebugStringA("[CLineRenderer] Vertex 버퍼 맵 실패\n");
+        return;
+    }
 
-    // 중요: 변환 행렬 바인딩
-    //// 이 오브젝트의 Transform 컴포넌트를 사용하여 월드 변환 행렬을 셰이더에 바인딩
-    //CTransform* transform = GetOwner()->GetComponent<CTransform>();
-    //transform->Bind();
+    // 중요: Transform 바인딩 (로컬 좌표를 월드로 변환하기 위함)
+    CTransform* transform = GetOwner()->GetComponent<CTransform>();
+    if (transform)
+        transform->Bind(view, projection);
+    else
+    {
+        // 안전장치: Identity 월드 사용 (셰이더 상수버퍼 방식에 따라 수정 필요)
+        // BindIdentityWorldAndViewProj(view, projection); // 구현체에 맞춰 추가
+    }
 
     // Vertex Buffer 바인딩
     UINT stride = sizeof(Vertex);
     UINT offsetValue = 0;
     GetDeviceContext()->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offsetValue);
+
     // Primitive Topology 설정 (Line Strip)
-    GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+    GetDeviceContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+
+    // Draw
     GetDeviceContext()->Draw((UINT)m_Vertices.size(), 0);
+
+    // 프레임 끝나기 전에 정점 클리어
+    m_Vertices.clear();
+    //if(m_Vertices.empty() || m_pVertexBuffer == nullptr)
+    //    return;
+
+    //// Vertex Buffer에 데이터 업로드
+    //D3D11_MAPPED_SUBRESOURCE mappedResource;
+    //HRESULT hr = GetDeviceContext()->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    //if (SUCCEEDED(hr))
+    //{
+    //    // 로컬 좌표를 사용
+    //    for (auto& vertex : m_Vertices)
+    //    {
+    //        vertex.isLine = 1.0f;
+    //    }
+    //    memcpy(mappedResource.pData, m_Vertices.data(), sizeof(Vertex) * m_Vertices.size());
+    //    GetDeviceContext()->Unmap(m_pVertexBuffer, 0);
+    //}
+
+    //// 중요: 변환 행렬 바인딩
+    ////// 이 오브젝트의 Transform 컴포넌트를 사용하여 월드 변환 행렬을 셰이더에 바인딩
+    //CTransform* transform = GetOwner()->GetComponent<CTransform>();
+    //transform->Bind(view, projection);
+
+    //// Vertex Buffer 바인딩
+    //UINT stride = sizeof(Vertex);
+    //UINT offsetValue = 0;
+    //GetDeviceContext()->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offsetValue);
+    //// Primitive Topology 설정 (Line Strip)
+    //GetDeviceContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+    //GetDeviceContext()->Draw((UINT)m_Vertices.size(), 0);
+
+    //m_Vertices.clear();
 }
 
 void CLineRenderer::SetShape(const Vector3& _vBottomLeft, const Vector3& _vTopRight, const Vector4& _vColor)
@@ -106,10 +148,85 @@ void CLineRenderer::SetLineData(const std::vector<Vector3>& points, const Vector
     // 로컬 좌표로 저장 (변환하지 않음)
     for (const auto& point : points)
     {
-        m_Vertices.push_back({ point, color });
+        Vertex v;
+        v.pos = point;
+        v.color = color;
+        v.uv = math::Vector2(0.0f, 0.0f);
+        v.isLine = 1.0f;
+        m_Vertices.push_back(v);
     }
 
     m_LineColor = color;
+    //m_Vertices.clear();
+
+    //// 로컬 좌표로 저장 (변환하지 않음)
+    //for (const auto& point : points)
+    //{
+    //    m_Vertices.push_back({ point, color });
+    //}
+
+    //m_LineColor = color;
+}
+
+void CLineRenderer::DrawLine(const Vector3& start, const Vector3& end, const TextureColor& color)
+{
+    math::Vector4 lineColor = {
+        color.R / 255.0f,
+        color.G / 255.0f,
+        color.B / 255.0f,
+        color.A / 255.0f
+    };
+
+    Vertex v1;
+    v1.pos = start;
+    v1.color = lineColor;
+    v1.uv = math::Vector2(0.0f, 0.0f);
+    v1.isLine = 1.0f;
+
+    Vertex v2;
+    v2.pos = end;
+    v2.color = lineColor;
+    v2.uv = math::Vector2(0.0f, 0.0f);
+    v2.isLine = 1.0f;
+
+    m_Vertices.push_back(v1);
+    m_Vertices.push_back(v2);
+
+#ifdef _DEBUG
+    if (m_Vertices.size() > 10000)
+    {
+        OutputDebugStringA("[CLineRenderer] Warning: Too many debug lines drawn this frame!\n");
+    }
+#endif
+//    math::Vector4 lineColor = {
+//        color.R / 255.0f,
+//        color.G / 255.0f,
+//        color.B / 255.0f,
+//        color.A / 255.0f
+//    };
+//
+//    Vertex v1;
+//    v1.pos = start;
+//    v1.color = lineColor;
+//    v1.uv = math::Vector2(0.0f, 0.0f);  // 선에서는 텍스처 좌표 사용 안함
+//    v1.isLine = 1.0f;
+//
+//    Vertex v2;
+//    v2.pos = end;
+//    v2.color = lineColor;
+//    v2.uv = math::Vector2(0.0f, 0.0f);
+//    v2.isLine = 1.0f;
+//
+//    m_Vertices.push_back(v1);
+//    m_Vertices.push_back(v2);
+//
+//#ifdef _DEBUG
+//    // 너무 많은 선을 그리는 경우 경고 로그
+//    if (m_Vertices.size() > 10000)
+//    {
+//        OutputDebugStringA("[CLineRenderer] Warning: Too many debug lines drawn this frame!\n");
+//    }
+//#endif
 }
 
 //if (m_Vertices.empty() || m_pVertexBuffer == nullptr)

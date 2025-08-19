@@ -166,8 +166,8 @@ bool CColliderManager::Intersect(CCollider* _pColLeft, CCollider* _pColRight)
     );
 
     Vector2 rightSize = Vector2(
-        _pColRight->GetScale().x * _pColRight->GetOwner()->GetComponent<CTransform>()->GetLocalScale().y,
-        _pColRight->GetScale().y * _pColRight->GetOwner()->GetComponent<CTransform>()->GetLocalScale().x
+        _pColRight->GetScale().x * _pColRight->GetOwner()->GetComponent<CTransform>()->GetLocalScale().x,
+        _pColRight->GetScale().y * _pColRight->GetOwner()->GetComponent<CTransform>()->GetLocalScale().y
     );
 
     // 충돌체 타입 확인

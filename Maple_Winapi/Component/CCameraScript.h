@@ -20,11 +20,15 @@ public:
 	{ 
 		m_pTarget = target;
 
-		std::wstring msg = L"[µð¹ö±ë] SetTarget È£ÃâµÊ. ´ë»ó: ";
+		/*std::wstring msg = L"[µð¹ö±ë] SetTarget È£ÃâµÊ. ´ë»ó: ";
 		msg += (m_pTarget ? m_pTarget->GetName() : L"¾øÀ½");
 		msg += L"\n";
 
-		OutputDebugStringW(msg.c_str());
+		OutputDebugStringW(msg.c_str());*/
+
+		wchar_t buffer[256];
+		swprintf_s(buffer, 256, L"[SetTarget] script this: %p, target: %p\n", this, target);
+		OutputDebugStringW(buffer);
 	}
 
 private:

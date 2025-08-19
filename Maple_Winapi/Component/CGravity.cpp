@@ -7,16 +7,17 @@
 #include "../Manager/CSceneManager.h"
 #include "../Object/CBackGround.h"
 #include "../Object/CPlayer.h"
+#include "CPixelCollider.h"
 
 CGravity::CGravity() :
     m_bPlayerGround(true),
     m_bMonsterGround(true),
     m_bIsGravity(false),
     m_fGravityForce(0.0f),
-    m_fGravitySpeed(15000.0f),
+    m_fGravitySpeed(1500.0f),
     m_vecMoveForce(Vector2(0.0f, 0.0f)),
     m_fMaxGravity(10.0f),
-    m_vGravity(Vector2(0.0f, -800.0f)),
+    m_vGravity(Vector2(0.0f, -300.0f)),
     m_pTransform(nullptr)
 {
 }
@@ -31,6 +32,7 @@ void CGravity::Init()
 
     m_pTransform = GetOwner()->GetComponent<CTransform>();
 
+    CPixelCollider* pixelCollider = GetOwner()->AddComponent<CPixelCollider>();
     //// 강제 확인
     //std::wstring name = GetOwner()->GetName();
     //OutputDebugStringW((L"Gravity Init Owner: " + name + L"\n").c_str());
@@ -47,11 +49,20 @@ void CGravity::Update()
     CBackGround* pBackGround = pCurScene->GetBackGround();
     if (!pBackGround) return;
 
-    // 플레이어는 항상 검사
-    if (m_pPlayer)
+    CPixelCollider* pixelCollider = GetOwner()->GetComponent<CPixelCollider>();
+    if (pixelCollider)
     {
-        m_bPlayerGround = m_pPlayer->CheckGround(m_pTransform->GetWorldPosition());
+        m_bPlayerGround = pixelCollider->CheckGround(m_pTransform->GetWorldPosition());
     }
+
+    //// 플레이어는 항상 검사
+    //if (m_pPlayer)
+    //{
+    //    m_bPlayerGround = m_pPlayer->CheckGround(m_pTransform->GetWorldPosition());
+
+    //    // 2025-07-07 여기서 플레이어의 world좌표와 텍스처의 좌표 확인해보기
+
+    //}
 
     // 몬스터가 존재할 경우에만 검사
     if (m_pMonster)

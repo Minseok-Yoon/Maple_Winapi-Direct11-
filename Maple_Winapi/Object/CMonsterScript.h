@@ -5,6 +5,15 @@
 #include "../Resource/CTexture.h"
 
 class CMonster;
+
+struct MonsterAnimInfo
+{
+	wstring		pathPattern;
+	int			frameCount;
+	float		frameDuration;
+	Vector2		frameSize;
+};
+
 class CMonsterScript : public CScript
 {
 public:
@@ -16,25 +25,23 @@ public:
 	virtual void OnLateUpdate() override;
 	virtual void OnRender(const Matrix& view, const Matrix& projection) override;
 
-	void AttackEffect();
-
 	virtual void OnCollisionEnter(class CCollider* other);
 	virtual void OnCollisionStay(class CCollider* other);
 	virtual void OnCollisionExit(class CCollider* other);
 
+	void AttackEffect();
+
+	void PlayAnimation(MON_STATE state);
+
 	void RandomChangeDirTime(float _fMinTime, float _fMaxTime);
 	void RandomChangeDir();
 
-	//void OnDeath();
+	void SetAnimationData(MON_STATE state, const MonsterAnimInfo& data)
+	{
+		m_AnimMap[state] = data;
+	}
 
-public:
 	void SetMonOwner(CMonster* _pMonOwner) { m_pMonOwner = _pMonOwner; }
-
-protected:
-	int iUpYPivot = 1;
-	int iDownYPivot = 0;
-	Vector3 vMoveVectorForce = Vector3(0.0f, 0.0f, 0.0f);
-	bool bWallCheck = true;
 
 private:
 	TextureColor checkGroundColor(const Vector3& _vPos);
@@ -46,19 +53,23 @@ private:
 	void move();
 	void dead();
 
-private:
-	//MON_STATE			m_eMonState;
+protected:
+	int iUpYPivot = 1;
+	int iDownYPivot = 0;
+	Vector3 vMoveVectorForce = Vector3(0.0f, 0.0f, 0.0f);
+	bool bWallCheck = true;
 
-	class CAnimator*	m_pAnimator;
+private:
+	//class CAnimator*	m_pAnimator;
 	int					m_iDir;
 
 	wstring				m_strCurAnimName; // 현재 재생 중인 애니메이션 이름
 
-	// 2025-05-26
-	CMonster* m_pMonOwner = nullptr;
+	CMonster* m_pMonOwner = nullptr;	// 2025-05-26
 
 private:
 	float m_fChangeDirTime = 3.0f;
 	CTransform* m_pTransform = nullptr;
 	CBackGround* m_pBackGround = nullptr;
+	unordered_map<MON_STATE, MonsterAnimInfo> m_AnimMap;
 };

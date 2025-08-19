@@ -8,6 +8,7 @@
 #include "../Component/CAudioSource.h"
 
 #include "../Manager/CColliderManager.h"
+#include "../Manager/CTimeManager.h"
 #include "../Manager/CSceneManager.h"
 #include "../Manager/CResourceManager.h"
 #include "../Resource/CAudioClip.h"
@@ -15,6 +16,7 @@
 #include <imgui.h>
 #include "../Component/CBaseRenderer.h"
 #include "..\Component\CRenderer.h"
+#include "../Component/CCameraScript.h"
 
 extern CCore core;
 
@@ -113,6 +115,19 @@ void CScene::Render()
 		RenderRenderables(cutoutList, viewMatrix, projectionMatrix);
 		RenderRenderables(transparentList, viewMatrix, projectionMatrix);
 	}
+
+	/*OutputDebugString(L"--- Cameras in Scene ---\n");
+	for (auto* cam : m_vecCameras)
+	{
+		if (cam == renderer::mainCamera)
+		{
+			OutputDebugString(L"MainCamera registered\n");
+		}
+		else if (cam == renderer::uiCamera)
+		{
+			OutputDebugString(L"UICamera registered\n");
+		}
+	}*/
 }
 
 void CScene::Destroy()
@@ -225,7 +240,8 @@ void CScene::EraseGameObject(CGameObject* _pGameObj)
 
 void CScene::AddCamera(CCamera* _pCamera)
 {
-	if (_pCamera == nullptr) return;
+	if (_pCamera == nullptr) 
+		return;
 
 	m_vecCameras.push_back(_pCamera);
 }
@@ -333,6 +349,68 @@ CGameObject* CScene::FindObjectByName(const wstring& _strName)
 	return nullptr;
 }
 
+void CScene::CreateCamera(CGameObject* playerTarget)
+{
+	// Main Camera
+	CGameObject* camera = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -10.0f));
+	camera->SetName(L"MainCamera");
+
+	CCamera* mainCamera = camera->AddComponent<CCamera>();
+	mainCamera->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+	mainCamera->SetCameraMask(~(1 << static_cast<UINT>(LAYER_TYPE::LT_UI)));
+
+	if (playerTarget)
+	{
+		CCameraScript* camScript = camera->AddComponent<CCameraScript>();
+		camScript->SetTarget(playerTarget);
+	}
+
+	renderer::mainCamera = mainCamera;
+	renderer::activeCamera = renderer::mainCamera;
+
+	m_vecCameras.push_back(mainCamera);
+
+	// UI Camera
+	CGameObject* uiCamObj = Instantiate<CGameObject>(LAYER_TYPE::LT_None, Vector3(0.0f, 0.0f, -5.0f));
+	uiCamObj->SetName(L"UICamera");
+
+	CCamera* uiCamera = uiCamObj->AddComponent<CCamera>();
+	uiCamera->SetProjectionType(CCamera::PROJECTION_TYPE::PT_Orthographic);
+	uiCamera->SetCameraMask(1 << static_cast<UINT>(LAYER_TYPE::LT_UI));
+
+	CCameraScript* uiCamScript = uiCamObj->AddComponent<CCameraScript>();
+
+	renderer::uiCamera = uiCamera;
+	m_vecCameras.push_back(uiCamera);
+}
+
+CAudioSource* CScene::CreateSceneAudio(const wstring& _SoundClipName, CGameObject*& _SoundObject)
+{
+	if (_SoundObject == nullptr)
+	{
+		_SoundObject = Instantiate<CGameObject>(LAYER_TYPE::LT_None);
+		_SoundObject->SetName(_SoundClipName);
+	
+		_SoundObject->AddComponent<CAudioListener>();
+		CAudioSource* audioSource = _SoundObject->AddComponent<CAudioSource>();
+
+		CAudioClip* clip = CResourceManager::Find<CAudioClip>(_SoundClipName);
+		if (clip)
+		{
+			audioSource->SetClip(clip);
+			audioSource->Play();
+		}
+		else
+		{
+			OutputDebugStringW((L"[Audio] Clip not found: " + _SoundClipName + L"\n").c_str());
+		}
+
+		return audioSource;
+	}
+
+	return _SoundObject->GetComponent<CAudioSource>();
+}
+
 void CScene::createLayers()
 {
 	m_vecLayers.resize(static_cast<UINT>(LAYER_TYPE::LT_End));
@@ -340,6 +418,45 @@ void CScene::createLayers()
 	for (size_t i = 0; i < static_cast<UINT>(LAYER_TYPE::LT_End); i++)
 	{
 		m_vecLayers[i] = new CLayer();
+	}
+}
+
+void CScene::placeNpc(CNpc* _pNpc, Vector3 _vNpcPosition)
+{
+	_pNpc->GetTransform()->SetLocalPosition(_vNpcPosition);
+}
+
+void CScene::PlaceMonster(CMonster* _pMonster, Vector3 _vRespawnPos)
+{
+	_pMonster->GetTransform()->SetLocalPosition(_vRespawnPos);
+}
+
+void CScene::respawnMonster()
+{
+	for (FieldMonsterInfo& monInfo : AllMonster)
+	{
+		if (!monInfo.pMonster->IsActive()) // 죽은 상태라면
+		{
+			monInfo.fRespawnTimer -= CTimeManager::GetfDeltaTime();
+
+			if (monInfo.fRespawnTimer <= 0.0f)
+			{
+				monInfo.pMonster->Respawn(); // 내부에서 상태 초기화
+				monInfo.pMonster->GetTransform()->SetLocalPosition(monInfo.fRespawnPos);
+
+				// 상태 초기화
+				monInfo.pMonster->SetActive(true);        // 다시 활성화
+				monInfo.pMonster->SetObjectState(OBJECT_STATE::OS_Active);
+				monInfo.pMonster->SetIsDead(false);
+				monInfo.pMonster->SetIsUpdate(true);    // 이건 따로 함수 만들어주는 게 좋음
+
+				monInfo.fRespawnTimer = RESPAWN_TIME;
+			}
+		}
+		else
+		{
+			monInfo.fRespawnTimer = RESPAWN_TIME;
+		}
 	}
 }
 

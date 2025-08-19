@@ -8,7 +8,7 @@ CShader::CShader() :
 	CResource(RESOURCE_TYPE::RT_Shader),
 	m_RasterizerState(RASTERIZER_STATE::RS_SolidBack),
 	m_BlendState(BLEND_STATE::BS_Transparent),
-	m_DepthStencilState(DEPTHSTENCIL_STATE::DS_LessEqual)
+	m_DepthStencilState(DEPTHSTENCIL_STATE::DS_DepthNone)
 {
 }
 
